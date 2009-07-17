@@ -1,6 +1,5 @@
 /*
- Copyright (c) 2007-2008 WebAppShowCase DBA NGASI (http://www.ngasi.com). All rights reserved.
-Apache Software License 2.0
+ Copyright (c) 2007-2009 WebAppShowCase DBA Appcloem (http://www.appcloem.com). All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -26,6 +25,8 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+
 
 package org.jiql;
 import java.sql.SQLException;
@@ -151,9 +152,9 @@ e.printStackTrace();
     }
 
 //    return null;
-    
+
     }
-    
+
 
 
 
