@@ -65,7 +65,7 @@ public class JiqlClient
 		InputStream responseStream = null;
     HttpClient client = new HttpClient();
 
-    // Create a method instance 1.
+    // Create a method instance 2.
     PostMethod method = new PostMethod(addr);
 
 			if (StringUtil.isRealString(hash.getProperty("user")))
