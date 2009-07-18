@@ -61,17 +61,11 @@ public class JiqlClient
 
 			Properties hash = jcon.getProperties();
    			String addr = (String)hash.get("url");
-   			//addr = addr.substring("jdbc:jiql://".length(),addr.length());
 
-
-
-
-
-        //byte[] responseBody = null;
 		InputStream responseStream = null;
     HttpClient client = new HttpClient();
 
-    // Create a method instance.
+    // Create a method instance 1.
     PostMethod method = new PostMethod(addr);
 
 			if (StringUtil.isRealString(hash.getProperty("user")))
