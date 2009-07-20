@@ -78,7 +78,17 @@ public  class SQLParser implements java.io.Serializable
    	
    	String prefixValue = "jiql";
 boolean prefix = true;
+public boolean hasPrefix(){
+	return prefix;
+}
+
+public String getPrefixValue(){
+	return prefixValue;
+}
 boolean tableleafs = true;
+public boolean hasTableleafs(){
+	return tableleafs;
+}
 
 	static {
 		reserved.add("where");

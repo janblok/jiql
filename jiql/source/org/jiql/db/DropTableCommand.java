@@ -38,7 +38,7 @@ public Object execute(SQLParser sqp)throws SQLException{
 			Gateway cgw = Gateway.get(sqp.getProperties());
 			if(cgw.readTableInfo(sqp.getTable()).size() <1)
 				throw JGException.get("table_does_not_exists","Table does NOT Exists");
-			cgw.dropTable(sqp.getTable());
+			cgw.dropTable(sqp.getTable(),sqp);
 	//		jiqlDBMgr.get(sqp.getProperties()).removeTableInfo(sqp.getTable());
 	//		removeTableInfo			
 			return null;
