@@ -552,15 +552,15 @@ realm_username:realm_user:01:ws_userid_fk:realm_userrole:GAPIK
 			}
 
 
-public int getRowCount(String t)throws SQLException{
+public int getRowCount(String t,SQLParser sqp)throws SQLException{
 
 				int rc = 0;
 				int ct = 1;
 				String tn = null;
 				int r = 0;
 				while (true){
-				tn = convertToJiql(t,ct);
-				r = getLeafCount(t,ct);
+				//tn = convertToJiql(t,ct,sqp);
+				r = getLeafCount(t,ct,sqp);
 				if (r <= 0)
 					break;
 				rc = rc + r;
@@ -576,8 +576,8 @@ public Hashtable readTableValueWhereEqual(SQLParser sqp,String t,String n,Object
 				int ct = 1;
 				String tn = null;
 				while (true){
-				tn = convertToJiql(t,ct);
-				if (getLeafCount(t,ct) <= 0)
+				tn = convertToJiql(t,ct,sqp);
+				if (getLeafCount(t,ct,sqp) <= 0)
 					break;
 				ez.addEnumeration(JIQLGDataUtil.listWhereEqual(tn,n,v).elements(),ez);
 				ct = ct + 1;
@@ -598,8 +598,8 @@ public Hashtable readTableValueWhereLessThan(SQLParser sqp,String t,String n,Obj
 				String tn = null;
 
 				while (true){
-				tn = convertToJiql(t,ct);
-				if (getLeafCount(t,ct) <= 0)
+				tn = convertToJiql(t,ct,sqp);
+				if (getLeafCount(t,ct,sqp) <= 0)
 					break;
 				ez.addEnumeration(JIQLGDataUtil.listWhereLessThan(tn,n,v).elements(),ez);
 				ct = ct + 1;
@@ -617,8 +617,8 @@ public Hashtable readTableValueWhereGreaterThan(SQLParser sqp,String t,String n,
 	String tn = null;
 
 	while (true){
-	tn = convertToJiql(t,ct);
-	if (getLeafCount(t,ct) <= 0)
+	tn = convertToJiql(t,ct,sqp);
+	if (getLeafCount(t,ct,sqp) <= 0)
 		break;
 	ez.addEnumeration(JIQLGDataUtil.listWhereGreaterThan(tn,n,v).elements(),ez);
 	ct = ct + 1;
@@ -635,8 +635,8 @@ public Hashtable readTableValueWhereLessThanOrEqual(SQLParser sqp,String t,Strin
 	String tn = null;
 
 	while (true){
-	tn = convertToJiql(t,ct);
-	if (getLeafCount(t,ct) <= 0)
+	tn = convertToJiql(t,ct,sqp);
+	if (getLeafCount(t,ct,sqp) <= 0)
 		break;
 	ez.addEnumeration(JIQLGDataUtil.listWhereLessThanOrEqual(tn,n,v).elements(),ez);
 	ct = ct + 1;
@@ -653,8 +653,8 @@ public Hashtable readTableValueWhereGreaterThanOrEqual(SQLParser sqp,String t,St
 	String tn = null;
 
 	while (true){
-	tn = convertToJiql(t,ct);
-	if (getLeafCount(t,ct) <= 0)
+	tn = convertToJiql(t,ct,sqp);
+	if (getLeafCount(t,ct,sqp) <= 0)
 		break;
 	ez.addEnumeration(JIQLGDataUtil.listWhereGreaterThanOrEqual(tn,n,v).elements(),ez);
 	ct = ct + 1;
@@ -666,7 +666,17 @@ static String leafstem = "leafstem";
 		
 		
 		
-		public static String convertToJiql(String t,int li){
+		public static String convertToJiql(String t,int li,SQLParser sqp)throws SQLException{
+		jiqlTableInfo jti = jiqlDBMgr.get(sqp.getProperties()).getTableInfo( t);
+		if (jti != null)
+		{
+			if(jti.isPrefix())
+			return convertToJiql(t,li,jti.getPrefixName());
+			else
+				return convertToJiql(t,li,"");
+		
+		}
+			
 		return convertToJiql(t,li,"jiql");
 		}
 		
@@ -710,24 +720,31 @@ static Hashtable tkeys = new HashCache();
 				return JIQLGDataUtil.count(convertToJiql(t,ct,prefix));
 			}
 			
-		int getLeafCount(String t,int ct)throws SQLException{
+		/*int getLeafCount(String t,int ct)throws SQLException{
 
 				return JIQLGDataUtil.count(convertToJiql(t,ct));
+			}*/
+
+
+		int getLeafCount(String t,int ct,SQLParser sqp)throws SQLException{
+
+				return JIQLGDataUtil.count(convertToJiql(t,ct,sqp));
 			}
+
 			
-			public void dropTable(String t)throws SQLException{
+			public void dropTable(String t,SQLParser sqp)throws SQLException{
 				int ct = 1;
 				String tn = null;
 				//JIQLTableIds tid =  getTableIDObj(t);
 				while (true){
-				tn = convertToJiql(t,ct);
-				if (getLeafCount(t,ct) <= 0)
+				tn = convertToJiql(t,ct,sqp);
+				if (getLeafCount(t,ct,sqp) <= 0)
 					break;
 				JIQLGDataUtil.delete(tn);
 				ct = ct + 1;
 				}
 				//JIQLGDataUtil.deleteWhereEqual("jiqlTableProp","tablename",t);
-			//	JIQLGDataUtil.deleteWhereEqual("jiqlTableInfo","tablename",t);
+			//	JIQLGDataUtil.deleteWhereEqual(" ","tablename",t);
 				jiqlDBMgr.get(getProperties()).removeTableInfo(t);
 				removeTableProp(t,null);
 				try{
@@ -816,6 +833,13 @@ static int writeTries = 15;
 static long wtP = 300;
 static int maxTS = 5000;
 
+/*	int maxLeafSize (String t,SQLParser sqp)
+	{
+			jiqlTableInfo jti = jiqlDBMgr.get(sqp.getProperties()).getTableInfo( t);
+		if (jti != null && jti.hasTableLeafs())
+	
+		return maxLeafSize;
+	}*/
     	 public void writeTableRow(String t,Hashtable hash,SQLParser sqp)
      throws SQLException
 
@@ -837,9 +861,14 @@ try{
 				
 			//	JIQLTableIds tid =  getTableIDObj(t);
 
+				jiqlTableInfo jti = jiqlDBMgr.get(sqp.getProperties()).getTableInfo( t);
+		if (jti != null && !jti.hasTableLeafs())
+				tn = convertToJiql(t,tct,sqp);
+				else
 				while (true){
-				tn = convertToJiql(t,tct);
-				if (getLeafCount(t,tct) >= maxLeafSize)
+				tn = convertToJiql(t,tct,sqp);
+
+				if (getLeafCount(t,tct,sqp) >= maxLeafSize)
 				{
 					tct = tct + 1;
 					continue;
@@ -916,9 +945,9 @@ Thread.currentThread().sleep(wtP);
 				//JIQLTableIds tid =  getTableIDObj(t);
 
 				while (true){
-				tn = convertToJiql(t,ct);
-				//(String.valueOf(tid.getLeafCount(ct)) + " readTableValue " + tn + ":" + ct);
-				if (getLeafCount(t,ct) <= 0)
+				tn = convertToJiql(t,ct,sqp);
+				//(String.valueOf(tid. (ct)) + " readTableValue " + tn + ":" + ct);
+				if (getLeafCount(t,ct,sqp) <= 0)
 					break;
 				v.addEnumeration(JIQLGDataUtil.list(tn).elements(),v);
 				ct = ct + 1;
@@ -966,8 +995,8 @@ public int countTableValueWhereEqual(SQLParser sqp,String t,String n,Object v)th
 				int ct = 1;
 				String tn = null;
 				while (true){
-				tn = convertToJiql(t,ct);
-				if (getLeafCount(t,ct) <= 0)
+				tn = convertToJiql(t,ct,sqp);
+				if (getLeafCount(t,ct,sqp) <= 0)
 					break;
 				ez = ez + (JIQLGDataUtil.countWhereEqual(tn,n,v));
 				ct = ct + 1;
@@ -988,8 +1017,8 @@ public int countTableValueWhereLessThan(SQLParser sqp,String t,String n,Object v
 				String tn = null;
 
 				while (true){
-				tn = convertToJiql(t,ct);
-				if (getLeafCount(t,ct) <= 0)
+				tn = convertToJiql(t,ct,sqp);
+				if (getLeafCount(t,ct,sqp) <= 0)
 					break;
 				ez = ez + (JIQLGDataUtil.countWhereLessThan(tn,n,v));
 				ct = ct + 1;
@@ -1007,8 +1036,8 @@ public int countTableValueWhereGreaterThan(SQLParser sqp,String t,String n,Objec
 	String tn = null;
 
 	while (true){
-	tn = convertToJiql(t,ct);
-	if (getLeafCount(t,ct) <= 0)
+	tn = convertToJiql(t,ct,sqp);
+	if (getLeafCount(t,ct,sqp) <= 0)
 		break;
 	ez = ez + (JIQLGDataUtil.countWhereGreaterThan(tn,n,v));
 	ct = ct + 1;
@@ -1025,8 +1054,8 @@ public int countTableValueWhereLessThanOrEqual(SQLParser sqp,String t,String n,O
 	String tn = null;
 
 	while (true){
-	tn = convertToJiql(t,ct);
-	if (getLeafCount(t,ct) <= 0)
+	tn = convertToJiql(t,ct,sqp);
+	if (getLeafCount(t,ct,sqp) <= 0)
 		break;
 	ez = ez + (JIQLGDataUtil.countWhereLessThanOrEqual(tn,n,v));
 	ct = ct + 1;
@@ -1043,8 +1072,8 @@ public int countTableValueWhereGreaterThanOrEqual(SQLParser sqp,String t,String 
 	String tn = null;
 
 	while (true){
-	tn = convertToJiql(t,ct);
-	if (getLeafCount(t,ct) <= 0)
+	tn = convertToJiql(t,ct,sqp);
+	if (getLeafCount(t,ct,sqp) <= 0)
 		break;
 	ez = ez + (JIQLGDataUtil.countWhereGreaterThanOrEqual(tn,n,v));
 	ct = ct + 1;

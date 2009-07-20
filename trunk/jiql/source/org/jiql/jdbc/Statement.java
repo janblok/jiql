@@ -140,6 +140,9 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 		
 		//			jiqlTableInfo ti = jiqlDBMgr.get(sqp.getProperties()).getTableInfo(sqp.getTable(),true);
 			jiqlTableInfo ti = sqp.getJiqlTableInfo(true);
+			ti.setPrefix(sqp.hasPrefix());
+			ti.setPrefixName(sqp.getPrefixValue());
+			ti.setTableLeafs(sqp.hasTableleafs());
 			//jiqlDBMgr.get(sqp.getProperties()).getTableInfo(sqp.getTable(),true);
 
 			Hashtable hash = sqp.getHash();

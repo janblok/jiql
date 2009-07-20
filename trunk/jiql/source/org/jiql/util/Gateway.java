@@ -161,7 +161,7 @@ return new Hashtable();
 	
 		
 		
-		public void dropTable(String t)throws SQLException{
+		public void dropTable(String t,SQLParser sqp)throws SQLException{
 
 		}
 
@@ -215,7 +215,7 @@ return null;
 	    		//("IS COINT " + sqp.isCount());
 	    		if (sqp != null && sqp.isCount()){
 	    			h = new Hashtable();
-	    			h.put("jiql_row_count",getRowCount(t));
+	    			h.put("jiql_row_count",getRowCount(t,sqp));
 	    			return h;
 	    		}
 	    		return readTableValue(sqp,t);
@@ -484,7 +484,7 @@ else if (cr.getCompareOperator().equals(">"))
 	}
 	return h;
 	}
-public int getRowCount(String t)throws SQLException{
+public int getRowCount(String t,SQLParser sqp)throws SQLException{
 return 0;
 }
 
