@@ -588,6 +588,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public String getDatabaseProductName() throws SQLException {
+    dmetaLog( "dme db 1 " );
 
         return "jiql RDBMS";
     }
@@ -608,6 +609,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public String getDatabaseProductVersion() throws SQLException {
+    dmetaLog( "dme db 6 " );
 
         return "0.1";
     }
@@ -619,6 +621,8 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public String getDriverName() throws SQLException {
+    dmetaLog( "dme db 4 " );
+
         return "org.jiql.jdbc.Driver";
     }
 
@@ -629,6 +633,8 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public String getDriverVersion() throws SQLException {
+     dmetaLog( "dme db 3 " );
+
         return getDatabaseProductVersion();
     }
 
@@ -638,6 +644,8 @@ dmetaLog( "dme 58 " );
      * @return JDBC driver major version
      */
     public int getDriverMajorVersion() {
+       dmetaLog( "dme db 2 " );
+
         return 0;
     }
 
@@ -5215,6 +5223,7 @@ dmetaLog( "dme 58 " );
      */
 //#ifdef JDBC3
     public int getDatabaseMajorVersion() throws SQLException {
+    dmetaLog( "dme db 9 " );
 
         return 0;
     }
@@ -5242,6 +5251,7 @@ dmetaLog( "dme 58 " );
      */
 //#ifdef JDBC3
     public int getDatabaseMinorVersion() throws SQLException {
+    dmetaLog( "dme db 8 " );
 
         return 1;
     }

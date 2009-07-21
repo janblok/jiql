@@ -1489,7 +1489,7 @@ if (si < 0)return;
 			tok = tok.trim();
 			
 			Vector v = null;
-			if (tok.startsWith("values"))
+			if (tok.toLowerCase().startsWith("values"))
 			{
 			tokf = tokf.trim();
 			tok = tok.substring("values".length(),tok.length());
