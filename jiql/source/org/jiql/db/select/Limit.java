@@ -47,13 +47,13 @@ public class Limit  implements Serializable
 	public StringBuffer parse(StringBuffer tok)throws SQLException{
 String tokstr = "limit ";
 int i3 = tok.toString().toLowerCase().indexOf(tokstr);
-	//( n + " addAutoIncrement2  " + i3 + ":" + tok);
+	//( n + "   " + i3 + ":" + tok);
 
 			if (i3 > 0){
 			//	if (autoincrement.contains(n))return tok;
 	        	tok.delete(i3,tok.length());
 
-			
+
 					return tok;
 
 
