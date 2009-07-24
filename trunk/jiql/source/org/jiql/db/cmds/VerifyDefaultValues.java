@@ -90,8 +90,8 @@ for (int ct = 0;ct < ch.size();ct++)
 				if (sqp.getJiqlTableInfo().listAutoIncrements().contains(nn))
 				{
 				//(nn + " getAutoIncrementInt b ");
-
-					inv.put(nn,Gateway.get(sqp.getProperties()).getAutoIncrementInt(sqp,nn));
+					sqp.getInsertParser().setAutoIncrementValue(Gateway.get(sqp.getProperties()).getAutoIncrementInt(sqp,nn));
+					inv.put(nn,sqp.getInsertParser().getAutoIncrementValue());
 				}
 				else
 				 inv.put(nn,0);

@@ -42,14 +42,18 @@ import org.jiql.db.*;
 import java.sql.Types;
 import java.text.DateFormat;
 import org.jiql.jdbc.jiqlConnection;
+import org.jiql.db.select.SelectParser;
+import org.jiql.db.insert.InsertParser;
 
 
 public  class SQLParser implements java.io.Serializable
 {
+	boolean special = false;
 	GroupBy groupby = new GroupBy();
 	LoadData loadtable = null;
-
+	SelectParser selectP = null;
 	CreateParser createP = null;
+	InsertParser insertP = null;
 	StringFunctions sfunctions = new StringFunctions();
 	String tok = null;
 	String action = null;
@@ -80,6 +84,9 @@ public  class SQLParser implements java.io.Serializable
 boolean prefix = true;
 public boolean hasPrefix(){
 	return prefix;
+}
+public boolean isSpecial(){
+	return special;
 }
 
 public String getPrefixValue(){
@@ -112,6 +119,18 @@ public DateFormat getDateFormat(){
 		return loadtable;
 	}
 
+	public InsertParser getInsertParser(){
+		if (insertP == null)
+			insertP = new InsertParser(this);
+		return insertP;
+	}
+
+	public SelectParser getSelectParser(){
+		if (selectP == null)
+			selectP = new SelectParser(this);
+		return selectP;
+	}
+	
 	public CreateParser getCreateParser(){
 		if (createP == null)
 			createP = new CreateParser(this);
@@ -334,14 +353,16 @@ public DateFormat getDateFormat(){
 	}
 	transient jiqlConnection connection = null;
 	public SQLParser(String t,jiqlConnection c)throws SQLException{
-		setSQLParser(t,c.getProperties());
 		connection = c;
+
+		setSQLParser(t,c.getProperties());
 	}
 	public jiqlConnection getConnection(){
 		return connection;
 	}
 	public void setConnection(jiqlConnection c){
 		connection = c;
+		connection.setIdentity(getInsertParser().getAutoIncrementValue());
 	}
 	public void setSQLParser(String t,Properties u)throws SQLException{
 		properties = u;
@@ -373,6 +394,7 @@ public DateFormat getDateFormat(){
 	public void setTable(String t){
 		t = StringUtil.replaceSubstring(t,"\"","");
 		t = StringUtil.replaceSubstring(t,"'","");
+		t = StringUtil.replaceSubstring(t,"`","");
 		if (t.startsWith("jiql."))
 			t = t.substring(5,t.length());
 		table = t;
@@ -420,9 +442,10 @@ public DateFormat getDateFormat(){
 			
 			ColumnInfo ci = ti.getColumnInfo(cn);
 			if (ci != null){
+				int cit = -34;
 				try{
 				
-				int cit = ci.getColumnType();
+				cit = ci.getColumnType();
 				Object o = jiqlCellValue.getObj(value,cit,this);
 				return o;
 				/*if (cit == Types.INTEGER){
@@ -435,7 +458,10 @@ public DateFormat getDateFormat(){
 				else if (cit == Types.FLOAT)
 					return new Double(value.toString());*/
 				}catch (Exception e){
-					tools.util.LogMgr.err("CRITERIA.getValue " + e.toString());
+					tools.util.LogMgr.err(value + ":" + c  + ":" + Types.DATE + ":" + cit + " CRITERIA.getValue " + e.toString());
+					//ByteArrayOutputStre
+					//e.printStackTrace();
+					JGUtil.olog(e);
 				}
 			}
 		}
@@ -497,10 +523,15 @@ public DateFormat getDateFormat(){
 		int i = tok.indexOf("=");
 		if (i > 0){
 			NameValue nv = new NameValue();
-			nv.name = tok.substring(0,i);
-			nv.value = tok.substring(i + 1,tok.length());
+			nv.name = tok.substring(0,i).trim();
+			nv.value = StringUtil.getTrimmedValue(tok.substring(i + 1,tok.length()).trim());
 			nv.value = decode(nv.value);
-			//(nv.name + ":nv " + nv.value);
+
+			//va = StringUtil.getTrimmedValue(va);
+			//va = decode(va);
+			//hash.put(n,convert(va,n));
+
+
 			return nv;
 			
 		}
@@ -883,6 +914,13 @@ int i3 = tok.indexOf(" ");
 			tok2 = tok.substring("getprimarykeys ".length(),tok2.length()).trim();
 			setTable(tok2);
 			return;
+		}//special = true;
+		else if (tok2.startsWith("getindex ")){
+			action = "getIndex";
+			tok2 = tok.substring("getindex ".length(),tok2.length()).trim();
+			setTable(tok2);
+			special = true;
+			return;
 		}
 		else if (tok2.startsWith("getexportedkeys ")){
 			action = "getExportedKeys";
@@ -906,9 +944,30 @@ int i3 = tok.indexOf(" ");
 		action = "select";
 		tok = tok.substring("select ".length(),tok.length());
 		tok = tok.trim();
-		tok2 = tok.toLowerCase();
+			StringBuffer tok2b = new StringBuffer (tok);
+			tok2b = getSelectParser().parse(tok2b);
+			tok = tok2b.toString();
 
-		if (tok2.startsWith("distinct ")){
+
+		tok2 = tok.toLowerCase();
+		
+			
+		//
+		if (tok2.startsWith("@@identity")){
+		special = true;
+		setAction("getIdentity");
+		
+		return;
+
+		}
+		else if (tok2.startsWith("found_rows()")){
+		special = true;
+		setAction("getFoundRows");
+		
+		return;
+
+		}
+		else if (tok2.startsWith("distinct ")){
 		distinct = true;
 		tok = tok.substring("distinct ".length(),tok.length());
 		tok = tok.trim();
@@ -923,6 +982,8 @@ int i3 = tok.indexOf(" ");
 		StringBuffer selsb = new StringBuffer(sels);
 		selsb = SharedMethods.replaceSubstringBuffer(selsb,"\"","");
 		selsb = SharedMethods.replaceSubstringBuffer(selsb,"'","");
+		selsb = SharedMethods.replaceSubstringBuffer(selsb,"`","");
+
 		selectList = new EZArrayList(new StringTokenizer(selsb.toString(),","));
 		////();
 		if (sels.toLowerCase().startsWith("count(") && sels.endsWith(")"))
@@ -1525,6 +1586,7 @@ if (si < 0)return;
 		{
 			n = v.elementAt(ct).toString();
 			n = n.trim();
+			n= StringUtil.getTrimmedValue(n);
 			try{
 			
 			va = vv.elementAt(ct).toString();
@@ -1707,8 +1769,13 @@ public  jiqlConstraint getConstraint(){
 		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_auto-increment","auto_increment");
 		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_AUTO-INCREMENT","AUTO_INCREMENT");
 
-		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_unsigned","unsigned");
-		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_UNSIGNED","UNSIGNED");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_unsiigned","unsigned");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_UNSIIGNED","UNSIGNED");
+
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_limiit","limit");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_LIMIIT","LIMIT");
+
+		sb = SharedMethods.replaceSubstringBuffer(sb,"\\\"","\"");
 
 		
 		return sb.toString();
@@ -1758,8 +1825,10 @@ public  jiqlConstraint getConstraint(){
 		sb = SharedMethods.replaceSubstringBuffer(sb,"auto_increment","jiql_replace_auto-increment");
 		sb = SharedMethods.replaceSubstringBuffer(sb,"AUTO_INCREMENT","jiql_replace_AUTO-INCREMENT");
 
-		sb = SharedMethods.replaceSubstringBuffer(sb,"unsigned","jiql_replace_unsigned");
-		sb = SharedMethods.replaceSubstringBuffer(sb,"UNSIGNED","jiql_replace_UNSIGNED");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"unsigned","jiql_replace_unsiigned");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"UNSIGNED","jiql_replace_UNSIIGNED");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"limit","jiql_replace_limiit");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"LIMIT","jiql_replace_LIMIIT");
 
 		
 	  
@@ -1834,10 +1903,17 @@ jiqlConstraint jConstraint = null;
 			n = n.trim();
 			i = n.indexOf(" ");
 			if (i < 0)
+				i = n.indexOf("\t");
+
+			//(i + ":" +  n + ":PC1\t:" + va);
+
+			if (i < 0)
 				i = n.indexOf("	");
+			
 			va = n.substring(i + 1,n.length());
 			va = va.trim();
-			//(n + ":PC:" + va);
+			//if (i < 0)
+			//("***********" + n + ":PC:" + va);
 			n =n.substring(0,i);
 			n = n.trim();
 			

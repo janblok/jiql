@@ -63,6 +63,7 @@ public class JiqlClient
    			String addr = (String)hash.get("url");
    			//addr = addr.substring("jdbc:jiql://".length(),addr.length());
 
+	     addr = StringUtil.replaceSubstring(addr," ","%20");
 
 
 

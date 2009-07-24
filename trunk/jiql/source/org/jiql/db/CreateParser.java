@@ -47,7 +47,7 @@ public class CreateParser  implements Serializable
 	AutoIncrement autoincrement = null;
 	NextVal nextval = new NextVal();
 	CreateKeyParam keys = new CreateKeyParam();
-
+	CreateUniqueKeyParam ukeys = new CreateUniqueKeyParam();
 	
 		SQLParser sqp = null;
 	public CreateParser(SQLParser sqp){
@@ -75,6 +75,8 @@ public class CreateParser  implements Serializable
 		StringBuffer tok = new StringBuffer(toks);
 		boolean tf = false;
 		if (keys.parse(tok))
+			tf = true;
+		else if (ukeys.parse(tok))
 			tf = true;
 
 		return tf;

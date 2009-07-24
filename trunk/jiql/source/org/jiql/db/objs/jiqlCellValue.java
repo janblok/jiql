@@ -36,6 +36,8 @@ import org.jiql.util.jiqlException;
 import java.sql.SQLException;
 import org.jiql.util.SQLParser;
 import org.jiql.jdbc.jiqlConnection;
+import java.text.SimpleDateFormat;
+
 
 public class jiqlCellValue implements Comparable
 {
@@ -45,6 +47,8 @@ Object co = null;
 //String rid = null;
 int otype = 0;
 //String coln = null;
+static String[] dformats = new String[]{"EEE MMM dd HH:mm:ss z yyyy"};
+
 public jiqlCellValue(Object v,int type,SQLParser sqp)throws SQLException{
 //new jiqlCellValue(get(cn),ci.getColumnType())	rid = i;
 	otype = type;
@@ -88,6 +92,13 @@ v = new String(((com.google.appengine.api.datastore.Text)v).getValue());
 			return new java.sql.Date(df.parse(v.toString()).getTime());
 			}catch (Throwable e){
 			 //org.jiql.util.JGUtil.log(e);
+			 for (int ct = 0;ct < dformats.length;ct++)
+			 	try{
+			 					df = new SimpleDateFormat(dformats[ct]);
+			 		return new java.sql.Date(df.parse(v.toString()).getTime());			
+
+			 	}catch (Exception e2){
+			 	}
 			 throw jiqlException.get("invalid_date_format",new StringBuffer("Invalid DateTime Format. Should be like ").append(sqp.getDatePattern()).toString());
 	
 			}

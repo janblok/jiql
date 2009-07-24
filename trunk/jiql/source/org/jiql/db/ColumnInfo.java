@@ -89,6 +89,9 @@ return tn.toString();
 
 }
 
+public boolean isNumeric()throws SQLException{
+	return (getColumnType() == Types.INTEGER);
+}
 public int 	getColumnType()throws SQLException{
 String tn =  getTypeName().toLowerCase();
 	if (tn.startsWith("int"))

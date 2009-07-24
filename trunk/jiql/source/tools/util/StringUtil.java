@@ -37,6 +37,84 @@ import java.util.*;
 public class StringUtil
 {
 
+
+    static public Hashtable parseQueryString(String s) {
+
+    String valArray[] = null;
+    
+    if (s == null) {
+        throw new IllegalArgumentException("Cannot Parse Null Query String");
+    }
+    Hashtable ht = new Hashtable();
+    StringBuffer sb = new StringBuffer();
+    StringTokenizer st = new StringTokenizer(s, "&");
+    while (st.hasMoreTokens()) {
+        String pair = (String)st.nextToken();
+        int pos = pair.indexOf('=');
+        if (pos == -1) {
+    	// XXX
+    	// should give more detail about the illegal argument
+    	throw new IllegalArgumentException("Query String missing = token");
+        }
+        String key = parseName(pair.substring(0, pos), sb);
+        String val = parseName(pair.substring(pos+1, pair.length()), sb);
+        if (ht.containsKey(key)) {
+    	String oldVals[] = (String []) ht.get(key);
+    	valArray = new String[oldVals.length + 1];
+    	if(oldVals.length > 1500){
+    		tools.util.LogMgr.red(key + " Excess Parameter Value ");	
+    		throw new IllegalArgumentException(key + " Excess Parameter Value ");	
+		}
+    	for (int i = 0; i < oldVals.length; i++) 
+    	    valArray[i] = oldVals[i];
+    	valArray[oldVals.length] = val;
+        } else {
+    	valArray = new String[1];
+    	valArray[0] = val;
+        }
+        ht.put(key, valArray);
+        if(ht.size() > 5000){
+    		tools.util.LogMgr.red(key + " Excess Parameters");	
+        	throw new IllegalArgumentException(" Excess Parameters ");	
+	}
+    }
+    return ht;
+    }
+
+    static private String parseName(String s, StringBuffer sb) {
+    sb.setLength(0);
+    for (int i = 0; i < s.length(); i++) {
+        char c = s.charAt(i); 
+        switch (c) {
+        case '+':
+    	sb.append(' ');
+    	break;
+        case '%':
+    	try {
+    	    sb.append((char) Integer.parseInt(s.substring(i+1, i+3), 
+    					      16));
+    	    i += 2;
+    	} catch (NumberFormatException e) {
+    	    // XXX
+    	    // need to be more specific about illegal arg
+    	    throw new IllegalArgumentException("Invalid Encoded String");
+    	} catch (StringIndexOutOfBoundsException e) {
+    	    String rest  = s.substring(i);
+    	    sb.append(rest);
+    	    if (rest.length()==2)
+    		i++;
+    	}
+    	
+    	break;
+        default:
+    	sb.append(c);
+    	break;
+        }
+    }
+    return sb.toString();
+    }
+
+
 		    public static String toLink(String wit)
     {
     	 wit = replaceSubstring(wit,"%","THIS_IS_A_PERCENT");
@@ -217,9 +295,9 @@ return wit;
  		if (t != null)
  		{
  			t = t.trim();
- 			if (t.startsWith("'") || t.startsWith("\""))
+ 			if (t.startsWith("'") || t.startsWith("\"") || t.startsWith("`"))
  				t = t.substring(1,t.length());
- 			if (t.endsWith("'") || t.endsWith("\""))
+ 			if (t.endsWith("'") || t.endsWith("\"")  || t.endsWith("`"))
  				t = t.substring(0,t.length() - 1);
  			return t;
  		}

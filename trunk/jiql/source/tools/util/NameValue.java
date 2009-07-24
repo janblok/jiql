@@ -33,7 +33,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Author: Gabriel Wong
  **/
- public class NameValue 
+ public class NameValue implements java.io.Serializable
 
  {
  	public NameValue(){

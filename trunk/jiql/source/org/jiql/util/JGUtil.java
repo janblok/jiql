@@ -45,6 +45,14 @@ public static void log(Throwable l){
 	pint.close();
 	log(new String(bout.toByteArray()));
 }
+
+public static void olog(Throwable l){
+	ByteArrayOutputStream bout = new ByteArrayOutputStream();
+	PrintWriter pint = new PrintWriter(bout);
+	l.printStackTrace(pint);
+	pint.close();
+	tools.util.LogMgr.err(new String(bout.toByteArray()));
+}
 public static void log(String l){
 			l = new Date() + " - " + l;
 			Hashtable hc = new Hashtable();

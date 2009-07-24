@@ -31,7 +31,7 @@ import java.util.*;
 import java.sql.*;
 import java.io.*;
 import tools.util.StringUtil;
-
+import tools.util.SEXParser;
 public class Driver implements java.sql.Driver
 {
 	 static
@@ -64,6 +64,26 @@ public Connection 	connect(String url, Properties info){
 url = StringUtil.replaceSubstring(url,"jdbc:jiql:gql:","");
 url = StringUtil.replaceSubstring(url,"jdbc:jiql:","");
 info.put("url",url);
+
+int i = url.indexOf("?");
+if (i > 0){
+String par = url.substring(i + 1,url.length());
+par = SEXParser.decodeXML(par);
+Hashtable h = StringUtil.parseQueryString(par);
+//("JID1a " + h);
+
+Enumeration en = h.keys();
+String n = null;
+String[] v = null;
+while (en.hasMoreElements())
+{
+	n = en.nextElement().toString();
+	v = (String[])h.get(n);
+	info.put(n,v[0]);
+	//(n + " JID2 " + v[0]);
+
+}
+}
 return  new jiqlConnection(info);
 }
           //Attempts to make a database connection to the given URL.

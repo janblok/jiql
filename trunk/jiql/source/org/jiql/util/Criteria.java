@@ -103,7 +103,7 @@ public Object getValue(){
 				else if (cit == Types.FLOAT)
 					return new Double(value);
 				}catch (Exception e){
-					tools.util.LogMgr.err("CRITERIA.getValue " + e.toString());
+					tools.util.LogMgr.err("CRhITERIA.getValue " + e.toString());
 				}
 			}
 		}*/

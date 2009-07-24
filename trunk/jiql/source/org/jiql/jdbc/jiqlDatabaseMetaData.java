@@ -439,6 +439,8 @@ dmetaLog( "dme 57 " );
      * @exception SQLException if a database access error occurs
      */
     public String getURL() throws SQLException {
+               dmetaLog("fwp 1");
+
         return connection.getProperties().getProperty("url");
     }
 
@@ -609,9 +611,13 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public String getDatabaseProductVersion() throws SQLException {
-    dmetaLog( "dme db 6 " );
+    String ver = connection.getProperties().getProperty("DatabaseProductVersion");
 
-        return "0.1";
+    if (ver == null)
+    	ver = "0.136";
+    dmetaLog(  " dme db 6 " + ver);
+
+        return ver;
     }
 
     /**
@@ -633,9 +639,15 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public String getDriverVersion() throws SQLException {
-     dmetaLog( "dme db 3 " );
 
-        return getDatabaseProductVersion();
+    String ver = connection.getProperties().getProperty("DriverVersion");
+
+    if (ver == null)
+    	ver = getDatabaseProductVersion();
+    dmetaLog(  " dme db 3 " + ver);
+
+
+        return ver;
     }
 
     /**
@@ -655,6 +667,8 @@ dmetaLog( "dme 58 " );
      * @return JDBC driver minor version number
      */
     public int getDriverMinorVersion() {
+                 dmetaLog("fwp 2");
+
         return 1;
     }
 
@@ -2370,6 +2384,8 @@ dmetaLog( "dme 58 " );
     public int getMaxBinaryLiteralLength() throws SQLException {
 
         // hard limit is Integer.MAX_VALUE
+                       dmetaLog("fwp 3");
+
         return 0;
     }
 
@@ -2393,6 +2409,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxCharLiteralLength() throws SQLException {
+               dmetaLog("fwp 4");
 
         // hard limit is Integer.MAX_VALUE
         return 0;
@@ -2418,6 +2435,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxColumnNameLength() throws SQLException {
+               dmetaLog("fwp 5");
 
         // hard limit is Integer.MAX_VALUE
         return 0;
@@ -2443,6 +2461,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxColumnsInGroupBy() throws SQLException {
+               dmetaLog("fwp 6");
 
         // hard limit is Integer.MAX_VALUE
         return 0;
@@ -2468,6 +2487,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxColumnsInIndex() throws SQLException {
+               dmetaLog("fwp 7");
 
         // hard limit is Integer.MAX_VALUE
         return 0;
@@ -2493,6 +2513,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxColumnsInOrderBy() throws SQLException {
+               dmetaLog("fwp 8");
 
         // hard limit is Integer.MAX_VALUE
         return 0;
@@ -2518,6 +2539,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxColumnsInSelect() throws SQLException {
+               dmetaLog("fwp 9");
 
         // hard limit is Integer.MAX_VALUE
         return 0;
@@ -2543,6 +2565,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxColumnsInTable() throws SQLException {
+               dmetaLog("fwp 10");
 
         // hard limit is Integer.MAX_VALUE
         return 0;
@@ -2568,6 +2591,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxConnections() throws SQLException {
+               dmetaLog("fwp 11");
 
         // hard limit is (probably) Integer.MAX_VALUE
         return 0;
@@ -2593,6 +2617,8 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxCursorNameLength() throws SQLException {
+               dmetaLog("fwp 12");
+
         return 0;
     }
 
@@ -2616,6 +2642,8 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxIndexLength() throws SQLException {
+               dmetaLog("fwp 13");
+
         return 0;
     }
 
@@ -2637,6 +2665,8 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxSchemaNameLength() throws SQLException {
+               dmetaLog("fwp 14");
+
         return 0;
     }
 
@@ -2660,6 +2690,8 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxProcedureNameLength() throws SQLException {
+               dmetaLog("fwp 15");
+
         return 0;
     }
 
@@ -2756,6 +2788,8 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxStatementLength() throws SQLException {
+               dmetaLog("fwp 16");
+
         return 0;
     }
 
@@ -2778,7 +2812,9 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxStatements() throws SQLException {
-        return 0;
+               dmetaLog("fwp 17");
+
+       return 0;
     }
 
     /**
@@ -2801,6 +2837,8 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxTableNameLength() throws SQLException {
+                dmetaLog("fwp 18");
+
         return 0;
     }
 
@@ -2824,6 +2862,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxTablesInSelect() throws SQLException {
+               dmetaLog("fwp 19");
 
         // - soft limit is >>> than will ever be seen in any real stmnt
         // - exists a fixed (non statement dependent) hard limit?  No.
@@ -2852,6 +2891,7 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      */
     public int getMaxUserNameLength() throws SQLException {
+               dmetaLog("fwp 20");
 
         // hard limit is Integer.MAX_VALUE
         return 0;
@@ -4330,15 +4370,19 @@ dmetaLog( "dme 58 " );
     public ResultSet getIndexInfo(String catalog, String schema,
                                   String table, boolean unique,
                                   boolean approximate) throws SQLException {
-              dmetaLog("getIndexInfo " + table);
-		Vector v = new Vector();
+              dmetaLog(new StringBuffer("getIndexInfo:").append(table).append(":").append(unique).append(":").append(approximate) .toString());
+		//dmetaLog("getIndexInfo " + );
+		               		ResultSet res =  connection.createStatement().executeQuery("getIndex " + table);
+
+				return res;
+		/*Vector v = new Vector();
 	
 		SQLParser sqp = new SQLParser("IndexInfo",connection);
 		sqp.setAction("showTables");
 			
 		org.jiql.jdbc.ResultSet jresult = new org.jiql.jdbc.ResultSet(v,sqp);
 	jresult.setIsCatalog(true);
-        return jresult;
+        return jresult;*/
 
     }
 
@@ -5106,7 +5150,7 @@ dmetaLog( "dme 58 " );
 
     }
     void dmetaLog(String t){
-	//("dmetaLog:" + t);
+	//tools.util.LogMgr.debug("jiqlDatabaseMetaData:" + t);
 }
 
 //#endif JDBC3
@@ -5276,6 +5320,8 @@ dmetaLog( "dme 58 " );
      */
 //#ifdef JDBC3
     public int getJDBCMajorVersion() throws SQLException {
+                dmetaLog("fwp 22");
+
         return 2;
     }
 
@@ -5298,6 +5344,8 @@ dmetaLog( "dme 58 " );
      */
 //#ifdef JDBC3
     public int getJDBCMinorVersion() throws SQLException {
+               dmetaLog("fwp 24");
+
         return 0;
     }
 
@@ -5458,7 +5506,7 @@ dmetaLog( "dme 58 " );
      * @return the result of issuing the statement
      * @throws SQLException is a database error occurs
      */
-    private ResultSet execute(String sql) throws SQLException {
+    /*private ResultSet execute(String sql) throws SQLException {
 
         // NOTE:
         // Need to create a jdbcStatement here so jdbcResultSet can return
@@ -5477,7 +5525,7 @@ dmetaLog( "dme 58 " );
 
 
         return r;
-    }
+    }*/
 
  
 
