@@ -44,6 +44,10 @@ public static Vector descols = new Vector();
 public static Vector<String> tcols = new Vector<String>();
 public static Vector<String> pkcols = new Vector<String>();
 public static Vector<String> ekcols = new Vector<String>();
+public static Vector<String> identity = new Vector<String>();
+public static Vector<String> foundrows = new Vector<String>();
+public static Vector<String> indexv = new Vector<String>();
+
 Vector results = null;
 boolean wasNull = false;
 int indx = 0;
@@ -112,13 +116,31 @@ static {
 	ekcols.add("DELETE_RULE");
 	ekcols.add("FK_NAME");
 	ekcols.add("PK_NAME");
-	ekcols.add("DEFERRABILITY");	
-
+	ekcols.add("DEFERRABILITY");
+	identity.add("@@identity");	
+	foundrows.add("FOUND_ROWS()");
+	
+	indexv.add("TABLE_CAT");
+	indexv.add("TABLE_SCHEM");
+	indexv.add("TABLE_NAME");
+	indexv.add("NON_UNIQUE");
+	indexv.add("INDEX_QUALIFIER");
+	indexv.add("INDEX_NAME");
+	indexv.add("TYPE");
+	indexv.add("ORDINAL_POSITION");
+	indexv.add("COLUMN_NAME");
+	indexv.add("ASC_OR_DESC");
+	indexv.add("CARDINALITY");
+	indexv.add("PAGES");
+	indexv.add("FILTER_CONDITION");
+	
 }
 public ResultSet(Vector r,SQLParser s){
 	results = r;
 	
 	sqp = s;
+	if (results != null && sqp.getConnection() != null)
+		sqp.getConnection().setFoundRows(results.size());
 }
 public Vector getResults(){
 	return results;
@@ -149,6 +171,15 @@ protected String getColumnName(int  ci) throws SQLException{
 	
 		return "tablename";
 	}
+	if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return identity.elementAt(ci -1).toString();
+		else if (sqp.getAction().equals("getFoundRows"))
+		return foundrows.elementAt(ci -1).toString();
+		else if (sqp.getAction().equals("getIndex"))
+		return indexv.elementAt(ci -1).toString();
+
+	}
 	if (sqp.getAction().equals("describeTable"))
 		return descols.elementAt(ci -1).toString();
 	if (sqp.getAction().equals("getColumns"))
@@ -166,7 +197,7 @@ protected String getColumnName(int  ci) throws SQLException{
 }
 
 protected  Row getRowObject(int i) throws SQLException{
-	rsetLog("getRowObject " + i);
+	rsetLog(results.size() + " getRowObject " + i);
 	Row nvp = (Row)results.elementAt(i -1);
 	nvp.noNulls(true);
 	return nvp;
@@ -204,17 +235,21 @@ indx = results.size();
 }
  //           Moves the cursor to the end of this ResultSet object, just after the last row. 
 public  void beforeFirst() throws SQLException{
-	rsetLog("RESL 23");
+	rsetLog("beforeFirst");
 
-indx = -1;
+indx = 0;
 }
  //           Moves the cursor to the front of this ResultSet object, just before the first row. 
 public  void cancelRowUpdates() throws SQLException{
+	rsetLog("RMISC 1");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Cancels the updates made to the current row in this ResultSet object. 
 public  void clearWarnings() throws SQLException{
+	rsetLog("RMISC 2");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -225,6 +260,8 @@ public  void close()  throws SQLException{
 }
  //           Releases this ResultSet object's database and JDBC resources immediately instead of waiting for this to happen when it is automatically closed. 
 public  void deleteRow() throws SQLException{
+	rsetLog("RMISC 3");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -243,6 +280,16 @@ public  int findColumn(String columnLabel) throws SQLException{
 			return 3;
 		}
 	Vector ez = sqp.getOriginalSelectList();
+		if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		ez = identity;
+		else if (sqp.getAction().equals("getFoundRows"))
+		ez = foundrows;
+		else if (sqp.getAction().equals("getIndex"))
+		ez = indexv;
+		//getFoundRows
+	}
+	
 	if (sqp.getAction().equals("describeTable"))
 		ez = descols;
 	if (sqp.getAction().equals("getColumns"))
@@ -270,11 +317,15 @@ return true;
 }
  //           Moves the cursor to the first row in this ResultSet object. 
 public  Array getArray(int columnIndex)  throws SQLException{
+	rsetLog("RMISC 4");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as an Array object in the Java programming language. 
 public  Array getArray(String columnLabel) throws SQLException{
+	rsetLog("RMISC 5");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -306,6 +357,8 @@ public  BigDecimal getBigDecimal(int columnIndex)  throws SQLException{
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a java.math.BigDecimal with full precision. 
 public  BigDecimal getBigDecimal(int columnIndex, int scale)  throws SQLException{
+	rsetLog("RMISC 6");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -318,6 +371,8 @@ return getBigDecimal(findColumn(columnLabel));
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.math.BigDecimal with full precision. 
 public  BigDecimal getBigDecimal(String columnLabel, int scale)  throws SQLException{
+	rsetLog("RMISC 7");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -340,11 +395,15 @@ return getBinaryStream(findColumn(columnLabel));
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a stream of uninterpreted bytes. 
 public Blob getBlob(int columnIndex)  throws SQLException{
+	rsetLog("RMISC 8");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a Blob object in the Java programming language. 
 public Blob getBlob(String columnLabel)  throws SQLException{
+	rsetLog("RMISC 9");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -357,36 +416,61 @@ public  boolean getBoolean(int columnIndex) throws SQLException{
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a boolean in the Java programming language. 
 public  boolean getBoolean(String columnLabel)  throws SQLException{
 	rsetLog("RESL 33");
+	checkNull(getRowObject().get(columnLabel));
 
-	return getRowObject().getBoolean(columnLabel);
+	boolean b= getRowObject().getBoolean(columnLabel);
+
+	return b;
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a boolean in the Java programming language. 
 public  byte getByte(int columnIndex)  throws SQLException{
 	rsetLog("RESL 34");
 
-	return getByte(getColumnName(columnIndex));
+	byte b = getByte(getColumnName(columnIndex));
 
+	return b;
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a byte in the Java programming language. 
 public byte getByte(String columnLabel)  throws SQLException{
 	rsetLog("RESL 35");
+
+	checkNull(getRowObject().get(columnLabel));
+
 
 	return getRowObject().getByte(columnLabel);
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a byte in the Java programming language. 
 public  byte[] getBytes(int columnIndex)  throws SQLException{
-	rsetLog("RESL 36");
+	rsetLog("getBytes " + columnIndex );
 
 	return getBytes(getColumnName(columnIndex));
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a byte array in the Java programming language. 
 public  byte[] getBytes(String columnLabel)  throws SQLException{
-	rsetLog("RESL 37");
+	rsetLog("getBytes " + columnLabel);
 
-	return getRowObject().get(columnLabel).toString().getBytes();
+		if (sqp.showTables()){
 
+				if (columnLabel.equalsIgnoreCase("TABLE_SCHEM"))
+					return "jiql".getBytes();	
+				if (columnLabel.equalsIgnoreCase("TABLE_CAT"))
+					return "".getBytes();	
+				if (columnLabel.equalsIgnoreCase("TABLE_TYPE"))
+					return "TABLE".getBytes();
+						if (columnLabel.equalsIgnoreCase("TABLE_CATALOG"))
+					return null;
+			columnLabel = "tablename";
+		}
+
+
+	byte[] b = getRowObject().get(columnLabel).toString().getBytes();
+	if (b == null)
+		wasNull = true;
+	else
+		wasNull = false;
+	return b;
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a byte array in the Java programming language. 
 public  Reader getCharacterStream(int columnIndex)  throws SQLException{
@@ -400,6 +484,11 @@ public  Reader getCharacterStream(String columnLabel)  throws SQLException{
 	rsetLog("RESL 39");
 
 	Object r = getRowObject().get(columnLabel);
+	if (r == null)
+		wasNull = true;
+	else
+		wasNull = false;
+
 	if (r == null)return null;
 	return new StringReader(r.toString());
 
@@ -407,11 +496,15 @@ public  Reader getCharacterStream(String columnLabel)  throws SQLException{
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a java.io.Reader object. 
 public  Clob getClob(int columnIndex)  throws SQLException{
+	rsetLog("RMISC 10");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a Clob object in the Java programming language. 
 public  Clob getClob(String columnLabel)  throws SQLException{
+	rsetLog("RMISC 11");
+
 	throw  JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -423,6 +516,8 @@ return CONCUR_READ_ONLY;
 }
  //            Retrieves the concurrency mode of this ResultSet object. 
 public  String getCursorName()  throws SQLException{
+	rsetLog("RMISC 12");
+
 	throw new SQLFeatureNotSupportedException (JGException.get("not_supported","NOT SUPPORTED").toString());
 
 }
@@ -446,14 +541,19 @@ public  java.sql.Date getDate(int columnIndex, Calendar cal)  throws SQLExceptio
 public  java.sql.Date getDate(String columnLabel)  throws SQLException{
 	rsetLog("RESL 43");
 
-	return (java.sql.Date)getRowObject().get(columnLabel);//.getLong(columnLabel));
+	java.sql.Date b = (java.sql.Date)getRowObject().get(columnLabel);//.getLong(columnLabel));
 
+	if (b == null)
+		wasNull = true;
+	else
+		wasNull = false;
+	return b;
 	//throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //             Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Date object in the Java programming language. 
 public  java.sql.Date getDate(String columnLabel, Calendar cal)  throws SQLException{
-//	return getRowObject().getDate(columnLabel);
+	rsetLog("RMISC 13");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -465,9 +565,16 @@ public  double getDouble(int columnIndex)  throws SQLException{
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a double in the Java programming language. 
+
+protected void checkNull(Object b){
+		if (b == null)
+		wasNull = true;
+	else
+		wasNull = false;
+}
 public  double getDouble(String columnLabel) throws SQLException{
 	rsetLog("RESL 45");
-
+	checkNull(getRowObject().get(columnLabel));
 	return getRowObject().getDouble(columnLabel);
 
 }
@@ -493,7 +600,7 @@ public  float getFloat(int columnIndex)  throws SQLException{
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a float in the Java programming language. 
 public  float getFloat(String columnLabel) throws SQLException{
 	rsetLog("RESL 49");
-
+	checkNull(getRowObject().get(columnLabel));
 	return getRowObject().getFloat(columnLabel);
 
 }
@@ -505,15 +612,23 @@ return CLOSE_CURSORS_AT_COMMIT ;
 }
  //            Retrieves the holdability of this ResultSet object 
 public  int getInt(int columnIndex)  throws SQLException{
-	rsetLog("RESL 51");
+	rsetLog("getInt " + columnIndex);
 
 	return getInt(getColumnName(columnIndex));
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as an int in the Java programming language. 
 public  int getInt(String columnLabel)  throws SQLException{
-	rsetLog("RESL 52");
-
+	rsetLog(sqp.isSpecial() + " getInt " + columnLabel);
+		if ( sqp.isSpecial())
+		{
+				if (columnLabel.equalsIgnoreCase("FOUND_ROWS()"))
+					return new Integer(sqp.getConnection().getFoundRows()).intValue();
+				if (columnLabel.equalsIgnoreCase("@@identity"))
+					return new Integer(sqp.getConnection().getIdentity()).intValue();
+			
+		}
+	checkNull(getRowObject().get(columnLabel));
 	return getRowObject().getInt(columnLabel);
 
 }
@@ -527,6 +642,18 @@ public  long getLong(int columnIndex)  throws SQLException{
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a long in the Java programming language. 
 public  long getLong(String columnLabel)  throws SQLException{
 	rsetLog("RESL 54");
+		if ( sqp.isSpecial())
+		{
+				if (columnLabel.equalsIgnoreCase("FOUND_ROWS()"))
+					return new Long(sqp.getConnection().getFoundRows()).longValue();
+				if (columnLabel.equalsIgnoreCase("@@identity")){
+				long ld = new Long(sqp.getConnection().getIdentity()).longValue();
+				rsetLog("getLong.@@identity " + ld);
+					return ld;
+				}
+			
+		}
+		checkNull(getRowObject().get(columnLabel));
 
 	return getRowObject().getLong(columnLabel);
 
@@ -552,9 +679,10 @@ public void setIsSchema(boolean tf){
 }
 
 public  ResultSetMetaData getMetaData()  throws SQLException{
+	rsetLog("RESL getMetaData");
+
 	if (isClosed())
 		throw JGException.get("operation_not_allowed_after_closed","Operation not allowed after close");
-	rsetLog("RESL 55");
 
 	jiqlResultSetMetaData jrd = new jiqlResultSetMetaData(sqp);
 	jrd.setIsCatalog(catalog);
@@ -564,31 +692,43 @@ public  ResultSetMetaData getMetaData()  throws SQLException{
 }
  //            Retrieves the number, types and  of this ResultSet object's columns. 
 public  Reader getNCharacterStream(int columnIndex)  throws SQLException{
+	rsetLog("RMISC 15");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //             Retrieves the value of the designated column in the current row of this ResultSet object as a java.io.Reader object. 
 public  Reader getNCharacterStream(String columnLabel)  throws SQLException{
+	rsetLog("RMISC 16");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.io.Reader object. 
 public  NClob getNClob(int columnIndex)  throws SQLException{
+	rsetLog("RMISC 17");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a NClob object in the Java programming language. 
 public  NClob getNClob(String columnLabel)  throws SQLException{
+	rsetLog("RMISC 18");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a NClob object in the Java programming language. 
 public  String getNString(int columnIndex) throws SQLException{
+	rsetLog("RMISC 19");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a String in the Java programming language. 
 public  String getNString(String columnLabel)  throws SQLException{
+	rsetLog("RMISC 20");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -601,6 +741,8 @@ public  Object getObject(int columnIndex)  throws SQLException{
 }
  //            Gets the value of the designated column in the current row of this ResultSet object as an Object in the Java programming language. 
 public  Object getObject(int columnIndex, Map<String,Class<?>> map)  throws SQLException{
+	rsetLog("RMISC 21");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -614,16 +756,31 @@ public  Object getObject(int columnIndex, Map<String,Class<?>> map)  throws SQLE
 public  Object getObject(String columnLabel)  throws SQLException{
 	rsetLog("getObject " + columnLabel);
 	Row r = getRowObject();
+		if ( sqp.isSpecial())
+		{
+				if (columnLabel.equalsIgnoreCase("FOUND_ROWS()")){
+					wasNull = false;
+					return new Integer(sqp.getConnection().getFoundRows());
+				}
+			
+		}
 		if (sqp.showTables()){
-
-				if (columnLabel.equalsIgnoreCase("TABLE_SCHEM"))
+				if (columnLabel.equalsIgnoreCase("TABLE_SCHEM")){
+				wasNull = false;
 					return "jiql";	
-				if (columnLabel.equalsIgnoreCase("TABLE_CAT"))
+				}
+				if (columnLabel.equalsIgnoreCase("TABLE_CAT")){
+				wasNull = false;
 					return "";	
-				if (columnLabel.equalsIgnoreCase("TABLE_TYPE"))
+				}
+				if (columnLabel.equalsIgnoreCase("TABLE_TYPE")){
+				wasNull = false;
 					return "TABLE";
-						if (columnLabel.equalsIgnoreCase("TABLE_CATALOG"))
+				}
+						if (columnLabel.equalsIgnoreCase("TABLE_CATALOG")){
+					wasNull = true;	
 					return null;
+						}
 					
 
 			columnLabel = "tablename";
@@ -641,8 +798,10 @@ public  Object getObject(String columnLabel)  throws SQLException{
 		{
 			cn = en.nextElement().toString();
 			cv = h.get(cn).toString();
-			if (cv.equals(columnLabel))
+			if (cv.equals(columnLabel)){
+				wasNull = false;
 				return r.get(cn);
+			}
 		}
 		//(columnLabel + " sqp.getRealColName(columnLabel) " + sqp.getRealColName(columnLabel) + ":" + r);
 	o = r.get(sqp.getRealColName(columnLabel));
@@ -656,27 +815,33 @@ public  Object getObject(String columnLabel)  throws SQLException{
 	}
 
 	}
-	
+	checkNull(o);
 	return o;
 }
  //            Gets the value of the designated column in the current row of this ResultSet object as an Object in the Java programming language. 
 public  Object getObject(String columnLabel, Map<String,Class<?>> map)  throws SQLException{
+	rsetLog("RMISC 22");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as an Object in the Java programming language. 
 public  Ref getRef(int columnIndex)  throws SQLException{
+	rsetLog("RMISC 23");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a Ref object in the Java programming language. 
 public  Ref getRef(String columnLabel)  throws SQLException{
+	rsetLog("RMISC 24");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //             Retrieves the value of the designated column in the current row of this ResultSet object as a Ref object in the Java programming language. 
 public  int getRow()  throws SQLException{
-	rsetLog("RESL 57");
+	rsetLog("getRow " + indx);
 
 return indx;
 }
@@ -703,17 +868,21 @@ public  short getShort(int columnIndex) throws SQLException{
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a short in the Java programming language. 
 public  short getShort(String columnLabel)  throws SQLException{
 	rsetLog("RESL 61");
-
+	checkNull(getRowObject().get(columnLabel));
 	return getRowObject().getShort(columnLabel);
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a short in the Java programming language. 
 public  SQLXML getSQLXML(int columnIndex) throws SQLException{
+	rsetLog("RMISC 25");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet as a java.sql.SQLXML object in the Java programming language. 
 public  SQLXML getSQLXML(String columnLabel)  throws SQLException{
+	rsetLog("RMISC 26");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -725,21 +894,26 @@ public  java.sql.Statement getStatement()  throws SQLException{
 }
  //           Retrieves the Statement object that produced this ResultSet object. 
 public  String getString(int columnIndex)  throws SQLException{
-	rsetLog("RESL 63");
+	rsetLog("getString " + columnIndex);
 
 		return getString(getColumnName(columnIndex));
 
 }
 
 void rsetLog(String t){
-	//("rsetLog:" + t);
+	//tools.util.LogMgr.debug("rsetLog:" + t);
 }
 
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a String in the Java programming language. 
 public  String getString(String columnLabel)  throws SQLException{
-	//(getRowObject() + ":" + indx + ":year " + columnLabel);
+	//( () + ":" + indx + ":year " + columnLabel);
 	rsetLog( " getString a " + columnLabel);
-
+		if ( sqp.isSpecial())
+		{
+				if (columnLabel.equalsIgnoreCase("FOUND_ROWS()"))
+					return new Integer(sqp.getConnection().getFoundRows()).toString();
+			
+		}
 		if (sqp.showTables()){
 
 				if (columnLabel.equalsIgnoreCase("TABLE_SCHEM"))
@@ -762,9 +936,11 @@ public  String getString(String columnLabel)  throws SQLException{
 	}*/
 
 	String s =  getRowObject().getString(columnLabel);
+		checkNull(s);
+
 	rsetLog(s + " getString " + columnLabel);
 
-	if (sqp.showTables() || sqp.getAction().equals("jiqldescribeTable")|| sqp.getAction().equals("describeTable")|| sqp.getAction().equals("getColumns")|| sqp.getAction().equals("getPrimaryKeys") || sqp.getAction().equals("getExportedKeys")|| sqp.getAction().equals("getImportedKeys"))
+	if (sqp.showTables() || sqp.getAction().equals("jiqldescribeTable")|| sqp.getAction().equals("describeTable")|| sqp.getAction().equals("getColumns")|| sqp.getAction().equals("getPrimaryKeys") || sqp.getAction().equals("getExportedKeys")|| sqp.getAction().equals("getImportedKeys") || sqp.isSpecial())
 		return s;
 
 	if (s == null)return null;
@@ -774,41 +950,57 @@ public  String getString(String columnLabel)  throws SQLException{
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a String in the Java programming language. 
 public  Time getTime(int columnIndex) throws SQLException{
+	rsetLog("RMISC 27");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Time object in the Java programming language. 
 public  Time getTime(int columnIndex, Calendar cal) throws SQLException{
+	rsetLog("RMISC 28");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Time object in the Java programming language. 
 public  Time getTime(String columnLabel) throws SQLException{
+	rsetLog("RMISC 29");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Time object in the Java programming language. 
 public  Time getTime(String columnLabel, Calendar cal) throws SQLException{
+	rsetLog("RMISC 30");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Time object in the Java programming language. 
 public  Timestamp getTimestamp(int columnIndex) throws SQLException{
+	rsetLog("RMISC 31");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Timestamp object in the Java programming language. 
 public  Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException{
+	rsetLog("RMISC 32");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Timestamp object in the Java programming language. 
 public  Timestamp getTimestamp(String columnLabel) throws SQLException{
+	rsetLog("RMISC 330");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Timestamp object in the Java programming language. 
 public  Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException{
+	rsetLog("RMISC 34");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -819,11 +1011,15 @@ rsetLog("RESL 1");
 }
  //            Retrieves the type of this ResultSet object. 
 public  InputStream getUnicodeStream(int columnIndex) throws SQLException{
+	rsetLog("RMISC 35");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Deprecated. use getCharacterStream in place of getUnicodeStream 
 public  InputStream getUnicodeStream(String columnLabel) throws SQLException{
+	rsetLog("RMISC 36");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -840,6 +1036,8 @@ rsetLog("RESL 2");
 public  URL getURL(String columnLabel)  throws SQLException{
 	try{
 	rsetLog("RESL 3");
+		checkNull(getRowObject().get(columnLabel));
+
 	return new URL(getRowObject().get(columnLabel).toString());
 	}catch (Exception e){
 		throw new SQLException(e.toString());
@@ -852,6 +1050,8 @@ rsetLog("RESL 4");
 }
  //           Retrieves the first warning reported by calls on this ResultSet object. 
 public  void insertRow() throws SQLException{
+	rsetLog("RMISC 37");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -867,7 +1067,7 @@ public  boolean isBeforeFirst()  throws SQLException{
 }
  //            Retrieves whether the cursor is before the first row in this ResultSet object. 
 public  boolean isClosed() throws SQLException{
- rsetLog("RESL 7");
+ rsetLog("isClosed " + close );
  return close;
 }
  //            Retrieves whether this ResultSet object has been closed. 
@@ -883,23 +1083,29 @@ return  (indx >= results.size());
 }
  //            Retrieves whether the cursor is on the last row of this ResultSet object. 
 public  boolean last() throws SQLException{
-rsetLog("RESL 10");
 	indx = results.size();
-	return true;
+	
+rsetLog("last " + indx);
+
+	return (indx > 0);
 }
  //            Moves the cursor to the last row in this ResultSet object. 
 public  void moveToCurrentRow() throws SQLException{
+	rsetLog("RMISC 38");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Moves the cursor to the remembered cursor position, usually the current row. 
 public  void moveToInsertRow() throws SQLException{
+	rsetLog("RMISC 39");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Moves the cursor to the insert row. 
 public  boolean next() throws SQLException{
-rsetLog("RESL 11");
+rsetLog("next");
 if (results == null || indx >= results.size())return false;
 indx = indx + 1;
 return true;
@@ -913,6 +1119,8 @@ rsetLog("RESL 12");
 }
  //            Moves the cursor to the previous row in this ResultSet object. 
 public  void refreshRow() throws SQLException{
+	rsetLog("RMISC 40");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
@@ -924,447 +1132,584 @@ return true;
 }
  //           Moves the cursor a relative number of rows, either positive or negative. 
 public  boolean rowDeleted() throws SQLException{
+	rsetLog("RMISC 41");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves whether a row has been deleted. 
 public  boolean rowInserted() throws SQLException{
+	rsetLog("RMISC 42");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Retrieves whether the current row has had an insertion. 
 public  boolean rowUpdated() throws SQLException{
+	rsetLog("RMISC 43");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Retrieves whether the current row has been updated. 
 public  void setFetchDirection(int direction)  throws SQLException{
+	rsetLog("RMISC 44");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Gives a hint as to the direction in which the rows in this ResultSet object will be processed. 
 public  void setFetchSize(int rows) throws SQLException{
+	rsetLog("RMISC 45");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Gives the JDBC driver a hint as to the number of rows that should be fetched from the database when more rows are needed for this ResultSet object. 
 public  void updateArray(int columnIndex, Array x) throws SQLException{
+	rsetLog("RMISC 46");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Array value. 
 public  void updateArray(String columnLabel, Array x) throws SQLException{
+	rsetLog("RMISC 47");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a java.sql.Array value. 
 public  void updateAsciiStream(int columnIndex, InputStream x) throws SQLException{
+	rsetLog("RMISC 48");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an ascii stream value. 
 public  void updateAsciiStream(int columnIndex, InputStream x, int length) throws SQLException{
+	rsetLog("RMISC 49");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with an ascii stream value, which will have the specified number of bytes. 
 public  void updateAsciiStream(int columnIndex, InputStream x, long length)  throws SQLException{
+	rsetLog("RMISC 50");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with an ascii stream value, which will have the specified number of bytes. 
 public  void updateAsciiStream(String columnLabel, InputStream x) throws SQLException{
+	rsetLog("RMISC 51");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with an ascii stream value. 
 public  void updateAsciiStream(String columnLabel, InputStream x, int length) throws SQLException{
+	rsetLog("RMISC 52");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an ascii stream value, which will have the specified number of bytes. 
 public  void updateAsciiStream(String columnLabel, InputStream x, long length) throws SQLException{
+	rsetLog("RMISC 53");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an ascii stream value, which will have the specified number of bytes. 
 public  void updateBigDecimal(int columnIndex, BigDecimal x) throws SQLException{
+	rsetLog("RMISC 54");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a java.math.BigDecimal value. 
 public  void updateBigDecimal(String columnLabel, BigDecimal x) throws SQLException{
+	rsetLog("RMISC 55");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a java.sql.BigDecimal value. 
 public  void updateBinaryStream(int columnIndex, InputStream x) throws SQLException{
+	rsetLog("RMISC 56");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a binary stream value. 
 public  void updateBinaryStream(int columnIndex, InputStream x, int length) throws SQLException{
+	rsetLog("RMISC 57");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a binary stream value, which will have the specified number of bytes. 
 public  void updateBinaryStream(int columnIndex, InputStream x, long length) throws SQLException{
+	rsetLog("RMISC 58");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a binary stream value, which will have the specified number of bytes. 
 public  void updateBinaryStream(String columnLabel, InputStream x) throws SQLException{
+	rsetLog("RMISC 59");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a binary stream value. 
 public  void updateBinaryStream(String columnLabel, InputStream x, int length) throws SQLException{
+	rsetLog("RMISC 60");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a binary stream value, which will have the specified number of bytes. 
 public  void updateBinaryStream(String columnLabel, InputStream x, long length) throws SQLException{
+	rsetLog("RMISC 61");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a binary stream value, which will have the specified number of bytes. 
 public  void updateBlob(int columnIndex, Blob x) throws SQLException{
+	rsetLog("RMISC 62");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a java.sql.Blob value. 
 public  void updateBlob(int columnIndex, InputStream inputStream) throws SQLException{
+	rsetLog("RMISC 63");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column using the given input stream. 
 public  void updateBlob(int columnIndex, InputStream inputStream, long length) throws SQLException{
+	rsetLog("RMISC 64");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given input stream, which will have the specified number of bytes. 
 public void updateBlob(String columnLabel, Blob x) throws SQLException{
+	rsetLog("RMISC 65");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a java.sql.Blob value. 
 public void updateBlob(String columnLabel, InputStream inputStream) throws SQLException{
+	rsetLog("RMISC 660");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column using the given input stream. 
 public void updateBlob(String columnLabel, InputStream inputStream, long length) throws SQLException{
+	rsetLog("RMISC 67");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given input stream, which will have the specified number of bytes. 
 public void updateBoolean(int columnIndex, boolean x) throws SQLException{
+	rsetLog("RMISC 68");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a boolean value. 
 public void updateBoolean(String columnLabel, boolean x) throws SQLException{
+	rsetLog("RMISC 70");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a boolean value. 
 public void updateByte(int columnIndex, byte x) throws SQLException{
+	rsetLog("RMISC 71");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a byte value. 
 public void updateByte(String columnLabel, byte x) throws SQLException{
+	rsetLog("RMISC 72");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a byte value. 
 public void updateBytes(int columnIndex, byte[] x) throws SQLException{
+	rsetLog("RMISC 73");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a byte array value. 
 public void updateBytes(String columnLabel, byte[] x) throws SQLException{
+	rsetLog("RMISC 74");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a byte array value. 
 public void updateCharacterStream(int columnIndex, Reader x) throws SQLException{
+	rsetLog("RMISC 75");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value. 
 public void updateCharacterStream(int columnIndex, Reader x, int length) throws SQLException{
+	rsetLog("RMISC 76");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value, which will have the specified number of bytes. 
 public void updateCharacterStream(int columnIndex, Reader x, long length) throws SQLException{
+	rsetLog("RMISC 77");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value, which will have the specified number of bytes. 
 public void updateCharacterStream(String columnLabel, Reader reader) throws SQLException{
+	rsetLog("RMISC 78");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value. 
 public void updateCharacterStream(String columnLabel, Reader reader, int length) throws SQLException{
+	rsetLog("RMISC 79");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value, which will have the specified number of bytes. 
 public void updateCharacterStream(String columnLabel, Reader reader, long length) throws SQLException{
+	rsetLog("RMISC 80");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value, which will have the specified number of bytes. 
 public void updateClob(int columnIndex, Clob x) throws SQLException{
+	rsetLog("RMISC 81");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Clob value. 
 public void updateClob(int columnIndex, Reader reader) throws SQLException{
+	rsetLog("RMISC 82");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //                  Updates the designated column using the given Reader object. 
 public void updateClob(int columnIndex, Reader reader, long length) throws SQLException{
+	rsetLog("RMISC 83");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given Reader object, which is the given number of characters long. 
 public void updateClob(String columnLabel, Clob x) throws SQLException{
+	rsetLog("RMISC 84");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Clob value. 
 public void updateClob(String columnLabel, Reader reader) throws SQLException{
+	rsetLog("RMISC 85");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given Reader object. 
 public void updateClob(String columnLabel, Reader reader, long length) throws SQLException{
+	rsetLog("RMISC 86");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given Reader object, which is the given number of characters long. 
 public void updateDate(int columnIndex, java.sql.Date x) throws SQLException{
+	rsetLog("RMISC 87");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Date value. 
 public void updateDate(String columnLabel, java.sql.Date x) throws SQLException{
+	rsetLog("RMISC 88");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Date value. 
 public void updateDouble(int columnIndex, double x) throws SQLException{
+	rsetLog("RMISC 89");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a double value. 
 public void updateDouble(String columnLabel, double x) throws SQLException{
+	rsetLog("RMISC 90");
+
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a double value. 
 public void updateFloat(int columnIndex, float x) throws SQLException{
+rsetLog("RMISC 91");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a float value. 
 public void updateFloat(String columnLabel, float x) throws SQLException{
+rsetLog("RMISC 92");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a float value. 
 public void updateInt(int columnIndex, int x) throws SQLException{
+rsetLog("RMISC 93");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an int value. 
 public void updateInt(String columnLabel, int x) throws SQLException{
+rsetLog("RMISC 94");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an int value. 
 public void updateLong(int columnIndex, long x) throws SQLException{
+rsetLog("RMISC 95");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a long value. 
 public void updateLong(String columnLabel, long x) throws SQLException{
+rsetLog("RMISC 96");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a long value. 
 public void updateNCharacterStream(int columnIndex, Reader x) throws SQLException{
+rsetLog("RMISC 97");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value. 
 public void updateNCharacterStream(int columnIndex, Reader x, long length) throws SQLException{
+rsetLog("RMISC 98");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value, which will have the specified number of bytes. 
 public void updateNCharacterStream(String columnLabel, Reader reader) throws SQLException{
+rsetLog("RMISC 99");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value. 
 public void updateNCharacterStream(String columnLabel, Reader reader, long length) throws SQLException{
+rsetLog("RMISC 100");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a character stream value, which will have the specified number of bytes. 
 public void updateNClob(int columnIndex, NClob nClob) throws SQLException{
+rsetLog("RMISC 101");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.NClob value. 
 public void updateNClob(int columnIndex, Reader reader) throws SQLException{
+rsetLog("RMISC 102");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given Reader The data will be read from the stream as needed until end-of-stream is reached. 
 public void updateNClob(int columnIndex, Reader reader, long length) throws SQLException{
+rsetLog("RMISC 103");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given Reader object, which is the given number of characters long. 
 public void updateNClob(String columnLabel, NClob nClob) throws SQLException{
+rsetLog("RMISC 104");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.NClob value. 
 public void updateNClob(String columnLabel, Reader reader) throws SQLException{
+rsetLog("RMISC 105");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given Reader object. 
 public void updateNClob(String columnLabel, Reader reader, long length) throws SQLException{
+rsetLog("RMISC 106");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column using the given Reader object, which is the given number of characters long. 
 public void updateNString(int columnIndex, String nString) throws SQLException{
+rsetLog("RMISC 107");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a String value. 
 public void updateNString(String columnLabel, String nString) throws SQLException{
+rsetLog("RMISC 108");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a String value. 
 public void updateNull(int columnIndex) throws SQLException{
+rsetLog("RMISC 109");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a null value. 
 public void updateNull(String columnLabel) throws SQLException{
+rsetLog("RMISC 110");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a null value. 
 public void updateObject(int columnIndex, Object x) throws SQLException{
+rsetLog("RMISC 111");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an Object value. 
 public void updateObject(int columnIndex, Object x, int scaleOrLength) throws SQLException{
+rsetLog("RMISC 112");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an Object value. 
 public void updateObject(String columnLabel, Object x) throws SQLException{
+rsetLog("RMISC 113");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an Object value. 
 public void updateObject(String columnLabel, Object x, int scaleOrLength) throws SQLException{
+rsetLog("RMISC 114");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with an Object value. 
 public void updateRef(int columnIndex, Ref x) throws SQLException{
+rsetLog("RMISC 115");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Ref value. 
 public void updateRef(String columnLabel, Ref x) throws SQLException{
+rsetLog("RMISC 116");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Ref value. 
 public void updateRow() throws SQLException{
+rsetLog("RMISC 117");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the underlying database with the new contents of the current row of this ResultSet object. 
 public void updateRowId(int columnIndex, java.sql.RowId x) throws SQLException {
+rsetLog("RMISC 118");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a RowId value. 
 public void updateRowId(String columnLabel, java.sql.RowId x) throws SQLException,SQLFeatureNotSupportedException {
+rsetLog("RMISC 119");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a RowId value. 
 public void updateShort(int columnIndex, short x) throws SQLException{
+rsetLog("RMISC 120");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a short value. 
 public void updateShort(String columnLabel, short x) throws SQLException{
+rsetLog("RMISC 121");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a short value. 
 public void updateSQLXML(int columnIndex, SQLXML xmlObject) throws SQLException{
+rsetLog("RMISC 122");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.SQLXML value. 
 public void updateSQLXML(String columnLabel, SQLXML xmlObject) throws SQLException{
+rsetLog("RMISC 123");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.SQLXML value. 
 public void updateString(int columnIndex, String x) throws SQLException{
+rsetLog("RMISC 124");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a String value. 
 public void updateString(String columnLabel, String x) throws SQLException{
+rsetLog("RMISC 125");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a String value. 
 public void updateTime(int columnIndex, Time x) throws SQLException{
+rsetLog("RMISC 126");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //            Updates the designated column with a java.sql.Time value. 
 public void updateTime(String columnLabel, Time x) throws SQLException{
+rsetLog("RMISC 127");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Time value. 
 public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException{
+rsetLog("RMISC 128");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Timestamp value. 
 public void updateTimestamp(String columnLabel, Timestamp x) throws SQLException{
+rsetLog("RMISC 129");
 	throw JGException.get("not_supported","NOT SUPPORTED");
 
 }
  //           Updates the designated column with a java.sql.Timestamp value. 
 public boolean wasNull() throws SQLException{
-rsetLog("RESL 19");
+rsetLog("wasNull " + wasNull);
  	return wasNull;
 }
  //           Reports whether the last column read had a value of SQL NULL. 

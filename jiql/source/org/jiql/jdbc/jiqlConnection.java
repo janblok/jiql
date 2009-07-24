@@ -49,6 +49,9 @@ public class jiqlConnection implements Connection{
 Properties properties = null;
 
 int isolation = 0;
+int foundrows = 0;
+int nfoundrows = 0;
+int identity = 0;
 public jiqlConnection(){
 }
 public jiqlConnection(Properties p){
@@ -63,7 +66,24 @@ DateFormat df = null;
 String dpat = null;
 
 
+public void setFoundRows(int f){
+	nfoundrows = f;
+	foundrows = nfoundrows;
+}
 
+public int getFoundRows(){
+	return foundrows;
+}
+
+
+public void setIdentity(int f){
+	if (f > 0)
+	identity = f;
+}
+
+public int getIdentity(){
+	return identity;
+}
 
 /*
 public void writeExternal(java.io.ObjectOutput out)
@@ -113,6 +133,7 @@ public	boolean 	isWrapperFor(Class<?> iface)throws SQLException{
       //    Returns true if this either implements the interface argument or is directly or indirectly a wrapper for an object that does.
 public <T> T unwrap(Class<T> iface)throws SQLException
 {
+	jcLog( " : unwrap " );
 	return null;
 }
 
@@ -132,26 +153,36 @@ public void 	commit()throws SQLException{
 }
 //Makes all changes made since the previous commit/rollback permanent and releases any database locks currently held by this Connection object.
 public Array 	createArrayOf(String typeName, Object[] elements)throws SQLException{
+                    	jcLog( " : ss 26 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //Factory method for creating Array objects.
 public Blob 	createBlob()throws SQLException{
+                   	jcLog( " : ss 27 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //Constructs an object that implements the Blob interface.
 public Clob 	createClob()throws SQLException{
+                    	jcLog( " : ss 28 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //Constructs an object that implements the Clob interface.
 public NClob 	createNClob()throws SQLException{
+                  	jcLog( " : ss 29 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //Constructs an object that implements the NClob interface.
 public SQLXML 	createSQLXML()throws SQLException{
+                  	jcLog( " : ss 30 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
@@ -163,32 +194,42 @@ public java.sql.Statement 	createStatement()throws SQLException{
 }
 //Creates a Statement object for sending SQL statements to the database.
 public java.sql.Statement 	createStatement(int resultSetType, int resultSetConcurrency)throws SQLException{
-        throw new SQLFeatureNotSupportedException(JGException.get("not_supported","Not Supported").toString());
+                  	jcLog( resultSetType + " : createStatement " + ResultSet.TYPE_FORWARD_ONLY + ":" + ResultSet.TYPE_SCROLL_INSENSITIVE + ":" + ResultSet.TYPE_SCROLL_SENSITIVE );
+                  	jcLog( resultSetConcurrency + " : createStatementb " + ResultSet.CONCUR_READ_ONLY  + ":" + ResultSet.CONCUR_UPDATABLE  );
 
+        //throw new SQLFeatureNotSupportedException(JGException.get("not_supported","Not Supported").toString());
+		return createStatement();
 }
 //Creates a Statement object that will generate ResultSet objects with the given type and concurrency.
 public java.sql.Statement 	createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)throws SQLException{
+                   	jcLog( " : ss 32 " );
+
         throw new SQLFeatureNotSupportedException(JGException.get("not_supported","Not Supported").toString());
 
 }
 //Creates a Statement object that will generate ResultSet objects with the given type, concurrency, and holdability.
 public Struct 	createStruct(String typeName, Object[] attributes)throws SQLException{
+                    	jcLog( " : ss 33 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //Factory method for creating Struct objects.
 public boolean 	getAutoCommit()throws SQLException{
-        //throw JGException.get("not_supported","Not Supported");
+        //throw JGException.get("not_supported"," ");
         return autoCommit;
 
 }
 // Retrieves the current auto-commit mode for this Connection object.
 public String 	getCatalog()throws SQLException{
-   jcLog("jclaw 1");
+  
+      String ver = getProperties().getProperty("Catalog");
+
+   jcLog("jclaw 1 " + ver);
    			
 
-        return null;
-        //throw JGException.get("not_supported","Not Supported");
+        return ver;
+        //throw JGException.get("not_supported"," ");
 
 }
 // Retrieves this Connection object's current catalog name.
@@ -211,7 +252,7 @@ return ResultSet.CLOSE_CURSORS_AT_COMMIT;
 }
 
 void jcLog(String t){
-	//("jcLog:" + t);
+	//tools.util.LogMgr.debug("jcLog:" + t);
 }
 //Retrieves the current holdability of ResultSet objects created using this Connection object.
 public DatabaseMetaData 	getMetaData()throws SQLException{
@@ -225,11 +266,15 @@ return  isolation;
 }
 // Retrieves this Connection object's current transaction isolation level.
 public Map<String,Class<?>> 	getTypeMap()throws SQLException{
+             	jcLog( " : ss 10 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //Retrieves the Map object associated with this Connection object.
 public SQLWarning 	getWarnings()throws SQLException{
+             	jcLog( " : ss 11 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
@@ -256,53 +301,73 @@ public String 	nativeSQL(String sql)throws SQLException{
 }
 //Converts the given SQL statement into the system's native SQL grammar.
 public CallableStatement 	prepareCall(String sql)throws SQLException{
+              	jcLog( " : ss 13 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //Creates a CallableStatement object for calling database stored procedures.
 public CallableStatement 	prepareCall(String sql, int resultSetType, int resultSetConcurrency)throws SQLException{
+                 	jcLog( " : ss 14 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //          Creates a CallableStatement object that will generate ResultSet objects with the given type and concurrency.
 public CallableStatement 	prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)throws SQLException{
+                 	jcLog( " : ss 15 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //          Creates a CallableStatement object that will generate ResultSet objects with the given type and concurrency.
 public PreparedStatement 	prepareStatement(String sql)throws SQLException{
+                 	jcLog( " : prepareStatement "  + sql);
+
      return new org.jiql.jdbc.jiqlPreparedStatement(this,sql);
 
 
 }
 //          Creates a PreparedStatement object for sending parameterized SQL statements to the database.
 public PreparedStatement 	prepareStatement(String sql, int autoGeneratedKeys)throws SQLException{
+                 	jcLog( " : ss 16 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //          Creates a default PreparedStatement object that has the capability to retrieve auto-generated keys.
 public PreparedStatement 	prepareStatement(String sql, int[] columnIndexes)throws SQLException{
+              	jcLog( " : ss 17 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //          Creates a default PreparedStatement object capable of returning the auto-generated keys designated by the given array.
 public PreparedStatement 	prepareStatement(String sql, int resultSetType, int resultSetConcurrency)throws SQLException{
+             	jcLog( " : ss 18 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //          Creates a PreparedStatement object that will generate ResultSet objects with the given type and concurrency.
 public PreparedStatement 	prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)throws SQLException{
+               	jcLog( " : ss 19 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //          Creates a PreparedStatement object that will generate ResultSet objects with the given type, concurrency, and holdability.
 public PreparedStatement 	prepareStatement(String sql, String[] columnNames)throws SQLException{
+                	jcLog( " : ss 20 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
 //          Creates a default PreparedStatement object capable of returning the auto-generated keys designated by the given array.
 public void 	releaseSavepoint(Savepoint savepoint)throws SQLException{
-        throw JGException.get("not_supported","Not Supported");
+                	jcLog( " : ss 21 " );
+
+       throw JGException.get("not_supported","Not Supported");
 
 }
 //          Removes the specified Savepoint and subsequent Savepoint objects from the current transaction.
@@ -315,6 +380,8 @@ trans = null;
 }
 //          Undoes all changes made in the current transaction and releases any database locks currently held by this Connection object.
 public void 	rollback(Savepoint savepoint)throws SQLException{
+                   	jcLog( " : ss 22 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
@@ -370,11 +437,15 @@ public void 	setReadOnly(boolean readOnly)throws SQLException{
 }
 //          Puts this connection in read-only mode as a hint to the driver to enable database optimizations.
 public Savepoint 	setSavepoint()throws SQLException{
-        throw JGException.get("not_supported","Not Supported");
+                     	jcLog( " : ss 23 " );
+
+       throw JGException.get("not_supported","Not Supported");
 
 }
 //          Creates an unnamed savepoint in the current transaction and returns the new Savepoint object that represents it.
 public Savepoint 	setSavepoint(String name)throws SQLException{
+                   	jcLog( " : ss 24 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }
@@ -384,6 +455,8 @@ public void 	setTransactionIsolation(int level)throws SQLException{
 }
 //          Attempts to change the transaction isolation level for this Connection object to the one given.
 public void 	setTypeMap(Map<String,Class<?>> map)throws SQLException{
+                     	jcLog( " : ss 25 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }

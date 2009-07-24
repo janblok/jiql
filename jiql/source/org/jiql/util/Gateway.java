@@ -56,6 +56,31 @@ public void setProperties(Properties props){
 	 properties = props;
 }
 
+			public Vector<Row> getIdentity(SQLParser sqp)throws SQLException{
+				Vector<Row> o = new Vector<Row>();
+
+						Row nv = new Row();
+
+						nv.put("@@identity",0);
+
+						
+					o.add(nv);
+						
+
+	
+				return o;
+
+			}
+			
+			public Vector<Row> getFoundRows(SQLParser sqp)throws SQLException{
+				Vector<Row> o = new Vector<Row>();
+							Row nv = new Row();
+
+						nv.put("FOUND_ROWS()",0);
+						o.add(nv);
+				return o;
+
+			}
 
 	/*public static Gateway get(){
 		if (gaeg == null)
@@ -106,6 +131,11 @@ return new Hashtable();
 				}
 				
 						public Vector<Row> getImportedKeys(SQLParser sqp)throws SQLException{
+					Vector<Row> o = new Vector<Row>();
+				return o;
+				}
+
+				public Vector<Row> getIndex(SQLParser sqp)throws SQLException{
 					Vector<Row> o = new Vector<Row>();
 				return o;
 				}

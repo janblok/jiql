@@ -32,6 +32,7 @@ import java.sql.*;
 import java.io.*;
 import org.jiql.db.*;
 import org.jiql.util.*;
+import org.jiql.db.objs.jiqlTableInfo;
 
 public class jiqlResultSetMetaData implements java.sql.ResultSetMetaData, java.io.Serializable
 {
@@ -58,7 +59,7 @@ public class jiqlResultSetMetaData implements java.sql.ResultSetMetaData, java.i
 	}
 	public jiqlResultSetMetaData(SQLParser sp)throws SQLException{
 			sqp = sp;
-if (!sqp.showTables()){
+if (!sqp.showTables() && !sqp.isSpecial()){
 
 			ti = sqp.getTableInfo();
 			if (ti == null)
@@ -97,6 +98,14 @@ public String 	getCatalogName(int column)throws SQLException{
 resLog("getCatalogName " + column);
 		if (isCatalog())
 			return "TABLE_CAT";
+
+	if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return "@@identity";
+		else if (sqp.getAction().equals("getFoundRows"))
+		return "FOUND_ROWS()";
+
+	}
 		if (sqp.showTables()){
 			if (column == 1)
 				return "TABLE_CAT";
@@ -126,6 +135,16 @@ return 2;
 		}
 		if (sqp.showTables())
 			return 4;
+	if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return org.jiql.jdbc.ResultSet.identity.size();
+		else if (sqp.getAction().equals("getFoundRows"))
+		return org.jiql.jdbc.ResultSet.foundrows.size();
+		else if (sqp.getAction().equals("getIndex"))
+		return org.jiql.jdbc.ResultSet.indexv.size();
+
+	}
+	
 	if (sqp.getAction().equals("describeTable"))
 		return org.jiql.jdbc.ResultSet.descols.size();
 	if (sqp.getAction().equals("getColumns"))
@@ -156,6 +175,16 @@ resLog("getColumnDisplaySize " + column);
 				
 			return 6;
 		}
+		
+			if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return org.jiql.jdbc.ResultSet.identity.elementAt(column - 1).toString().length();
+		else if (sqp.getAction().equals("getFoundRows"))
+		return org.jiql.jdbc.ResultSet.foundrows.elementAt(column - 1).toString().length();
+		else if (sqp.getAction().equals("getIndex"))
+		return org.jiql.jdbc.ResultSet.indexv.elementAt(column - 1).toString().length();
+
+	}
 	if (sqp.getAction().equals("describeTable"))
 		return org.jiql.jdbc.ResultSet.descols.elementAt(column - 1).toString().length();
 	if (sqp.getAction().equals("getColumns"))
@@ -175,7 +204,7 @@ return ci.getName().length();
 
 boolean catalog = false;
 public boolean isCatalog(){
-resLog("RL " + 9);
+//("RL " + 9);
 	return catalog;
 }
 
@@ -209,6 +238,16 @@ resLog("getColumnLabel " + column);
 				return "TABLE_TYPE";
 			return "tables";
 		}
+	
+				if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return org.jiql.jdbc.ResultSet.identity.elementAt(column - 1).toString();
+		else if (sqp.getAction().equals("getFoundRows"))
+		return org.jiql.jdbc.ResultSet.foundrows.elementAt(column - 1).toString();
+		else if (sqp.getAction().equals("getIndex"))
+		return org.jiql.jdbc.ResultSet.indexv.elementAt(column - 1).toString();
+
+	}
 	if (sqp.getAction().equals("describeTable"))
 		return org.jiql.jdbc.ResultSet.descols.elementAt(column - 1).toString();
 	if (sqp.getAction().equals("getColumns"))
@@ -248,6 +287,15 @@ resLog("getColumnName " + column);
 				return "TABLE_TYPE";
 			return "tables";
 }
+				if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return org.jiql.jdbc.ResultSet.identity.elementAt(column - 1).toString();
+		else if (sqp.getAction().equals("getFoundRows"))
+		return org.jiql.jdbc.ResultSet.foundrows.elementAt(column - 1).toString();
+		else if (sqp.getAction().equals("getIndex"))
+		return org.jiql.jdbc.ResultSet.indexv.elementAt(column - 1).toString();
+
+	}
 	if (sqp.getAction().equals("describeTable"))
 		return org.jiql.jdbc.ResultSet.descols.elementAt(column - 1).toString();
 	if (sqp.getAction().equals("getColumns"))
@@ -273,6 +321,22 @@ resLog("getColumnType " + column);
 
 		if (sqp.showTables())
 			return Types.VARCHAR;
+
+				if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return Types.VARCHAR;
+		else if (sqp.getAction().equals("getFoundRows"))
+		return Types.INTEGER;
+				else if (sqp.getAction().equals("getIndex"))
+				{
+					if (column == 7||column == 8 || column == 11 || column == 12)
+					return Types.INTEGER;
+					if (column == 4)
+					return Types.BOOLEAN;	
+					return Types.VARCHAR;
+				}
+
+	}
 		if (sqp.getAction().equals("getPrimaryKeys")){
 			if (5 == (column))
 				return Types.INTEGER;
@@ -310,6 +374,20 @@ resLog("getColumnType " + column);
 
 		if (sqp.showTables())
 			return "varchar";
+					if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return "varchar";
+		else if (sqp.getAction().equals("getFoundRows"))
+		return "int";
+				else if (sqp.getAction().equals("getIndex"))
+				{
+					if (column == 7||column == 8 || column == 11 || column == 12)
+					return "int";
+					if (column == 4)
+					return "bool";	
+					return "varchar";
+				}
+	}
 			if (sqp.getAction().equals("getPrimaryKeys")){
 			if (5 == (column))
 				return "int";
@@ -347,7 +425,7 @@ resLog("getPrecision " + column);
 return -1;
 }
 void resLog(String t){
-	//("resLog:" + t);
+	//tools.util.LogMgr.debug("resLog:" + t);
 }
           //Get the designated column's specified column size.
 public int 	getScale(int column)throws SQLException{
@@ -368,6 +446,14 @@ resLog("getTableName " + column);
 			return "TABLE_CAT";
 		if (sqp.showTables())
 			return "tables";
+					if (sqp.isSpecial()){
+		if (sqp.getAction().equals("getIdentity"))
+		return "identity";
+		else if (sqp.getAction().equals("getFoundRows"))
+		return "rows";
+
+	}
+	
 		if (sqp.getAction().equals("describeTable")|| sqp.getAction().equals("getColumns") || sqp.getAction().equals("getPrimaryKeys") || sqp.getAction().equals("getExportedKeys")|| sqp.getAction().equals("getImportedKeys"))
 		return sqp.getTable();
 
@@ -376,7 +462,7 @@ resLog("getTableName " + column);
 }
           //Gets the designated column's table name.
 public boolean 	isAutoIncrement(int column)throws SQLException{
-resLog("RL " + 1);
+resLog("isAutoIncrement " + column);
 return sqp.getJiqlTableInfo().listAutoIncrements().contains(getColumnName(column));
 //return false;
 }
@@ -397,12 +483,24 @@ return true;
 }
           //Indicates whether a write on the designated column will definitely succeed.
 public int 	isNullable(int column)throws SQLException{
-resLog("RL " + 3);
-	return -1;
+	String cn = getColumnName(column);
+	jiqlTableInfo jti = sqp.getJiqlTableInfo();
+	if (jti == null)
+	{
+		
+		resLog(cn + " isNullable NOT jiqlTableInfo " + column  + ":" + sqp.getTable());
+		return columnNullableUnknown;
+	}
+boolean nn = jti.getNotNulls().contains(cn);
+resLog(cn + " isNullable " + column  + ":" + nn + ":" + sqp.getTable());
+if (nn)
+ return columnNoNulls;
+	return columnNullable;
 }
           //Indicates the nullability of values in the designated column.
 public boolean 	isReadOnly(int column)throws SQLException{
-resLog("isReadOnly " + column);
+String cn = getColumnName(column);
+resLog(cn + " isReadOnly " + column);
 
 return false;
 }
@@ -413,8 +511,21 @@ return true;
 }
           //Indicates whether the designated column can be used in a where clause.
 public boolean 	isSigned(int column)throws SQLException{
-resLog("RL " + 5);
-return false;
+//String cn = getColumnName(column);
+if (ti == null){
+resLog(getColumnName(column) + " isSigned " + column + ":TI NULL FALSE");
+ return false;
+}
+
+ColumnInfo ci = ti.getColumnInfo(column);
+if (ci == null || !ci.isNumeric()){
+resLog(getColumnName(column) + " isSigned " + column + ":FALSE");
+ return false;
+}
+String ct = ci.getTypeName();
+int b = ct.toLowerCase().indexOf("unsigned");
+resLog(getColumnName(column) + " isSigned " + column + ":" + ct + ":" + b);
+return (b < 0);
 }
           //Indicates whether values in the designated column are signed numbers.
 public boolean 	isWritable(int column)throws SQLException{

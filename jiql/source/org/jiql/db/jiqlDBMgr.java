@@ -105,7 +105,7 @@ return getTableInfo(t,false);
 }
 
 public jiqlTableInfo getTableInfo(String t,boolean create)throws SQLException{
-
+		if (t == null)return null;
 		jiqlTableInfo uti = (jiqlTableInfo)tableinfos.get(t);
 		if (uti != null)return uti;
 			JGNameValuePairs o = Gateway.get(getProperties()).readTableProp(t);

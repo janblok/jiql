@@ -272,11 +272,14 @@ public class GAppEngineGateway extends Gateway
 
 			public Vector<Row> getPrimaryKeys(SQLParser sqp)throws SQLException{
 				String t = sqp.getTable();
+				Vector<Row> o = new Vector<Row>();
 
 					jiqlTableInfo jti = jiqlDBMgr.get(sqp.getProperties()).getTableInfo( t);
+				if (jti == null)
+					//	throw JGException.get("table_not_exists","Table " + t + " doesn't exist");
+					return o;
+						
 
-				Vector<Row> o = new Vector<Row>();
-				if (jti == null)return o;
 				Vector pk = jti.getPrimaryKeys();
 				if (pk == null || pk.size() < 1) return o;
 				

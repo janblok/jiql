@@ -64,9 +64,13 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 	}
 
 	void sdebug(String t){
-		//("statment " + t);
+		//tools.util.LogMgr.debug("statment " + t);
 	}
 	
+	SQLParser dsqp = null;
+	public SQLParser getSQLParser(){
+		return dsqp;
+	}
 	public boolean execute(String sql)
 	throws SQLException
 	{
@@ -80,16 +84,19 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 
 		SQLParser sqp = (SQLParser)hres.get("sqlparser");
 		Vector vres = (Vector)hres.get("results");
+					sqp.setConnection(connection);
+
 		if (vres != null)
 		{
-				sqp.setConnection(connection);
+				//sqp.setConnection(connection);
 
 			resultset = new org.jiql.jdbc.ResultSet(vres,sqp);
 		}
 		return true;
 	}
 
-	SQLParser sqp = SQLParser.get(sql,connection);
+	dsqp = SQLParser.get(sql,connection);
+	SQLParser sqp = dsqp;
 	if (sqp.getAction() != null)
 	{
 		Gateway gappe = Gateway.get(connection.getProperties());
@@ -124,9 +131,21 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 		{
 			getExportedKeys(sqp);
 		}		
+		else if (sqp.getAction().equals("getIndex"))
+		{
+			getIndex(sqp);
+		}
 		else if (sqp.getAction().equals("getImportedKeys"))
 		{
 			getImportedKeys(sqp);
+		}
+		else if (sqp.getAction().equals("getIdentity"))
+		{
+			getIdentity(sqp);
+		}
+		else if (sqp.getAction().equals("getFoundRows"))
+		{
+			getFoundRows(sqp);
 		}
 		else if (sqp.getAction().equals("jiqldescribeTable"))
 		{
@@ -217,8 +236,9 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 
 
 			Gateway.get(connection.getProperties()).writeTableRow(sqp.getTable(),sqp.getHash(),sqp);
-			
-						//(sqp.getTable() + " writeTableRow 1 " + sqp.getHash());
+					connection.setIdentity(sqp.getInsertParser().getAutoIncrementValue());
+
+						//(sqp.getTable() + "   1 " + sqp.getHash());
 
 			
     	}
@@ -238,8 +258,8 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 		{
 		Hashtable h = Gateway.get(connection.getProperties()).readTableValue(sqp.getTable(),sqp.getIncludeAllList(),sqp.getSelectList(),sqp.getEitherOrAllList(),sqp.isDistinct(),sqp);
 if (h == null) h = new Hashtable();
-		Vector r = new EZArrayList(h.elements());
-		//(sqp.getUpdateList() +" VR tabffff234 " + r);
+		//Vector r = new EZArrayList(h.elements());
+		//(sqp.getUpdateList() +" VR tabffff234 " + h);
 		
 		Enumeration en = h.keys();
 		String rid = null;
@@ -316,15 +336,18 @@ org.jiql.jdbc.ResultSet resultset = null;
 		if (je != null)throw new SQLException(je.toString());
 		SQLParser sqp = (SQLParser)hres.get("sqlparser");
 		Vector vres = (Vector)hres.get("results");
+		sqp.setConnection(connection);
+
 		if (vres != null)
 		{
-			sqp.setConnection(connection);
+			//sqp.setConnection(connection);
 			resultset = new org.jiql.jdbc.ResultSet(vres,sqp);
 		}
 		return resultset;
 	}
 
-	SQLParser sqp = SQLParser.get(sql,connection);
+	dsqp = SQLParser.get(sql,connection);
+	SQLParser sqp = dsqp;
 	if (sqp.getAction() != null)
 	{
 		Gateway gw = Gateway.get(connection.getProperties());
@@ -351,10 +374,23 @@ org.jiql.jdbc.ResultSet resultset = null;
 		{
 			getPrimaryKeys(sqp);
 		}
+				else if (sqp.getAction().equals("getIndex"))
+		{
+			getIndex(sqp);
+		}
 		else if (sqp.getAction().equals("getExportedKeys"))
 		{
 			getExportedKeys(sqp);
-		}		
+		}	
+		else if (sqp.getAction().equals("getIdentity"))
+		{
+			getIdentity(sqp);
+		}				
+		else if (sqp.getAction().equals("getFoundRows"))
+		{
+			getFoundRows(sqp);
+		}
+		//getFoundRows
 		else if (sqp.getAction().equals("getImportedKeys"))
 		{
 			getImportedKeys(sqp);
@@ -392,6 +428,15 @@ org.jiql.jdbc.ResultSet resultset = null;
 		resultset = new org.jiql.jdbc.ResultSet(sqp.getResults(),sqp);
 		
     }
+  
+          	              protected void getIndex(SQLParser sqp )throws SQLException{
+    	Vector r = Gateway.get(connection.getProperties()).getIndex(sqp);
+
+		sqp.setResults(r);
+
+		resultset = new org.jiql.jdbc.ResultSet(sqp.getResults(),sqp);
+		
+    }
     
         	              protected void getExportedKeys(SQLParser sqp )throws SQLException{
     	Vector r = Gateway.get(connection.getProperties()).getExportedKeys(sqp);
@@ -403,6 +448,23 @@ org.jiql.jdbc.ResultSet resultset = null;
     }
       protected void getImportedKeys(SQLParser sqp )throws SQLException{
     	Vector r = Gateway.get(connection.getProperties()).getImportedKeys(sqp);
+
+		sqp.setResults(r);
+
+		resultset = new org.jiql.jdbc.ResultSet(sqp.getResults(),sqp);
+		
+    }
+    
+    	         protected void getFoundRows(SQLParser sqp )throws SQLException{
+    	Vector r = Gateway.get(connection.getProperties()).getFoundRows(sqp);
+
+		sqp.setResults(r);
+
+		resultset = new org.jiql.jdbc.ResultSet(sqp.getResults(),sqp);
+		
+    }
+          protected void getIdentity(SQLParser sqp )throws SQLException{
+    	Vector r = Gateway.get(connection.getProperties()).getIdentity(sqp);
 
 		sqp.setResults(r);
 
@@ -472,13 +534,14 @@ org.jiql.jdbc.ResultSet resultset = null;
 
     public boolean execute(String sql,
                            int autoGeneratedKeys) throws SQLException {
-    	//("not supported: " + sql);
+    	sdebug(autoGeneratedKeys + " : ss 1 " + sql);
 
         throw JGException.get("not_supported","Not Supported");
     }
 
     public boolean execute(String sql,
                            String[] columnNames) throws SQLException {
+    	sdebug(columnNames + " : ss 2 " + sql);
 
         throw JGException.get("not_supported","Not Supported");
     }
@@ -486,6 +549,7 @@ org.jiql.jdbc.ResultSet resultset = null;
 
     public boolean execute(String sql,
                            int[] columnIndexes) throws SQLException {
+    	sdebug(columnIndexes + " : ss 3 " + sql);
 
         throw JGException.get("not_supported","Not Supported");
     }
@@ -493,19 +557,27 @@ org.jiql.jdbc.ResultSet resultset = null;
   Vector batch = new Vector();
     
 public    void 	addBatch(String sql) throws SQLException {
+    	sdebug( " : ssb 3 " + sql);
+
 batch.add(sql);
 }        
 //Adds the given SQL command to the current list of commmands for this Statement object.
 public void 	cancel() throws SQLException {
+    	sdebug( " : ss 4 ");
+
         throw JGException.get("not_supported","Not Supported");
 
 }        
 //Cancels this Statement object if both the DBMS and driver support aborting an SQL statement.
 public void 	clearBatch() throws SQLException {
+    	sdebug( " : ssb 4 " );
+
 batch.clear();
 }        
 //Empties this Statement object's current list of SQL commands.
 public void 	clearWarnings() throws SQLException {
+    	sdebug( " : ssb 5 " );
+
 }        
 //Clears all the warnings reported on this Statement object.
 boolean close = false;
@@ -515,6 +587,8 @@ public void 	close() throws SQLException {
 //Releases this Statement object's database and JDBC resources immediately instead of waiting for this to happen when it is automatically closed.
 
 public int[] 	executeBatch() throws SQLException {
+    	sdebug( " : ss executeBatch ");
+
 	while (batch.size() > 0){
 		String sql = batch.elementAt(0).toString();
 		batch.removeElementAt(0);
@@ -525,20 +599,28 @@ public int[] 	executeBatch() throws SQLException {
 //Submits a batch of commands to the database for execution and if all commands execute successfully, returns an array of update counts.
 
 public int 	executeUpdate(String sql) throws SQLException {
+    	sdebug( " : ss executeUpdate ");
+
 execute(sql);
 return 0;
 }        
 //Executes the given SQL statement, which may be an INSERT, UPDATE, or DELETE statement or an SQL statement that returns nothing, such as an SQL DDL statement.
 public int 	executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
+    	sdebug( " : ss executeUpdate 2 ");
+
 	return 0;
 }        
 //Executes the given SQL statement and signals the driver with the given flag about whether the auto-generated keys produced by this Statement object should be made available for retrieval.
 public int 	executeUpdate(String sql, int[] columnIndexes) throws SQLException {
+     	sdebug(columnIndexes + " : ss 5 " + sql);
+
         throw JGException.get("not_supported","Not Supported");
 
 }        
 //Executes the given SQL statement and signals the driver that the auto-generated keys indicated in the given array should be made available for retrieval.
 public int 	executeUpdate(String sql, String[] columnNames) throws SQLException {
+     	sdebug(columnNames + " : ss 6 " + sql);
+
         throw JGException.get("not_supported","Not Supported");
 
 }        
@@ -548,35 +630,45 @@ return connection;
 }        
 //Retrieves the Connection object that produced this Statement object.
 public int 	getFetchDirection() throws SQLException {
+     	sdebug( " : ss 7 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }        
 //Retrieves the direction for fetching rows from database tables that is the default for result sets generated from this Statement object.
 public int 	getFetchSize() throws SQLException {
+     	sdebug( " : ss 8 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }        
 //Retrieves the number of result set rows that is the default fetch size for ResultSet objects generated from this Statement object.
 public ResultSet 	getGeneratedKeys() throws SQLException {
+       	sdebug( " : ss 9 " );
+
         throw JGException.get("not_supported","Not Supported");
 
 }        
 //Retrieves any auto-generated keys created as a result of executing this Statement object.
 public int 	getMaxFieldSize() throws SQLException {
+    	sdebug( " : ssb 6 " );
+
 return 30000;
 }        
 //Retrieves the maximum number of bytes that can be returned for character and binary column values in a ResultSet object produced by this Statement object.
 public int 	getMaxRows() throws SQLException {
+    	sdebug( " : ssb 7 " );
+
 return 30000;
 }        
 //Retrieves the maximum number of rows that a ResultSet object produced by this Statement object can contain.
 /*public boolean 	getMoreResults() throws SQLException {
-        throw JGException.get("not_supported","Not Supported");
+        throw JGException.get("not_supported"," ");
 
 }        
 //Moves to this Statement object's next result, returns true if it is a ResultSet object, and implicitly closes any current ResultSet object(s) obtained with the method getResultSet.
 public boolean 	getMoreResults(int current) throws SQLException {
-        throw JGException.get("not_supported","Not Supported");
+        throw JGException.get("not_supported"," ");
 
 }    */  
 
@@ -588,6 +680,8 @@ public boolean 	getMoreResults(int current) throws SQLException {
     * obtained with the method getResultSet.
     */
    public boolean getMoreResults() throws SQLException {
+     	sdebug( " : ssb 8 " );
+
        return getMoreResults( Statement.CLOSE_CURRENT_RESULT );
    }
 
@@ -597,6 +691,8 @@ public boolean 	getMoreResults(int current) throws SQLException {
     * flag, and returns true if the next result is a ResultSet object.
     */
    public boolean getMoreResults( int current ) throws SQLException {
+          	sdebug( " : ss 10 " );
+
        switch ( current ) {
            case Statement.CLOSE_CURRENT_RESULT :
                if ( resultset != null ) {
@@ -618,6 +714,8 @@ public boolean 	getMoreResults(int current) throws SQLException {
   
 //Moves to this Statement object's next result, deals with any current ResultSet object(s) according to the instructions specified by the given flag, and returns true if the next result is a ResultSet object.
 public int 	getQueryTimeout() throws SQLException {
+    	sdebug( " : ssb 10 " );
+
 return 30;
 }        
 //Retrieves the number of seconds the driver will wait for a Statement object to execute.
@@ -626,57 +724,72 @@ public ResultSet 	getResultSet() throws SQLException {
 }        
 //Retrieves the current result as a ResultSet object.
 public int 	getResultSetConcurrency() throws SQLException {
+sdebug( " : ssb 110 " );
 	return -1;
 }        
 //Retrieves the result set concurrency for ResultSet objects generated by this Statement object.
 public int 	getResultSetHoldability() throws SQLException {
+sdebug( " : ssb 120 " );
 	return -1;
 }        
 // Retrieves the result set holdability for ResultSet objects generated by this Statement object.
 public int 	getResultSetType() throws SQLException {
+sdebug( " : ssb 13 " );
 	return ResultSet.TYPE_FORWARD_ONLY;
 }        
 //Retrieves the result set type for ResultSet objects generated by this Statement object.
 public int 	getUpdateCount() throws SQLException {
+sdebug( " : ssb 14 " );
 return -1;
 }        
 //Retrieves the current result as an update count; if the result is a ResultSet object or there are no more results, -1 is returned.
 public SQLWarning 	getWarnings() throws SQLException {
+sdebug( " : ssb 15 " );
 return null;
 }        
 //Retrieves the first warning reported by calls on this Statement object.
 public boolean 	isClosed() throws SQLException {
+sdebug( " : ssb 16 " );
 	return close;
 }        
 //Retrieves whether this Statement object has been closed.
 public boolean 	isPoolable() throws SQLException {
+sdebug( " : ssb 17 " );
 	return false;
 }        
 String cname = null;
 //Returns a value indicating whether the Statement is poolable or not.
 public void 	setCursorName(String name) throws SQLException {
+sdebug( " : ssb 18 " );
 cname = name;
 }        
 //Sets the SQL cursor name to the given String, which will be used by subsequent Statement object execute methods.
 public void 	setEscapeProcessing(boolean enable) throws SQLException {
+sdebug( " : setEscapeProcessing "  + enable);
 }        
 //Sets escape processing on or off.
 public void 	setFetchDirection(int direction) throws SQLException {
+sdebug( " : ssb 20 " );
 }        
 //Gives the driver a hint as to the direction in which rows will be processed in ResultSet objects created using this Statement object.
 public void 	setFetchSize(int rows) throws SQLException {
+sdebug( " : ssb 21 " );
 }        
 //Gives the JDBC driver a hint as to the number of rows that should be fetched from the database when more rows are needed for ResultSet objects genrated by this Statement.
 public void 	setMaxFieldSize(int max) throws SQLException {
+sdebug( " : ssb 22 " );
 }        
 //Sets the limit for the maximum number of bytes that can be returned for character and binary column values in a ResultSet object produced by this Statement object.
 public void 	setMaxRows(int max) throws SQLException {
+sdebug( " : ssb 23 " );
 }        
 //Sets the limit for the maximum number of rows that any ResultSet object generated by this Statement object can contain to the given number.
 public void 	setPoolable(boolean poolable) throws SQLException {
+sdebug( " : ssb 24 " );
 }        
 //Requests that a Statement be pooled or not pooled.
 public void 	setQueryTimeout(int seconds) throws SQLException {
+sdebug( " : ssb 25 " );
 }        
 //Sets the number of seconds the driver will wait for a Statement object to execute to the given number of seconds.
     

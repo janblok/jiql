@@ -117,7 +117,7 @@ String tok = req.getParameter("date.format");
 if (tok != null)
 nvp.put("date.format",tok);
  Conn = get(nvp);
-Statement Stmt = Conn.createStatement();
+org.jiql.jdbc.Statement Stmt = (org.jiql.jdbc.Statement)Conn.createStatement();
 Stmt.execute(sql);
 org.jiql.jdbc.ResultSet res = (org.jiql.jdbc.ResultSet)Stmt.getResultSet();
  
@@ -130,6 +130,9 @@ org.jiql.jdbc.ResultSet res = (org.jiql.jdbc.ResultSet)Stmt.getResultSet();
   if (res.getSQLParser() != null)
  h.put("sqlparser",res.getSQLParser());
  }
+ else
+ 	 h.put("sqlparser",Stmt.getSQLParser());
+
  //h.put("remote","true");
             resp.setContentType("binary/object");
             OutputStream fos = resp.getOutputStream();
@@ -141,6 +144,7 @@ org.jiql.jdbc.ResultSet res = (org.jiql.jdbc.ResultSet)Stmt.getResultSet();
 }catch (Exception ex){
 //org.jiql.util.JGUtil.log(ex);
 ex.printStackTrace();
+tools.util.LogMgr.err("JIQLServlet " + ex.toString());
 JGException je = null;
 if (ex instanceof JGException)
 je = (JGException)ex;

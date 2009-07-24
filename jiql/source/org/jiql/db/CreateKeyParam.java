@@ -47,17 +47,25 @@ public class CreateKeyParam  implements Serializable
 	Vector<String> keys = new Vector<String>();
 
 
-
+StringBuffer cache = new StringBuffer();
 
 
 	public boolean parse(StringBuffer tok){
 String tokstr = "key ";
-boolean i3 = tok.toString().toLowerCase().startsWith(tokstr);
+tok.insert(0,cache);
+boolean i3 = tok.toString().trim().toLowerCase().startsWith(tokstr);
 			if (i3){
+				if (tok.indexOf("(") > 0 && !(tok.indexOf(")") > 0))
+				{
+					cache.append(tok);
+					return true;
+				}
 				//if (keys.contains(n))return tok;
+					//("$$ IS KEY " + tok);
+
 	        	tok.replace(0,tok.length(),"");
-
-
+					if (cache.length() > 0)
+					cache.delete(0,cache.length());
 					//keys.add(n);
 					return true;
 
