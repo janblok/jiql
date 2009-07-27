@@ -44,7 +44,9 @@ import org.jiql.util.JGUtil;
 public class SelectParser  implements Serializable
 {
 	Limit limit = new Limit();
+	CalcFoundRows cfr = new CalcFoundRows();
 		SQLParser sqp = null;
+		SQLFunctionParser sfp = new SQLFunctionParser();
 	public SelectParser(SQLParser sqp){
 		this.sqp = sqp;
 
@@ -53,15 +55,25 @@ public class SelectParser  implements Serializable
 	public Limit getLimit(){
 		return limit;
 	}
-
+	public CalcFoundRows getCalcFoundRows(){
+		return cfr;
+	}
 
 	public StringBuffer parse(StringBuffer tok)throws SQLException{
 		tok = getLimit().parse(tok);
+		tok = getCalcFoundRows().parse(tok);
 		return tok;
 
 	}
 
+	public SQLFunctionParser getSQLFunctionParser(){
+		return sfp;
+	}
+	public StringBuffer parseFunctions(StringBuffer tok,String alias)throws SQLException{
+		tok = getSQLFunctionParser().parse(tok,alias);
+		return tok;
 
+	}
 
 
 
