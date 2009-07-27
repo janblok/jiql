@@ -43,7 +43,7 @@ import org.jiql.util.JGException;
 public class StringFunctions  implements Serializable
 {
 
-	static Vector supporedtFunctions = new Vector();
+	static Vector<String> supporedtFunctions = new Vector<String>();
 	static{
 		supporedtFunctions.add("upper");
 		supporedtFunctions.add("lower");
