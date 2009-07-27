@@ -77,6 +77,7 @@ public  class SQLParser implements java.io.Serializable
 	boolean count = false;
 	
 	Hashtable selectAS = new Hashtable();
+   	Hashtable<String,String> selectAS2 = new Hashtable<String,String>();
    	static Vector<String> reserved  = new Vector<String>();
    	static Vector<String> sreserved  = new Vector<String>();
    	
@@ -177,10 +178,16 @@ public DateFormat getDateFormat(){
 		public Hashtable getSelectAS(){
 	return selectAS;
 	}
+
+		public Hashtable<String,String> getSelectAS2(){
+	return selectAS2;
+	}
 	
 	String getSAlias(String n){
 		
 		String a = (String)selectAS.get(n);
+		if (a == null)
+			a = selectAS2.get(n);
 		if (a != null)return a;
 		return null;
 	}
@@ -197,13 +204,15 @@ public DateFormat getDateFormat(){
 		
 		return null;
 	}
-	public void updateSelects(){
+	public void updateSelects()throws SQLException{
 		String itm = null;
 		int i = 0;
 		for (int ct = 0;ct < selectList.size();ct++)
 		{
 			itm = selectList.elementAt(ct).toString();
 			String itm2 = parseSelectAlias(itm);
+			//(itm + " parseSelectAS2  " + itm2);
+
 			itm2 = sfunctions.parse(itm2);
 
 			if (!itm2.equals(itm))
@@ -215,15 +224,29 @@ public DateFormat getDateFormat(){
 			if (itm.startsWith(table + ".")){
 			itm = StringUtil.getTrimmedValue(itm.substring(table.length() + 1,itm.length()));
 			if (StringUtil.isRealString(itm))
-			selectList.setElementAt(itm,ct);
+			selectList.setElementAt(getSelectParser().parseFunctions(new StringBuffer(itm),null).toString(),ct);
 			}
 			//itm =  (itm);
 			i =  itm.toLowerCase().indexOf(" as ");
 			if (i > 0){
 			if (StringUtil.isRealString(StringUtil.getTrimmedValue(itm.substring(0,i)))){
-			
-			selectList.setElementAt(StringUtil.getTrimmedValue(itm.substring(0,i)),ct);
-			selectAS.put(selectList.elementAt(ct),StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length())));
+			StringBuffer un = new StringBuffer(StringUtil.getTrimmedValue(itm.substring(0,i)));
+			StringBuffer uv = new StringBuffer(StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length())));
+			getSelectParser().parseFunctions(un,uv.toString());
+
+		//	selectList.setElementAt(un.toString(),ct);
+	//		 (selectList.elementAt(ct),uv.toString());
+	//		 (uv.toString(),selectList.elementAt(ct).toString());
+			selectList.setElementAt(uv.toString(),ct);
+			selectAS.put(selectList.elementAt(ct),un.toString());
+			//(ct + " ADD TO SELECT LIST " + uv.toString() + ":" + un.toString() + selectAS);
+
+
+			// (un.toString(),selectList.elementAt(ct));
+
+			// (uv.toString(),selectList.elementAt(ct).toString());
+
+
 			}
 			}
 		}
@@ -243,6 +266,7 @@ public DateFormat getDateFormat(){
 			itm = sfunctions.parse(itm);
 
 			String itm2 = parseSelectAlias(itm);
+			//(itm + " parseSelectAS1  " + itm2);
 			if (!itm2.equals(itm))
 			{
 				itm = itm2;
@@ -276,7 +300,7 @@ public DateFormat getDateFormat(){
 	}
 	
 		public boolean isCount(){
-		return count;
+		return ((count || getSelectParser().getSQLFunctionParser().hasFunction("count") ) && (getSelectList().size() < 2));
 	}
 	
 	public Vector getSortList(){
@@ -375,7 +399,7 @@ public DateFormat getDateFormat(){
 	}
 	
 	public String toString(){
-		return "jiql.SQLParser table:" + table + ";aliases:" + aliases  + ";values:" + hash + ";selects:" + selectList + ";selectAS:" + selectAS +  ";includealllist:" +  includealllist + ";eitheroralllist:" + eitheroralllist + ";getOriginalSelectList:" + getOriginalSelectList()+ ";groupby:" + groupby + ";union:" + union;
+		return "jiql.SQLParser table:" + table + ";aliases:" + aliases  + ";values:" + hash + ";selects:" + selectList + ";selectAS:" + selectAS + ";selectAS2:" + selectAS2 +  ";includealllist:" +  includealllist + ";eitheroralllist:" + eitheroralllist + ";getOriginalSelectList:" + getOriginalSelectList()+ ";groupby:" + groupby + ";union:" + union;
 	}
 
 		/*public String toString(){
@@ -448,7 +472,7 @@ public DateFormat getDateFormat(){
 				cit = ci.getColumnType();
 				Object o = jiqlCellValue.getObj(value,cit,this);
 				return o;
-				/*if (cit == Types.INTEGER){
+				/*if (cit ==  ){
 					//(c + " convert: " + ":" +  value + ":" +  value.getClass().getName());
 	
 					return new Long(value.toString());
@@ -474,28 +498,41 @@ public DateFormat getDateFormat(){
 	
 	public String getRealColName(String n){
 		
-					//Enumeration en = SelectAS.keys
-					//n = StringUtil.getTrimmedValue(n);
+					int i2 = 0;
+					//String oldn = n;
+					
+					i2 = n.indexOf(".");
+					/*if (i2 > 0){
+						n = n.substring(i2 +1 ,n.length());
+					}*/
 					String rn = (String)selectAS.get(n);
-				//( rn + " selectAS getRealColName " + selectAS + ":" + n + ":" + aliases);
+					//(rn +  " RN " + n + ":" + selectAS);
+					//if (rn == null)
+					//	rn = selectAS2.get(n);
+				//( rn + "   getRealColName " + selectAS + ":" + n + ":" + aliases);
 
 					if (rn != null)n = rn;
-					int i2 = n.indexOf(".");
+					i2 = n.indexOf(".");
 	
-				//(n + " NEW COL b " + v);
+							//(  " log getRealColName 333 " + rn + ":" + n + ":" + table + ":" +  aliases);
+//the_role:the_role:realm_userrole1:{role=realm_userrole1}
+//the_role RN role.realm_rolename:{role.realm_rolename=the_role}
+
 
 			if (i2 > 0){
 				String al = n.substring(0,i2);
 				al = al.trim();
 				String ta = (String)aliases.get(al);
 
-				//( al + " log getRealColName " + ta + ":" + n + ":" + aliases);
-				if (ta !=  null){
+				//( al + " log getRealColName " + ta + ":" + n + ":" + table + ":" +  aliases);
+				if (ta !=  null || al.equals(table)){
 					n = n.substring(i2+1,n.length());
 					return n;
 					
 				}
 			}
+			
+
 			
 			n =  getSelectASRealName(n);
 				 i2 = n.indexOf(".");
@@ -556,10 +593,11 @@ public DateFormat getDateFormat(){
 	}
 	
 	String getSelectASRealName(String n){
-		
+		/*
 		String rn = (String)selectAS.get(n);
-			//(rn + ":" + selectAS + " selectAS " + n + ":" + aliases);
-
+			//(rn + ":" +   + " selectAS " + n + ":" + aliases);
+			if (rn == null)
+			rn = (String)selectAS2.get(n);
 			if (rn != null) n = rn;
 		
 		Enumeration en = selectAS.keys();
@@ -573,7 +611,7 @@ public DateFormat getDateFormat(){
 				break;
 			}
 		}
-			//(rn + ":" + selectAS + " selectAS 2 " + n + ":" + aliases);
+*/
 		
 		return n;
 		
@@ -1898,6 +1936,9 @@ jiqlConstraint jConstraint = null;
 		{
 
 			n = v.elementAt(ct).toString();
+		n = StringUtil.replaceSubstring(n,"\"","");
+		n = StringUtil.replaceSubstring(n,"'","");
+		n = StringUtil.replaceSubstring(n,"`","");
 			if (getCreateParser().parseParams(n))
 				continue;
 			n = n.trim();
