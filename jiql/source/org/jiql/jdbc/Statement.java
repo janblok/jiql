@@ -64,7 +64,8 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 	}
 
 	void sdebug(String t){
-		//tools.util.LogMgr.debug("statment " + t);
+		//tools.util.LogMgr.debug
+		//("statment " + t);
 	}
 	
 	SQLParser dsqp = null;
