@@ -64,10 +64,11 @@ public Connection 	connect(String url, Properties info){
 url = StringUtil.replaceSubstring(url,"jdbc:jiql:gql:","");
 url = StringUtil.replaceSubstring(url,"jdbc:jiql:","");
 info.put("url",url);
-
+String baseUrl = url;
 int i = url.indexOf("?");
 if (i > 0){
 String par = url.substring(i + 1,url.length());
+baseUrl = url.substring(0,i);
 par = SEXParser.decodeXML(par);
 Hashtable h = StringUtil.parseQueryString(par);
 //("JID1a " + h);
@@ -84,6 +85,7 @@ while (en.hasMoreElements())
 
 }
 }
+info.put("baseUrl",baseUrl);
 return  new jiqlConnection(info);
 }
           //Attempts to make a database connection to the given URL.
