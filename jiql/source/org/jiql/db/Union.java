@@ -45,7 +45,7 @@ public class Union implements Serializable
 //	Vector tables = new Vector();
 	Hashtable aliases = new Hashtable();
    //Hashtable<String, Vector> selects  = new Hashtable<String, Vector>();	
-   //Hashtable<String, Hashtable> selectAS  = new Hashtable<String, Hashtable>();	
+   //Hashtable<String, Hashtable>    = new Hashtable<String, Hashtable>();	
    Vector<Criteria> jincludealllist  = new Vector<Criteria>();	
    	Vector<Criteria> jeitheroralllist  = new Vector<Criteria>();
   // 	   Hashtable<String, Vector> includealllist  = new Hashtable<String, Vector>();	
@@ -84,7 +84,7 @@ public Union(SQLParser s){
 	    				nvo = row.get(rn);
 	    				//(nvo + " CMPR " + cr.getName() + ":" +  cr.getValue());
 	    				if (nvo == null)continue;
-	    		//typ = ti.getColumnInfo(cr.getName()).getColumnType();
+	    		//typ = ti.get (cr.getName()).getColumnType();
 	    				c1 = new jiqlCellValue(nvo,typ,sqp);
 	    				c2 = new jiqlCellValue(v,typ,sqp);
 	    			    if (c1.compareTo(c2) == 0){
@@ -140,7 +140,7 @@ public Union(SQLParser s){
 	    				nvo = row.get(rn);
 	    				//(nvo + " CMPR " + cr.getName() + ":" +  cr.getValue());
 	    				if (nvo == null)continue;
-	    		//typ = ti.getColumnInfo(cr.getName()).getColumnType();
+	    		//typ = ti.get (cr.getName()).getColumnType();
 	    				c1 = new jiqlCellValue(nvo,typ,null);
 	    				c2 = new jiqlCellValue(v,typ,null);
 	    			    if (c1.compareTo(c2) == 0)
@@ -511,6 +511,23 @@ SQLParser getAnySQLParser(String t)throws SQLException{
 		return sqp;
 	return getSQLParser(t);
 }
+
+
+
+public String getRealColName(String n){
+			String rn = null;
+				Enumeration<SQLParser> ens = listSQLParsers();
+				//(rn + " *** WOKED BEFORE 1 " + n);
+
+			while (ens.hasMoreElements())
+			{
+				rn = ens.nextElement().getRealColName(n);
+				//(rn + " *** WOKED BEFORE " + n);
+				if (rn != null)
+					return rn;
+			}
+			return null;
+}
 public SQLParser getSQLParser(String t)throws SQLException{
 SQLParser s = sqps.get(t);
 if (s != null){
@@ -519,7 +536,7 @@ if (s != null){
 return s;
 }
 
-public Enumeration listSQLParsers(){
+public Enumeration<SQLParser> listSQLParsers(){
 return sqps.elements();
 }
 
@@ -637,13 +654,9 @@ Hashtable v =	s.getSelectAS();
 void selectASPut(String t,String c,String a)throws SQLException{
 
 				Hashtable sl = add(t).getSelectAS();
-				//selectAS.get(t);
-				/*if (sl == null){
-				sl  = new Hashtable<String, String>();	
+					sl.put(a,c);
 
-					selectAS.put(t,sl);
-				}*/
-				sl.put(c,a);
+				//sl.put(c,a);
 
 }
 	
@@ -726,7 +739,7 @@ return null;
 
 
 	public boolean isJoinFilter(String left,String right){
-// :[table2]; :{t2=table2}; :{table2=[t2.price]};selectAS:{table2={t2.price=the_price}} 
+// :[table2]; :{t2=table2}; :{table2=[t2.price]}; :{table2={t2.price=the_price}} 
 //select t1.name,t2.price   the_price,countf from testablet   t1,table2   t2 where the_price=t1.price
 
 	//( t + ":" + a +   ":" + sal  +":" + sar + ":" + l + " log isJoinFilter " + r + ":" + left + ":" + right);
@@ -763,7 +776,7 @@ return false;
 	}
 
 	public boolean isJoinFilter(String t,String a,String sal,String sar,String l,String r){
-// :[table2]; :{t2=table2}; :{table2=[t2.price]};selectAS:{table2={t2.price=the_price}} 
+// :[table2]; :{t2=table2}; :{table2=[t2.price]}; :{table2={t2.price=the_price}} 
 //select t1.name,t2.price   the_price,countf from testablet   t1,table2   t2 where the_price=t1.price
 	String left = findTable(t,a,sal,l);
 	String right = findTable(t,a,sar,r);
@@ -780,7 +793,7 @@ return false;
 	}*/
 	
 		public String findTable(String t,String a,String sa,String l)throws SQLException{
-// :[table2]; :{t2=table2}; :{table2=[t2.price]};selectAS:{table2={t2.price=the_price}} 
+// :[table2]; :{t2=table2}; :{table2=[t2.price]}; :{table2={t2.price=the_price}} 
 //select t1.name,t2.price   the_price,countf from testablet   t1,table2   t2 where the_price=t1.price
 	merge();
 	if (sa != null && sa.equals(l))
@@ -875,8 +888,9 @@ return null;
 			if (i > 0){
 			
 			String itmn = (StringUtil.getTrimmedValue(itm.substring(0,i)));
-			selectASPut(t,itmn,StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length())));
-			itm = itmn;
+			String itmn2 = StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length()));
+			selectASPut(t,itmn,itmn2);
+			itm = itmn2;
 			}
 			//}else
 				sl.add(itm);
@@ -895,8 +909,10 @@ return null;
 			if (i > 0){
 			
 			String itmn = (StringUtil.getTrimmedValue(itm.substring(0,i)));
-			selectASPut(t,itmn,StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length())));
-			itm = itmn;
+						String itmn2 = StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length()));
+
+			selectASPut(t,itmn,itmn2);
+			itm = itmn2;
 			}
 				
 				sl.add(itm);
@@ -940,8 +956,9 @@ return null;
 			if (i > 0){
 			
 			String itmn = (StringUtil.getTrimmedValue(itm.substring(0,i)));
-			selectASPut(t,itmn,StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length())));
-			itm = itmn;
+			String itmn2 = StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length()));
+			selectASPut(t,itmn,itmn2);
+			itm = itmn2;
 			}
 			//}else
 				sl.add(itm);
@@ -960,8 +977,9 @@ return null;
 			if (i > 0){
 			
 			String itmn = (StringUtil.getTrimmedValue(itm.substring(0,i)));
-			selectASPut(t,itmn,StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length())));
-			itm = itmn;
+			String itmn2 = StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length()));
+			selectASPut(t,itmn,itmn2);
+			itm = itmn2;
 			}
 				
 				sl.add(itm);
