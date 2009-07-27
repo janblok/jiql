@@ -82,9 +82,9 @@ for (int ct = 0;ct < ch.size();ct++)
 			
 			ColumnInfo ci = tbi.getColumnInfo(nn);
 			if (ci != null){
-				//(nn + " getAutoIncrementInt c " + ci.getColumnType() + ":" + Types.INTEGER);
+				//(nn + " getAutoIncrementInt c " + ci.getColumnType() + ":" +  );
 
-				if (ci.getColumnType() == Types.INTEGER){
+				if (ci.isNumeric()){
 				//(nn + " getAutoIncrementInt a ");
 
 				if (sqp.getJiqlTableInfo().listAutoIncrements().contains(nn))
