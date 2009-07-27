@@ -685,7 +685,7 @@ return 0;
 	    	
 	    	//("RD 34 " + h);
 	    	if (selL == null || selL.size() < 1)return h;
-	    	if(selL.contains("*"))return h;
+	    	if(selL.contains("*") || sqp.isCount())return h;
 	    	Enumeration en = h.keys();
 	    	Hashtable sh = new Hashtable();
 	    	Row nrow = null;
