@@ -32,7 +32,7 @@ import java.sql.*;
 import java.io.*;
 import org.jiql.util.SQLParser;
 
-public class TableInfo extends Vector  implements Serializable
+public class TableInfo extends Vector  implements Cloneable,Serializable
 {
 public String getTableName(){
 	//return ((Vector)elementAt(0)).elementAt(1).toString();
@@ -76,7 +76,7 @@ public ColumnInfo getColumnInfo(String n){
 	return null;
 }
 
-public void include(SQLParser sqp){
+public void include(SQLParser sqp)throws SQLException{
 	//|| v.size() < 1(v + " TII " + v.contains("*"));
 	Vector v = sqp.getSelectList();
 	Vector inc = new Vector();
@@ -110,30 +110,46 @@ public void include(SQLParser sqp){
 			tools.util.LogMgr.err("TableInfo.inc* " + e.toString());
 		}
 	}
-Vector v2 = new Vector();
+/*Vector v2 = new Vector();
 	while (v.size() > 0)
 	{
 		String n = (String)v.elementAt(0);
 		v.removeElementAt(0);
 		n = sqp.getRealColName(n);
-		if (!v2.contains(n))
+	//	if (!v2.contains(n))
 			v2.add(n);
 	}
 
-	v = v2;
+	v = v2;*/
 
 
 //	 inc = new Vector();
 //	 ci = null;
 
-	while (size() > 0)
+String dn = null;
+String rn = null;
+	for (int ctr = 0 ;ctr < v.size();ctr++)
 	{
-		ci = (ColumnInfo)elementAt(0);
-		removeElementAt(0);
-		//(v + " CI.INCL " + ci.getName());
-		if (v.contains(ci.getName()))
-			inc.add(ci);
+		dn = v.elementAt(ctr).toString();
+		rn = sqp.getRealColName(dn);
+	//(rn + " TI INCLUDE " + dn);
+		for (int ctr2 = 0 ;ctr2 < size();ctr2++)
+	{	
+		ci = (ColumnInfo)elementAt(ctr2);
+		if (rn.equals(ci.getName()))
+			break;
 	}
+		ci = ci.copy();
+		ci.setDisplayName(dn);
+		inc.add(ci);
+	}
+	
+		while (size() > 0)
+	{
+		removeElementAt(0);
+	}
+	
+	
 	while (inc.size() > 0)
 	{
 		add((ColumnInfo)inc.elementAt(0));
