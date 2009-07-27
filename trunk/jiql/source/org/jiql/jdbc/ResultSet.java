@@ -37,6 +37,8 @@ import org.jiql.db.*;
 import java.math.*;
 import java.net.*;
 import org.jiql.db.objs.*;
+import org.jiql.db.select.FunctionBase;
+
 public class ResultSet implements java.sql.ResultSet,java.io.Serializable
 {
 public static Vector jiqldescols = new Vector();
@@ -141,6 +143,12 @@ public ResultSet(Vector r,SQLParser s){
 	sqp = s;
 	if (results != null && sqp.getConnection() != null)
 		sqp.getConnection().setFoundRows(results.size());
+}
+
+public void reset(){
+	indx = 0;
+	wasNull = false;
+	close = false;
 }
 public Vector getResults(){
 	return results;
@@ -628,8 +636,20 @@ public  int getInt(String columnLabel)  throws SQLException{
 					return new Integer(sqp.getConnection().getIdentity()).intValue();
 			
 		}
-	checkNull(getRowObject().get(columnLabel));
-	return getRowObject().getInt(columnLabel);
+	
+		Object o = getRowObject().get(columnLabel);
+	//	checkNull(o);
+
+//		FunctionBase fb = sqp.getSelectParser().getSQLFunctionParser().getFunction(columnLabel);
+//if (fb != null)o = fb.process(o);
+		if (o != null)
+		return (Integer)o;
+		
+		return 0; 
+
+	
+	//checkNull(o);
+	//return getRowObject().getInt(columnLabel);
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as an int in the Java programming language. 
@@ -815,7 +835,10 @@ public  Object getObject(String columnLabel)  throws SQLException{
 	}
 
 	}
+	FunctionBase fb = sqp.getSelectParser().getSQLFunctionParser().getFunction(columnLabel);
+if (fb != null)o = fb.process(o,sqp); 
 	checkNull(o);
+
 	return o;
 }
  //            Gets the value of the designated column in the current row of this ResultSet object as an Object in the Java programming language. 
@@ -931,7 +954,7 @@ public  String getString(String columnLabel)  throws SQLException{
 		if (column == 1 || column == 3)
 		return Types.BOOLEAN;
 		if ( column == 4)
-		return Types.INTEGER;
+		return  ;
 		return Types.VARCHAR;
 	}*/
 
