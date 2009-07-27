@@ -55,9 +55,9 @@ public jiqlCellValue(Object v,int type,SQLParser sqp)throws SQLException{
 	this.sqp = sqp;
 co = getObj(v,type,sqp);
 /*if (v == null)return ;
-	if (Types.VARCHAR == type )
+	if ( = type )
 		co = new String(v.toString());
-	else if (Types.INTEGER == type)
+	else if (  == type)
 		co = new Integer(v.toString());
 	else co = v;*/	
 	
@@ -72,7 +72,7 @@ if (v instanceof com.google.appengine.api.datastore.Text)
 v = new String(((com.google.appengine.api.datastore.Text)v).getValue());
 	if (Types.VARCHAR == type )
 		return new String(v.toString());
-	else if (Types.INTEGER == type)
+	else if (Types.INTEGER == type || Types.BIGINT == type)
 		return new Long(v.toString());
 	else if (Types.FLOAT == type)
 		return new Float(v.toString());
