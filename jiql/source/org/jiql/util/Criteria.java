@@ -96,7 +96,7 @@ public Object getValue(){
 				try{
 				
 				int cit = ci.getColumnType();
-				if (cit == Types.INTEGER)
+				if (cit ==  )
 					return new Long(value);
 				else if (cit == Types.DATE)
 					return new Date(value);
