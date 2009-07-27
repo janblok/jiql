@@ -76,7 +76,7 @@ if (jti == null )
 			{
 			String sn = v.elementAt(ct).toString();
 			if (sn.indexOf("*") > -1)continue;
-			if (ti.getColumnInfo(sqp.getRealColName(sn)) == null)
+			if (ti.getColumnInfo(sqp.getRealColName(sn)) == null  && !sqp.isCount())
 			throw jiqlException.get("unknown_column",sqp.getTable() + " Selected Unknown column " + sn + ":" + sqp.getRealColName(sn) + ":" + sqp.getTAlias(sqp.getTable()) + ":" + ti);
 			}
 
