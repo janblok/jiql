@@ -33,12 +33,31 @@ import java.io.*;
 import org.jiql.util.JGNameValuePairs;
 
 
-public class ColumnInfo implements Serializable
+public class ColumnInfo implements Serializable,Cloneable
 {
 org.jiql.util.JGNameValuePairs nvp = null;
 
 public ColumnInfo(JGNameValuePairs v){
 	nvp = v;
+}
+
+String dn = null;
+public void setDisplayName(String d){
+	dn = d;
+}
+public ColumnInfo copy()throws SQLException{
+	try{
+	
+	return (ColumnInfo)clone();
+	}catch (Exception e){
+		throw new SQLException("ColumnInfo.copy " + e.toString());
+	}
+	
+}
+
+public String getDisplayName(){
+	if (dn != null)return dn;
+	return getName();
 }
 
 public String getName(){
@@ -90,11 +109,14 @@ return tn.toString();
 }
 
 public boolean isNumeric()throws SQLException{
-	return (getColumnType() == Types.INTEGER);
+	int ct = getColumnType();
+	return (ct == Types.INTEGER || ct == Types.BIGINT);
 }
 public int 	getColumnType()throws SQLException{
 String tn =  getTypeName().toLowerCase();
-	if (tn.startsWith("int"))
+	if (tn.startsWith("bigint"))
+	 return Types.BIGINT;
+	else if (tn.startsWith("int"))
 		return Types.INTEGER;
 	else if (tn.startsWith("var") || tn.indexOf("text") > -1)
 		return Types.VARCHAR;
@@ -104,8 +126,8 @@ String tn =  getTypeName().toLowerCase();
 		return Types.BOOLEAN;
 	else if (tn.startsWith("tinyint"))
 		return Types.INTEGER;
-	else if (tn.startsWith("bigint"))
-		return Types.INTEGER;
+	//else if (tn.startsWith("bigint"))
+	//	return Types.INTEGER;
 
 	else if (tn.startsWith("float"))
 		return Types.FLOAT;
@@ -116,7 +138,9 @@ String tn =  getTypeName().toLowerCase();
 
 }
 
-
+public String toString(){
+	return "ColumnInfo:" + nvp;
+}
 
 }
 
