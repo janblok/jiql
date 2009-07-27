@@ -68,6 +68,7 @@ import java.sql.SQLException;
 import java.util.Vector;
 import org.jiql.db.Row;
 import org.jiql.util.SQLParser;
+import org.jiql.util.CacheMgr;
 
 // fredt@users 20020320 - patch 1.7.0 - JDBC 2 support and error trapping
 // JDBC 2 methods can now be called from jdk 1.1.x - see javadoc comments
@@ -3535,14 +3536,20 @@ dmetaLog( "dme 58 " );
      * @exception SQLException if a database access error occurs
      * @see #getSearchStringEscape
      */
+     
+
     public ResultSet getColumns(String catalog, String schemaPattern,
                                 String tableNamePattern,
                                 String columnNamePattern)
                                 throws SQLException {
              dmetaLog("getColumns " + catalog + ":" + schemaPattern + ":" + tableNamePattern + ":" +  columnNamePattern);
-		return connection.createStatement().executeQuery("getColumns " + tableNamePattern);
+		//return connection.createStatement().executeQuery("getColumns " + tableNamePattern);
 
-         //dmetaLog("getColumns " + catalog);
+			    org.jiql.jdbc.ResultSet r = CacheMgr.getMetaCache(connection.getProperties().getProperty("baseUrl"),"getColumns",tableNamePattern);
+        		if (r != null)return r;
+        		r = (org.jiql.jdbc.ResultSet)connection.createStatement().executeQuery("getColumns " + tableNamePattern);
+				CacheMgr.setMetaCache(connection.getProperties().getProperty("baseUrl"),"getColumns",r,connection.getProperties().getProperty("MetaCache"),tableNamePattern);
+				return r;
 
 
     }
@@ -3880,8 +3887,11 @@ dmetaLog( "dme 58 " );
     public ResultSet getPrimaryKeys(String catalog, String schema,
                                     String table) throws SQLException {
              dmetaLog("getPrimaryKeys " + table);
-        		return connection.createStatement().executeQuery("getPrimaryKeys " + table);
-
+             	org.jiql.jdbc.ResultSet r = CacheMgr.getMetaCache(connection.getProperties().getProperty("baseUrl"),"getPrimaryKeys",table);
+        		if (r != null)return r;
+        		r = (org.jiql.jdbc.ResultSet)connection.createStatement().executeQuery("getPrimaryKeys " + table);
+				CacheMgr.setMetaCache(connection.getProperties().getProperty("baseUrl"),"getPrimaryKeys",r,connection.getProperties().getProperty("MetaCache"),table);
+				return r;
 
     }
 
@@ -3985,10 +3995,12 @@ dmetaLog( "dme 58 " );
                                      String table) throws SQLException {
              dmetaLog("getImportedKeys " + table);
 
-               		ResultSet res =  connection.createStatement().executeQuery("getImportedKeys " + table);
-             dmetaLog("getImportedKeys2 " + res);
-
-		return res;
+               	//ResultSet res =  connection.createStatement().executeQuery("getImportedKeys " + table);
+             	org.jiql.jdbc.ResultSet r = CacheMgr.getMetaCache(connection.getProperties().getProperty("baseUrl"),"getImportedKeys",table);
+        		if (r != null)return r;
+        		r = (org.jiql.jdbc.ResultSet)connection.createStatement().executeQuery("getImportedKeys " + table);
+				CacheMgr.setMetaCache(connection.getProperties().getProperty("baseUrl"),"getImportedKeys",r,connection.getProperties().getProperty("MetaCache"),table);
+				return r;
 
     }
 
@@ -4092,10 +4104,15 @@ dmetaLog( "dme 58 " );
                                      String table) throws SQLException {
              dmetaLog("getExportedKeys " + table);
 
-              ResultSet res = connection.createStatement().executeQuery("getExportedKeys " + table);
-             dmetaLog("getExportedKeys2 " + res);
+              //ResultSet res = connection.createStatement().executeQuery("getExportedKeys " + table);
+             //dmetaLog("getExportedKeys2 " + res);
 			
-			return res;
+			//return res;
+			    org.jiql.jdbc.ResultSet r = CacheMgr.getMetaCache(connection.getProperties().getProperty("baseUrl"),"getExportedKeys",table);
+        		if (r != null)return r;
+        		r = (org.jiql.jdbc.ResultSet)connection.createStatement().executeQuery("getExportedKeys " + table);
+				CacheMgr.setMetaCache(connection.getProperties().getProperty("baseUrl"),"getExportedKeys",r,connection.getProperties().getProperty("MetaCache"),table);
+				return r;
 
     }
 
@@ -4372,17 +4389,14 @@ dmetaLog( "dme 58 " );
                                   boolean approximate) throws SQLException {
               dmetaLog(new StringBuffer("getIndexInfo:").append(table).append(":").append(unique).append(":").append(approximate) .toString());
 		//dmetaLog("getIndexInfo " + );
-		               		ResultSet res =  connection.createStatement().executeQuery("getIndex " + table);
+		        //ResultSet res =  connection.createStatement().executeQuery("getIndex " + table);
 
-				return res;
-		/*Vector v = new Vector();
-	
-		SQLParser sqp = new SQLParser("IndexInfo",connection);
-		sqp.setAction("showTables");
-			
-		org.jiql.jdbc.ResultSet jresult = new org.jiql.jdbc.ResultSet(v,sqp);
-	jresult.setIsCatalog(true);
-        return jresult;*/
+				//return res;
+			    org.jiql.jdbc.ResultSet r = CacheMgr.getMetaCache(connection.getProperties().getProperty("baseUrl"),"getIndex",table);
+        		if (r != null)return r;
+        		r = (org.jiql.jdbc.ResultSet)connection.createStatement().executeQuery("getIndex " + table);
+				CacheMgr.setMetaCache(connection.getProperties().getProperty("baseUrl"),"getIndex",r,connection.getProperties().getProperty("MetaCache"),table);
+				return r;
 
     }
 
