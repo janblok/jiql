@@ -33,6 +33,7 @@ import java.io.*;
 import org.jiql.db.*;
 import org.jiql.util.*;
 import org.jiql.db.objs.jiqlTableInfo;
+import org.jiql.db.select.FunctionBase;
 
 public class jiqlResultSetMetaData implements java.sql.ResultSetMetaData, java.io.Serializable
 {
@@ -64,16 +65,23 @@ if (!sqp.showTables() && !sqp.isSpecial()){
 			ti = sqp.getTableInfo();
 			if (ti == null)
 				ti = Gateway.get(sqp.getProperties()).readTableInfo(sqp.getTable());
+			ti = (TableInfo)ti.clone();
 			ti.include(sqp);
 	
 	Enumeration en =  sqp.getUnion().listSQLParsers();
 	while (en.hasMoreElements()){
 		SQLParser s = (SQLParser)en.nextElement();
 		TableInfo tis = s.getTableInfo();
+		 tis = (TableInfo)tis.clone();
 		tis.include(s);
 
-		for (int ct = 0;ct < tis.size();ct++)
+		//Vector ez = sqp.getOriginalSelectList();
+		//for (int ct = 0;ct < tis.size();ct++)
+		//	ti.add(tis.elementAt(ct));
+	
+			for (int ct = 0;ct < tis.size();ct++)
 			ti.add(tis.elementAt(ct));
+
 			
 	}
 	}
@@ -129,7 +137,7 @@ public int 	getColumnCount()throws SQLException{
 resLog("getColumnCount " );
 		if (isSchema())
 		{
-resLog("getColumnCount isSchema " );
+//("getColumnCount isSchema " );
 return 2;
 			
 		}
@@ -313,12 +321,11 @@ return "count(*)";
 ColumnInfo ci = ti.getColumnInfo(column);
 String dna = (String)(sqp.getSelectAS()).get(ci.getName());
 if (dna != null)return dna;
-return ci.getName();
+return ci.getDisplayName();
 }
           //Get the designated column's name.
 public int 	getColumnType(int column)throws SQLException{
 resLog("getColumnType " + column);
-
 		if (sqp.showTables())
 			return Types.VARCHAR;
 
@@ -363,7 +370,11 @@ resLog("getColumnType " + column);
 		return Types.INTEGER;
 		return Types.VARCHAR;
 	}
+
 ColumnInfo ci = ti.getColumnInfo(column);
+FunctionBase fb = sqp.getSelectParser().getSQLFunctionParser().getFunction(ci.getDisplayName());
+if (fb != null)return fb.getType(); 
+
 	return ci.getColumnType();
 
 
@@ -415,6 +426,9 @@ resLog("getColumnType " + column);
 		return "varchar";
 	}
 ColumnInfo ci = ti.getColumnInfo(column);
+FunctionBase fb = sqp.getSelectParser().getSQLFunctionParser().getFunction(ci.getDisplayName());
+if (fb != null)return fb.getTypeName(); 
+
 return ci.getTypeName();
 
 }
