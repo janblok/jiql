@@ -112,8 +112,16 @@ public boolean isNumeric()throws SQLException{
 	int ct = getColumnType();
 	return (ct == Types.INTEGER || ct == Types.BIGINT);
 }
+/*public static int getTypeFromName(String tn){
+
+}*/
 public int 	getColumnType()throws SQLException{
 String tn =  getTypeName().toLowerCase();
+return getTypeFromName(tn);
+}
+
+public static int 	getTypeFromName(String tn)throws SQLException{
+//String tn =  getTypeName().toLowerCase();
 	if (tn.startsWith("bigint"))
 	 return Types.BIGINT;
 	else if (tn.startsWith("int"))
