@@ -113,6 +113,7 @@ public jiqlTableInfo getTableInfo(String t,boolean create)throws SQLException{
 		 Object tis = null;
 		 	if (o != null)
 		 		tis = o.get("tableprop");
+	//(tis + " getTableInfo1 " + o + ":" + t);
 		 if (tis == null && !create)return null;
 
 	if (tis instanceof com.google.appengine.api.datastore.Text)
