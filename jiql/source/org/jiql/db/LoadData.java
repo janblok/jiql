@@ -101,7 +101,7 @@ load(sb,l);
 
 		if (fields == null){
 			//insert into wp_users (user_login) values ('gabo');
-			fields = new StringBuffer("insert into ").append(table).append(" (").append(templ).append(") values (");
+			fields = new StringBuffer("jiqlInsert into ").append(table).append(" (").append(templ).append(") values (");
 			olength = fields.length();
 		}
 		else{
@@ -127,7 +127,7 @@ load(sb,l);
 			fin.close();
 		}
 		}catch (IOException e){
-			tools.util.LogMgr.err("parseScript " + e.toString());
+			tools.util.LogMgr.err("LoadData.parseScript " + e.toString());
 			e.printStackTrace();
 		}
 	}
