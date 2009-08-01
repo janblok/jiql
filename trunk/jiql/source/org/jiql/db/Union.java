@@ -57,6 +57,33 @@ SQLParser sqp = null;
 public Union(SQLParser s){
 	sqp = s;
 }
+
+	public StringBuffer parse(StringBuffer tok)throws SQLException{
+		int i = tok.indexOf("INNER JOIN");
+		if (i < 0)
+			i = tok.indexOf("inner join");
+		if (i > 0){
+			tok.replace(i, i + 10,",");
+			i = tok.indexOf(" WHERE ");
+			if (i < 0)
+			i = tok.indexOf(" where ");
+			if (i > 0)
+				tok.replace(i,i + 7 ," and ");
+
+
+			i = tok.indexOf(" ON ");
+			if (i < 0)
+			i = tok.indexOf(" on ");
+			if (i > 0)
+				tok.replace(i,i + 4 ," where ");
+
+		}
+		//(" U.parse " + tok);
+		return tok;
+
+	}
+
+
 	public Vector joinTable(String rn,Vector h,int typ,Object v,NameValuePairs ref)throws SQLException{
 		
 //					if (incl.size() < 1)
@@ -286,7 +313,9 @@ return null;
 		return sq.getTable();
 		
 	}
-	if (sqp.getTableInfo().getColumnInfo(sqp.getRealColName(l)) != null)
+	TableInfo ti = sqp.getTableInfo();
+	if (ti != null)
+	if (ti.getColumnInfo(sqp.getRealColName(l)) != null)
 		return sqp.getTable();
 return null;		
 	}
@@ -531,6 +560,8 @@ public String getRealColName(String n){
 public SQLParser getSQLParser(String t)throws SQLException{
 SQLParser s = sqps.get(t);
 if (s != null){
+	if (sqp != null && sqp.getConnection().isRemote())
+		s.setConnection(sqp.getConnection());
 	s.setTable(t);
 }	
 return s;
@@ -563,6 +594,8 @@ public void merge()throws SQLException{
 		
 	
 	}
+	//(sqp.getOriginalSelectList() + " SELECTSSS U 2b " + sqp.getSelectList());
+
 	String al = (String) sqp.getAliases().get(sqp.getTable());
 	if (al != null){
 	s = (SQLParser)sqps.remove(al);
@@ -601,7 +634,25 @@ Hashtable v =	s.getSelectAS();
 	String itm = null;
 	while (en.hasMoreElements()){
 		itm = en.nextElement().toString();
-	if(!addToTheSelectList(itm))
+	//(itm + " SELECTSSS U 2c " + sqp.getSelectList() + ":" + vv2.contains(itm) + s.getTable());
+
+				if (itm.endsWith(".*") )
+				{
+					vv2.remove(itm);
+
+					Vector fl = sqp.getJiqlTableInfo().getFieldList();
+					String an = itm.substring(0,itm.length() - 1);
+					for (int fct = 0;fct < fl.size();fct++){
+						itm = an + fl.elementAt(fct).toString();
+					addToTheSelectList(itm);
+					//(!addToTheSelectList(itm))
+		if (!vv2.contains(itm)){
+		vv2.add(itm);
+		}
+				}
+				}
+
+	else if(!addToTheSelectList(itm))
 		if (!vv2.contains(itm)){
 		vv2.add(itm);
 		}
@@ -619,11 +670,49 @@ Hashtable v =	s.getSelectAS();
 			}
 		}
 		}
+	
+		Vector vv2a =	sqp.getSelectList();
+	String itm = null;
+	Vector vv2 = (Vector)vv2a.clone();
+	for (int ct = 0; ct < vv2.size();ct++){
+		itm = vv2.elementAt(ct).toString();
+
+
+				if (itm.endsWith(".*") )
+				{
+					vv2a.remove(itm);
+
+				///{
+					String an = itm.substring(0,itm.length() - 1);
+					String tn = findTable(itm.substring(0,itm.length() - 2));
+					if (tn == null)
+						tn = (String)aliases.get(itm.substring(0,itm.length() - 2));
+			//(itm.substring(0,itm.length() - 2) + " SELECTSSS U 24u2 " + tn + ":" + aliases + ":" + vv2a + ":" + itm);
+					if (tn == null)continue;
+					Vector fl = jiqlDBMgr.get(sqp.getProperties()).getTableInfo(tn).getFieldList();
+
+
+
+					for (int fct = 0;fct < fl.size();fct++){
+						itm = an + fl.elementAt(fct).toString();
+					addToTheSelectList(itm);
+					//(!addToTheSelectList(itm))
+		if (!vv2a.contains(itm)){
+		//vv2a.add(itm);
+		}
+				}
+				}
+
+		
+		
+	}
+	
+	
 		
 	}
 	/*if (s!= null){
-	Hashtable v =	s.getSelectAS();
-	Hashtable v2 =	sqp.getSelectAS();
+	Hashtable v =	s. ();
+	Hashtable v2 =	sqp. ();
 	Enumeration en = v.keys();
 	String k = null;
 	while (en.hasMoreElements()){
@@ -640,7 +729,7 @@ Hashtable v =	s.getSelectAS();
 	String itm = null;
 	while (en.hasMoreElements()){
 		itm = en.nextElement().toString();
-	if(!addToTheSelectList(itm))
+	if(! (itm))
 		if (!vv2.contains(itm)){
 		org.jiql.util. (sqp.getTable() + " MERGE 1 " + itm);
 		vv2.add(itm);
@@ -653,7 +742,10 @@ Hashtable v =	s.getSelectAS();
 }
 void selectASPut(String t,String c,String a)throws SQLException{
 
-				Hashtable sl = add(t).getSelectAS();
+				SQLParser sq = add(t);
+				Hashtable sl = sq.getSelectAS();
+								//(a + " SELECTSSS U " + c);
+
 					sl.put(a,c);
 
 				//sl.put(c,a);
@@ -893,6 +985,8 @@ return null;
 			itm = itmn2;
 			}
 			//}else
+					//(t + " SELECTSSS U 4 " + itm);
+
 				sl.add(itm);
 				return true;
 			}
@@ -914,7 +1008,8 @@ return null;
 			selectASPut(t,itmn,itmn2);
 			itm = itmn2;
 			}
-				
+				//(t + " SELECTSSS U 5 " + itm);
+			
 				sl.add(itm);
 				return true;
 			}
@@ -960,7 +1055,19 @@ return null;
 			selectASPut(t,itmn,itmn2);
 			itm = itmn2;
 			}
-			//}else
+			
+			/* (t + " SELECTSSS U 2 " + itm);
+				if (itm.endsWith(".*"))
+				{
+					String tn = findTable(t);
+			 (t + " SELECTSSS U 24u " + tn + ":" + aliases);
+
+					Vector fl = jiqlDBMgr.get(sqp.getProperties()).getTableInfo(tn).getFieldList();
+					String an = itm.substring(0,itm.length() - 1);
+					for (int fct = 0;fct < fl.size();fct++)
+						sl.add(an + fl.elementAt(fct));
+				}
+				else*/
 				sl.add(itm);
 				return true;
 			}
@@ -981,7 +1088,8 @@ return null;
 			selectASPut(t,itmn,itmn2);
 			itm = itmn2;
 			}
-				
+				//(t + " SELECTSSS U 3 " + itm);
+			
 				sl.add(itm);
 				return true;
 			}
@@ -995,11 +1103,13 @@ return null;
 	
 			merge();
 			EZArrayList uv = new EZArrayList(new StringTokenizer(t,","));
+			//(" PARSE U aaaa :" + t + ":");
+
 			String upstr = null;
 			for (int ct = 0;ct < uv.size();ct++){
 			upstr = uv.elementAt(ct).toString();
 			upstr = upstr.trim();
-
+			//(" PARSE U :" + upstr + ":");
 			int i = upstr.toLowerCase().indexOf(" as ");
 			if (i > 0){
 				String alias = upstr.substring(i + " as ".length(),upstr.length());
