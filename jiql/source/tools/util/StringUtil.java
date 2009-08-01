@@ -81,6 +81,15 @@ public class StringUtil
     return ht;
     }
 
+
+	public static StringBuffer trimQuotes(StringBuffer selsb){
+		selsb = SharedMethods.replaceSubstringBuffer(selsb,"\"","");
+		selsb = SharedMethods.replaceSubstringBuffer(selsb,"'","");
+		selsb = SharedMethods.replaceSubstringBuffer(selsb,"`","");
+		return selsb;
+		
+	}
+
     static private String parseName(String s, StringBuffer sb) {
     sb.setLength(0);
     for (int i = 0; i < s.length(); i++) {
