@@ -62,7 +62,7 @@ int ml = 0;
 			
 			ml = ci.getMaxLength();
 			}catch (NullPointerException e){
-				throw jiqlException.get("insert_attributes_does_not_match_table","Insert attributes does not match table. Try the 'describe <tablename>' command " + cn);
+				throw jiqlException.get("insert_attributes_does_not_match_table",cn + " Insert attributes does not match table " + sqp.getTable() +". Try the 'describe <tablename>' command " + cn);
 
 			}
 			if (ml <1)continue;
