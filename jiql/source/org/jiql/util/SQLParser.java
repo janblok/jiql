@@ -44,6 +44,7 @@ import java.text.DateFormat;
 import org.jiql.jdbc.jiqlConnection;
 import org.jiql.db.select.SelectParser;
 import org.jiql.db.insert.InsertParser;
+import org.jiql.db.jdbc.stat.StatementProcessor;
 
 
 public  class SQLParser implements java.io.Serializable
@@ -51,6 +52,7 @@ public  class SQLParser implements java.io.Serializable
 	boolean special = false;
 	GroupBy groupby = new GroupBy();
 	LoadData loadtable = null;
+	InsertData inserttable = null;
 	SelectParser selectP = null;
 	CreateParser createP = null;
 	InsertParser insertP = null;
@@ -83,6 +85,19 @@ public  class SQLParser implements java.io.Serializable
    	
    	String prefixValue = "jiql";
 boolean prefix = true;
+StatementProcessor spro = null;
+//boolean local = false;
+
+/*public boolean isLocal(){
+	return local;
+}*/
+
+public StatementProcessor getStatementProcessor(){
+	return spro;
+}
+public void setStatementProcessor(StatementProcessor sp){
+	spro = sp;
+}
 public boolean hasPrefix(){
 	return prefix;
 }
@@ -119,7 +134,11 @@ public DateFormat getDateFormat(){
 			loadtable = new LoadData(this,tok);
 		return loadtable;
 	}
-
+	public InsertData getInsertIntoTable(){
+		if (inserttable == null)
+			inserttable = new InsertData(this,tok);
+		return inserttable;
+	}
 	public InsertParser getInsertParser(){
 		if (insertP == null)
 			insertP = new InsertParser(this);
@@ -422,12 +441,14 @@ public DateFormat getDateFormat(){
 		if (t.startsWith("jiql."))
 			t = t.substring(5,t.length());
 		table = t;
+		if (connection == null || !connection.isRemote())
 		try{
 		
 		TableInfo ti = Gateway.get(getProperties()).readTableInfo(getTable());
 		setTableInfo(ti);
 		}catch (Exception e){
-			tools.util.LogMgr.err("setTable.setTableInfo " + e.toString());
+			tools.util.LogMgr.err(t + " setTable.setTableInfo " + tbi + ":" +e.toString());
+			e.printStackTrace();
 		}
 
 	}
@@ -475,7 +496,7 @@ public DateFormat getDateFormat(){
 				/*if (cit ==  ){
 					//(c + " convert: " + ":" +  value + ":" +  value.getClass().getName());
 	
-					return new Long(value.toString());
+					return new  (value.toString());
 				}
 				else if (cit == Types.DATE)
 					return new Date(value.toString());
@@ -912,6 +933,9 @@ int i3 = tok.indexOf(" ");
 			return tok;		
 	}
 	
+		public void setSpecial(boolean tf){
+			special = tf;
+		}
 		public void setAction(String a){
 			action = a;
 		}
@@ -966,6 +990,13 @@ int i3 = tok.indexOf(" ");
 			setTable(tok2);
 			return;
 		}
+				else if (tok2.startsWith("gettypeinfo")){
+		special = true;
+		setAction("getTypeInfo");
+		//local = true;
+		return;
+
+		}
 		else if (tok2.startsWith("getimportedkeys ")){
 			action = "getImportedKeys";
 			tok2 = tok.substring("getimportedkeys ".length(),tok2.length()).trim();
@@ -998,6 +1029,7 @@ int i3 = tok.indexOf(" ");
 		return;
 
 		}
+
 		else if (tok2.startsWith("found_rows()")){
 		special = true;
 		setAction("getFoundRows");
@@ -1015,6 +1047,12 @@ int i3 = tok.indexOf(" ");
 		//"select countf from testable where name='counter'"
 		//countf from testable where name='counter'"
 		int si = tok2.indexOf(" from ");
+		if (si < 0)
+		{
+			if (getSelectParser().parseNoFrom(tok2))
+				return;
+			throw new SQLException("SELECT STATEMENT MISSING FROM CLAUSE " + tok);
+		}
 		String sels = tok.substring(0,si);
 		sels = sels.trim();
 		StringBuffer selsb = new StringBuffer(sels);
@@ -1062,7 +1100,12 @@ int i3 = tok.indexOf(" ");
 				
 			}
 			i = tok.indexOf(" ");
-			int i2 = tok.indexOf(",");
+			
+			int i2 = tok.indexOf(" ,");
+			if (i2 > 0 && i2 <= i)
+				i = i+ 1;
+			i2 = tok.indexOf(",");
+
 			if (i2 > 0 && i2 < i)
 				i = i2;
 				if (i < 1)
@@ -1178,8 +1221,10 @@ int i3 = tok.indexOf(" ");
 				if (se.equals(al))
 					selectList.setElementAt("*",ct);
 				else if (se.startsWith(al + ".") && StringUtil.isRealString(se.substring(al.length() + 1,se.length()))){
-					updateSelectAS(se,se.substring(al.length() + 1,se.length()));
-					selectList.setElementAt(se.substring(al.length() + 1,se.length()),ct);
+					String cn = se.substring(al.length() + 1,se.length());
+					//(se + " SELECTSSS " + cn);
+					updateSelectAS(se,cn);
+					selectList.setElementAt(cn,ct);
 				}
 					
 			}
@@ -1435,6 +1480,7 @@ if (si < 0)return;
 		return;
 		}
 		ti = tok2.indexOf(" index ");
+
 		if (tok2.startsWith("create ") && ti > 0)
 		{
 			action = "createIndex";
@@ -1446,6 +1492,13 @@ if (si < 0)return;
 			action = "createTable";
 			tok = tok.substring(ti + " table ".length(),tok.length());
 			tok = tok.trim();
+			if (tok.toUpperCase().startsWith("IF NOT EXISTS"))
+			{
+				tok = tok.substring(14,tok.length());
+				tok = tok.trim();
+				getCreateParser().setIfNotExists(true);
+				
+			}
 			int i = tok.indexOf(" ");
 					if (i < 0)
 			i = tok.length();
@@ -1482,9 +1535,19 @@ if (si < 0)return;
 			setTable(table);
 			return;
 		}
+		else if (tok2.startsWith("set "))
+		{
+			action = "setOperation";
+			return;
+		}
 		else if (tok2.startsWith("load ")){
 			action = "loadTable";
 			getLoadTable();
+			return;
+		}
+		else if (tok2.startsWith("insert ")){
+			action = "sqlInsert";
+			getInsertIntoTable();
 			return;
 		}
 		else if (tok2.startsWith("alter ") && ti > 0){
@@ -1549,7 +1612,7 @@ if (si < 0)return;
 				tok = tok.substring("role ".length(),tok.length());
 				tok = tok.trim();
 				if (!tok.equalsIgnoreCase("admin") && !tok.equalsIgnoreCase("user"))
-					throw JGException.get("invalid_role","Invalid Role! Should be admin or user");
+					throw JGException.get("invalid_role Invalid Role! Should be admin or user");
 				 ("role",tok);
 				}
 
@@ -1559,17 +1622,23 @@ if (si < 0)return;
 			}
 
 		ti = tok2.indexOf(" into ");
-		if (tok2.startsWith("insert ") && ti > 0)
+		if (tok2.startsWith("jiqlinsert ") && ti > 0)
 			{
 			action = "writeTableRow";
 			tok = tok.substring(ti + " into ".length(),tok.length());
 			tok = tok.trim();
 			int i = tok.indexOf(" ");
+				int i2 = tok.indexOf("(");
+			if (i > i2)
+				i = i2;
 					if (i < 0)
 			i = tok.length();
 
 			table = tok.substring(0,i);
 			setTable(table);
+			if (i == i2)
+			tok = tok.substring(i,tok.length());
+			else
 			tok = tok.substring(i + 1,tok.length());
 			tok = tok.trim();
 			if (tok.toLowerCase().startsWith("values"))
@@ -1632,17 +1701,17 @@ if (si < 0)return;
 			throw JGException.get("missing_column_value",n + " Missing Column Value! ");
 			
 			}
-					//(n + " INSERT TOKO b " + va);
+					//(n + "   TOKO b " + va);
 
 			va = va.trim();
-					//(n + " INSERT TOKO c " + va);
+					//(n + "   TOKO c " + va);
 
 			//va = decode(va);
 			if (!(va.startsWith("'") && va.endsWith("'")))
 				notquoted.put(n,true);
 			va = StringUtil.getTrimmedValue(va);
 			va = decode(va);
-			//(n + " INSERTE " + va);
+			//(n + "  E " + va);
 			hash.put(n,convert(va,n));
 		}
 		return;
@@ -1813,6 +1882,11 @@ public  jiqlConstraint getConstraint(){
 		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_limiit","limit");
 		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_LIMIIT","LIMIT");
 
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_inner-join","inner join");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_INNER-JOIN","INNER JOIN");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_o-n","on");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_O-N","ON");
+
 		sb = SharedMethods.replaceSubstringBuffer(sb,"\\\"","\"");
 
 		
@@ -1868,6 +1942,10 @@ public  jiqlConstraint getConstraint(){
 		sb = SharedMethods.replaceSubstringBuffer(sb,"limit","jiql_replace_limiit");
 		sb = SharedMethods.replaceSubstringBuffer(sb,"LIMIT","jiql_replace_LIMIIT");
 
+		sb = SharedMethods.replaceSubstringBuffer(sb,"inner join","jiql_replace_inner-join");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"INNER JOIN","jiql_replace_INNER-JOIN");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"on","jiql_replace_o-n");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"ON","jiql_replace_O-N");
 		
 	  
 
@@ -1984,8 +2062,8 @@ jiqlConstraint jConstraint = null;
 
 				va = va.substring( 0,va.length() -1);
 				va = va.trim();
-				primaryKeys = new EZArrayList(new StringTokenizer(va,","));
-				//("primaryKeys VAL " + primaryKeys);
+				primaryKeys = new EZArrayList(new StringTokenizer(va,","),true);
+				//("  VAL " +  );
 
 
 			}
@@ -2024,7 +2102,6 @@ jiqlConstraint jConstraint = null;
 				if (i > -1 && tok2.indexOf(" null") > i)
 				{
 					if (!notnulls.contains(n)){
-										//(va + " PARS44 " + n);
 
 						notnulls.add(n);
 					}
@@ -2032,6 +2109,7 @@ jiqlConstraint jConstraint = null;
 				i = tok2.indexOf("primary ");
 					if (i > -1 && tok2.indexOf(" key") > i)
 				{
+					n = StringUtil.trimQuotes(new StringBuffer(n)).toString();
 					if (!primaryKeys.contains(n))
 						primaryKeys.add(n);
 				}
