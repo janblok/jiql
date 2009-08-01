@@ -38,6 +38,8 @@ import java.math.*;
 import java.net.*;
 import org.jiql.db.objs.*;
 import org.jiql.db.select.FunctionBase;
+import org.jiql.db.jdbc.stat.ResultObj;
+
 
 public class ResultSet implements java.sql.ResultSet,java.io.Serializable
 {
@@ -49,6 +51,8 @@ public static Vector<String> ekcols = new Vector<String>();
 public static Vector<String> identity = new Vector<String>();
 public static Vector<String> foundrows = new Vector<String>();
 public static Vector<String> indexv = new Vector<String>();
+
+ResultObj rmo = null;
 
 Vector results = null;
 boolean wasNull = false;
@@ -142,7 +146,7 @@ public ResultSet(Vector r,SQLParser s){
 	
 	sqp = s;
 	if (results != null && sqp.getConnection() != null)
-		sqp.getConnection().setFoundRows(results.size());
+		sqp.getConnection().setFoundRows(size());
 }
 
 public void reset(){
@@ -157,9 +161,15 @@ public Vector getResults(){
 public SQLParser getSQLParser(){
 	return sqp;
 }
+
+	public void setResultMetaObj(ResultObj ro){
+		rmo = ro;
+	}
 protected String getColumnName(int  ci) throws SQLException{
 	//NameValuePairs nvp = (NameValuePairs)results.elementAt(0);
 	//EZArrayList ez = new EZArrayList(nvp.keys());
+	if (rmo != null)
+		return rmo.getColumnName(ci);
 	if (sqp.showTables()){
 			if (isSchema())
 			{
@@ -179,6 +189,7 @@ protected String getColumnName(int  ci) throws SQLException{
 	
 		return "tablename";
 	}
+	
 	if (sqp.isSpecial()){
 		if (sqp.getAction().equals("getIdentity"))
 		return identity.elementAt(ci -1).toString();
@@ -186,6 +197,8 @@ protected String getColumnName(int  ci) throws SQLException{
 		return foundrows.elementAt(ci -1).toString();
 		else if (sqp.getAction().equals("getIndex"))
 		return indexv.elementAt(ci -1).toString();
+		else if (sqp.getAction().equals("getTypeInfo"))
+		return Gateway.get(sqp.getProperties()).getTypeinfoCols().elementAt(ci -1).toString();
 
 	}
 	if (sqp.getAction().equals("describeTable"))
@@ -205,7 +218,7 @@ protected String getColumnName(int  ci) throws SQLException{
 }
 
 protected  Row getRowObject(int i) throws SQLException{
-	rsetLog(results.size() + " getRowObject " + i);
+	rsetLog(size() + " getRowObject " + i);
 	Row nvp = (Row)results.elementAt(i -1);
 	nvp.noNulls(true);
 	return nvp;
@@ -231,7 +244,7 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 public boolean absolute(int row) throws SQLException{
 	rsetLog("RESL 21");
 
-if (row >= results.size())return false;
+if (row >= size())return false;
 indx = row - 1;
 return true;
 }
@@ -239,7 +252,7 @@ return true;
 public  void afterLast() throws SQLException{
 	rsetLog("RESL 22");
 
-indx = results.size();
+indx = size();
 }
  //           Moves the cursor to the end of this ResultSet object, just after the last row. 
 public  void beforeFirst() throws SQLException{
@@ -288,6 +301,10 @@ public  int findColumn(String columnLabel) throws SQLException{
 			return 3;
 		}
 	Vector ez = sqp.getOriginalSelectList();
+		if (rmo != null)
+		return rmo.findColumn(columnLabel);
+
+	
 		if (sqp.isSpecial()){
 		if (sqp.getAction().equals("getIdentity"))
 		ez = identity;
@@ -295,7 +312,8 @@ public  int findColumn(String columnLabel) throws SQLException{
 		ez = foundrows;
 		else if (sqp.getAction().equals("getIndex"))
 		ez = indexv;
-		//getFoundRows
+		else if (sqp.getAction().equals("getTypeInfo"))
+		ez = Gateway.get(sqp.getProperties()).getTypeinfoCols();
 	}
 	
 	if (sqp.getAction().equals("describeTable"))
@@ -473,12 +491,13 @@ public  byte[] getBytes(String columnLabel)  throws SQLException{
 		}
 
 
-	byte[] b = getRowObject().get(columnLabel).toString().getBytes();
+	Object b = getObject(columnLabel);
 	if (b == null)
 		wasNull = true;
 	else
 		wasNull = false;
-	return b;
+	if (b == null)return null;
+	return b.toString().getBytes();
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a byte array in the Java programming language. 
 public  Reader getCharacterStream(int columnIndex)  throws SQLException{
@@ -637,15 +656,22 @@ public  int getInt(String columnLabel)  throws SQLException{
 			
 		}
 	
-		Object o = getRowObject().get(columnLabel);
+		Object o = null;
+		if (rmo != null)
+		o = rmo.getValue(columnLabel);
+		else
+		o = getRowObject().get(columnLabel);
 	//	checkNull(o);
 
 //		FunctionBase fb = sqp.getSelectParser().getSQLFunctionParser().getFunction(columnLabel);
 //if (fb != null)o = fb.process(o);
-		if (o != null)
-		return (Integer)o;
-		
+		if (o == null)
 		return 0; 
+
+	if (o instanceof Long)
+		return ((Long)o).intValue();
+	return new Integer(o.toString());
+		
 
 	
 	//checkNull(o);
@@ -673,9 +699,20 @@ public  long getLong(String columnLabel)  throws SQLException{
 				}
 			
 		}
-		checkNull(getRowObject().get(columnLabel));
+//		checkNull(getRowObject().get(columnLabel));
 
-	return getRowObject().getLong(columnLabel);
+//	return getRowObject().getLong(columnLabel);
+		Object b = getObject(columnLabel);
+	if (b == null)
+		wasNull = true;
+	else
+		wasNull = false;
+	if (b == null)return 0;
+//("CANE YOU SEEa  " + b);
+	if (b instanceof Long)
+		return (Long)b;
+	return new Long(b.toString());
+
 
 }
  //             Retrieves the value of the designated column in the current row of this ResultSet object as a long in the Java programming language. 
@@ -698,16 +735,17 @@ public void setIsSchema(boolean tf){
 	schema = tf;
 }
 
+jiqlResultSetMetaData jrd = null;
 public  ResultSetMetaData getMetaData()  throws SQLException{
 	rsetLog("RESL getMetaData");
 
 	if (isClosed())
 		throw JGException.get("operation_not_allowed_after_closed","Operation not allowed after close");
-
-	jiqlResultSetMetaData jrd = new jiqlResultSetMetaData(sqp);
+	if (jrd != null)return jrd;
+	jrd = new jiqlResultSetMetaData(sqp);
 	jrd.setIsCatalog(catalog);
 	jrd.setIsSchema(schema);
-
+	jrd.setResultMetaObj(rmo);
 	return jrd;
 }
  //            Retrieves the number, types and  of this ResultSet object's columns. 
@@ -775,12 +813,26 @@ public  Object getObject(int columnIndex, Map<String,Class<?>> map)  throws SQLE
 }*/
 public  Object getObject(String columnLabel)  throws SQLException{
 	rsetLog("getObject " + columnLabel);
+
+		if (rmo != null)
+		return rmo.getValue(columnLabel);
+
 	Row r = getRowObject();
+	
+		
+
 		if ( sqp.isSpecial())
 		{
 				if (columnLabel.equalsIgnoreCase("FOUND_ROWS()")){
 					wasNull = false;
 					return new Integer(sqp.getConnection().getFoundRows());
+				}
+				else if (sqp.getAction().equals("getTypeInfo")){
+				
+					Object o = r.getObject(columnLabel);
+					checkNull(o);
+
+					return o;
 				}
 			
 		}
@@ -838,7 +890,6 @@ public  Object getObject(String columnLabel)  throws SQLException{
 	FunctionBase fb = sqp.getSelectParser().getSQLFunctionParser().getFunction(columnLabel);
 if (fb != null)o = fb.process(o,sqp); 
 	checkNull(o);
-
 	return o;
 }
  //            Gets the value of the designated column in the current row of this ResultSet object as an Object in the Java programming language. 
@@ -891,8 +942,20 @@ public  short getShort(int columnIndex) throws SQLException{
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a short in the Java programming language. 
 public  short getShort(String columnLabel)  throws SQLException{
 	rsetLog("RESL 61");
-	checkNull(getRowObject().get(columnLabel));
-	return getRowObject().getShort(columnLabel);
+	//checkNull(getRowObject().get(columnLabel));
+	//return getRowObject().getShort(columnLabel);
+	
+	Object b = getObject(columnLabel);
+	if (b == null)
+		wasNull = true;
+	else
+		wasNull = false;
+	if (b == null)return 0;
+//("CANE YOU SEEa  " + b);
+	if (b instanceof Long)
+		return ((Long)b).shortValue();
+	return new Short(b.toString());
+	
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a short in the Java programming language. 
@@ -931,6 +994,12 @@ void rsetLog(String t){
 public  String getString(String columnLabel)  throws SQLException{
 	//( () + ":" + indx + ":year " + columnLabel);
 	rsetLog( " getString a " + columnLabel);
+		if (rmo != null){
+			Object o = rmo.getValue(columnLabel);
+			if (o == null)return null;
+			return o.toString();
+		}
+
 		if ( sqp.isSpecial())
 		{
 				if (columnLabel.equalsIgnoreCase("FOUND_ROWS()"))
@@ -967,7 +1036,10 @@ public  String getString(String columnLabel)  throws SQLException{
 		return s;
 
 	if (s == null)return null;
-	Object o = jiqlCellValue.getObj(s,sqp.getTableInfo().getColumnInfo(columnLabel).getColumnType(),sqp);
+	//(s + " RGS " + columnLabel + ":" + sqp.getTableInfo() + ":" + sqp.getTableInfo().getColumnInfo(columnLabel));
+	ColumnInfo ci = sqp.getTableInfo().getColumnInfo(columnLabel);
+	if (ci == null)return s;
+	Object o = jiqlCellValue.getObj(s,ci.getColumnType(),sqp);
 	return o.toString();
 
 }
@@ -1081,7 +1153,7 @@ public  void insertRow() throws SQLException{
  //           Inserts the contents of the insert row into this ResultSet object and into the database. 
 public  boolean isAfterLast() throws SQLException{
 rsetLog("RESL 5");
-return (indx > results.size());
+return (indx > size());
 }
  //            Retrieves whether the cursor is after the last row in this ResultSet object. 
 public  boolean isBeforeFirst()  throws SQLException{
@@ -1102,11 +1174,11 @@ return  (indx ==1);
  //           Retrieves whether the cursor is on the first row of this ResultSet object. 
 public  boolean isLast()  throws SQLException{
 rsetLog("RESL 9");
-return  (indx >= results.size());
+return  (indx >= size());
 }
  //            Retrieves whether the cursor is on the last row of this ResultSet object. 
 public  boolean last() throws SQLException{
-	indx = results.size();
+	indx = size();
 	
 rsetLog("last " + indx);
 
@@ -1127,9 +1199,14 @@ public  void moveToInsertRow() throws SQLException{
 
 }
  //            Moves the cursor to the insert row. 
+ public int size(){
+ 	if (rmo != null)
+ 		return rmo.size();
+ 	return results.size();
+ }
 public  boolean next() throws SQLException{
 rsetLog("next");
-if (results == null || indx >= results.size())return false;
+if (results == null || indx >= size())return false;
 indx = indx + 1;
 return true;
 }
