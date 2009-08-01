@@ -58,7 +58,7 @@ co = getObj(v,type,sqp);
 	if ( = type )
 		co = new String(v.toString());
 	else if (  == type)
-		co = new Integer(v.toString());
+		co = new  (v.toString());
 	else co = v;*/	
 	
 }
@@ -86,8 +86,8 @@ v = new String(((com.google.appengine.api.datastore.Text)v).getValue());
 				//new SimpleDateFormat(dfmt);
 				//DateFormat.getInstance() ;
 			try{
-		//	org.jiql.util.JGUtil.log("SQP " + sqp);
-			//		DateFormat df = sqp.getDateFormat();
+		//	org.jiql.util.JGUtil.log("  " +  );
+			//		DateFormat df =  .getDateFormat();
 	
 			return new java.sql.Date(df.parse(v.toString()).getTime());
 			}catch (Throwable e){
