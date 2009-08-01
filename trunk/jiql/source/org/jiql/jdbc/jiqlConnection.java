@@ -144,6 +144,12 @@ boolean close = false;
 public void 	close()throws SQLException{
 close = true;
 }
+
+public void 	close(boolean tf)throws SQLException{
+close = tf;
+}
+
+
 //          Releases this Connection object's database and JDBC resources immediately instead of waiting for them to be automatically released.
 public void 	commit()throws SQLException{
 	if (trans != null)
@@ -282,6 +288,11 @@ public SQLWarning 	getWarnings()throws SQLException{
 public boolean 	isClosed()throws SQLException{
 return close;
 }
+
+public void setClosed(boolean tf){
+	close = tf;
+}
+
 //Retrieves whether this Connection object has been closed.
 public boolean 	isReadOnly()throws SQLException{
 return false;
