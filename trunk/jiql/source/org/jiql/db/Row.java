@@ -134,6 +134,9 @@ Comparable c2 = null;
 return r;
 }
 
+public Object getObject(String cn){
+	return super.get(cn);
+}
 
 public Object get(String cn){
 			if (sqp == null)
@@ -163,7 +166,8 @@ TableInfo ti = sqp.getTableInfo();
 				
 			}
 		}catch (Exception e){
-				tools.util.LogMgr.err(cn + " ERROR union Row.get " + e.toString());
+				tools.util.LogMgr.err(cn + " ERROR union Row.get " + e.toString() + ti + ":" + ci);
+				e.printStackTrace();
 
 		}
 		}
