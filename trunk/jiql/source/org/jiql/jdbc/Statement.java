@@ -40,6 +40,7 @@ import org.jiql.db.*;
 import tools.util.EZArrayList;
 import tools.util.NameValue;
 import tools.util.NameValuePairs;
+import org.jiql.db.jdbc.stat.StatementProcessor;
 
 import org.jiql.db.objs.*;
 public class Statement implements java.sql.Statement
@@ -49,6 +50,16 @@ public class Statement implements java.sql.Statement
 		return password;
 	}*/
 	jiqlConnection connection = null;
+	static Vector<String> locals = new Vector<String>();
+	//static Hashtable<String,StatementProcessor> sprocessors = new Hashtable<String,StatementProcessor>();
+
+	static{
+		locals.add("getTypeInfo");
+		locals.add("SelectValue");
+		//locals.add("getTypeInfo;");
+		//sprocessors.put("",new SelectValueStatementProcessor());
+
+	}
 	
 	public	boolean 	isWrapperFor(Class<?> iface)throws SQLException{
 	return false;
@@ -64,8 +75,7 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 	}
 
 	void sdebug(String t){
-		//tools.util.LogMgr.debug
-		//("statment " + t);
+		//tools.util.LogMgr.debug("statment " + t);
 	}
 	
 	SQLParser dsqp = null;
@@ -75,8 +85,9 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 	public boolean execute(String sql)
 	throws SQLException
 	{
+	resultset = null;
 	sdebug("execute1: " + sql);
-	if (connection.isRemote() && ! sql.toLowerCase().trim().startsWith("load ")){
+	if (connection.isRemote() && ! (locals.contains(sql) || sql.toLowerCase().trim().startsWith("load ") || sql.toLowerCase().trim().startsWith("insert "))){
 		Hashtable hres = org.jiql.JiqlClient.execute(connection,sql);
 		//JGException je = (JGException)hres.get("error");
 		//if (je != null)throw je;
@@ -93,6 +104,7 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 
 			resultset = new org.jiql.jdbc.ResultSet(vres,sqp);
 		}
+		if (!locals.contains(sqp.getAction()))
 		return true;
 	}
 
@@ -105,12 +117,23 @@ public <T> T unwrap(Class<T> iface)throws SQLException
     	Union union = sqp.getUnion();
 		sqp.mergeAliases(union.getAliases());
 //( " select sqp + :" + sqp);
-			if (sqp.getAction().equals("createIndex"))
+		StatementProcessor sp = sqp.getStatementProcessor();
+		if (sp != null){
+			resultset = sp.process(sqp);
+			return true;
+		}else if (sqp.getAction().equals("createIndex"))
+		{
+		}
+		else if (sqp.getAction().equals("setOperation"))
 		{
 		}
 		else if (sqp.getAction().equals("loadTable"))
 		{
 			sqp.getLoadTable().execute(connection);
+		}
+		else if (sqp.getAction().equals("sqlInsert"))
+		{
+			sqp.getInsertIntoTable().execute(connection);
 		}
 		else if (sqp.getAction().equals("showTables"))
 		{
@@ -144,6 +167,10 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 		{
 			getIdentity(sqp);
 		}
+		else if (sqp.getAction().equals("getTypeInfo"))
+		{
+			getTypeInfo(sqp);
+		}
 		else if (sqp.getAction().equals("getFoundRows"))
 		{
 			getFoundRows(sqp);
@@ -156,8 +183,11 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 		{
 
 			if(Gateway.get(connection.getProperties()).readTableInfo(sqp.getTable()).size() > 0)
+			{
+				if (sqp.getCreateParser().ifNotExists())
+					return true;
 				throw JGException.get("table_exists",sqp.getTable() + " Table Exists");
-		
+			}
 		//			jiqlTableInfo ti = jiqlDBMgr.get(sqp.getProperties()).getTableInfo(sqp.getTable(),true);
 			jiqlTableInfo ti = sqp.getJiqlTableInfo(true);
 			ti.setPrefix(sqp.hasPrefix());
@@ -227,7 +257,8 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 
 		}
     	else if (sqp.getAction().equals("writeTableRow")){
-		//sqp.getUnion().merge();
+		    				jiqlDBMgr.get(sqp.getProperties()).getCommand("VerifyTable").execute(sqp);
+
 			jiqlDBMgr.get(sqp.getProperties()).getCommand("verifyPrimaryKeys").execute(sqp);
 			jiqlDBMgr.get(sqp.getProperties()).getCommand("verifyConstraints").execute(sqp);
 			jiqlDBMgr.get(sqp.getProperties()).getCommand("VerifyDefaultValues").execute(sqp);
@@ -321,7 +352,7 @@ if (h == null) h = new Hashtable();
 		}
 		//else //throw JGException.get("statement_not_recognized","Statement NOT recognized! " + sql);
 			//gappe.write(sqp.getAction(),sqp.getHash());
-	}		else throw JGException.get("statement_not_recognized","Statement NOT recognized! " + sql);
+	}		else throw JGException.get("statement_not_recognized",sqp.getAction() + " Statement NOT recognized! " + sql);
 
 
 	return true;
@@ -329,9 +360,9 @@ if (h == null) h = new Hashtable();
 org.jiql.jdbc.ResultSet resultset = null;
     public ResultSet executeQuery(String sql) throws SQLException {
 		sdebug("execute: " + sql);
+resultset = null;
 
-
-	if (connection.isRemote()){
+	if (connection.isRemote() && !locals.contains(sql)){
 		Hashtable hres = org.jiql.JiqlClient.execute(connection,sql);
 		Object je = hres.get("error");
 		if (je != null)throw new SQLException(je.toString());
@@ -344,6 +375,7 @@ org.jiql.jdbc.ResultSet resultset = null;
 			//sqp.setConnection(connection);
 			resultset = new org.jiql.jdbc.ResultSet(vres,sqp);
 		}
+		if (!locals.contains(sqp.getAction()))
 		return resultset;
 	}
 
@@ -353,7 +385,13 @@ org.jiql.jdbc.ResultSet resultset = null;
 	{
 		Gateway gw = Gateway.get(connection.getProperties());
 		//("sel 1 " + sqp.getAction());
-		if (sqp.getAction().equals("select"))
+		
+		StatementProcessor sp = sqp.getStatementProcessor();
+		if (sp != null){
+			resultset = sp.process(sqp);
+			return resultset;
+		} 
+		else if (sqp.getAction().equals("select"))
 		{
 			select(sqp);
 
@@ -383,6 +421,10 @@ org.jiql.jdbc.ResultSet resultset = null;
 		{
 			getExportedKeys(sqp);
 		}	
+		else if (sqp.getAction().equals("getTypeInfo"))
+		{
+			getTypeInfo(sqp);
+		}
 		else if (sqp.getAction().equals("getIdentity"))
 		{
 			getIdentity(sqp);
@@ -472,6 +514,15 @@ org.jiql.jdbc.ResultSet resultset = null;
 		resultset = new org.jiql.jdbc.ResultSet(sqp.getResults(),sqp);
 		
     }
+    
+              protected void getTypeInfo(SQLParser sqp )throws SQLException{
+    	Vector r = Gateway.get(connection.getProperties()).getTypeInfo(sqp);
+
+		sqp.setResults(r);
+
+		resultset = new org.jiql.jdbc.ResultSet(sqp.getResults(),sqp);
+		
+    }
     	
                protected void getColumns(SQLParser sqp )throws SQLException{
     	Vector r = Gateway.get(connection.getProperties()).getColumns(sqp);
@@ -494,7 +545,7 @@ org.jiql.jdbc.ResultSet resultset = null;
     protected void select(SQLParser sqp )throws SQLException{
     				//Union union = sqp.getUnion();
 					//sqp.mergeAliases(union.getAliases());
-
+resultset = null;
     				jiqlDBMgr.get(sqp.getProperties()).getCommand("VerifyTable").execute(sqp);
 
 		Hashtable h = null;
@@ -647,8 +698,16 @@ public int 	getFetchSize() throws SQLException {
 public ResultSet 	getGeneratedKeys() throws SQLException {
        	sdebug( " : ss 9 " );
 
-        throw JGException.get("not_supported","Not Supported");
+    	SQLParser sqpgk = new SQLParser(connection.getProperties());
+    	sqpgk.setSpecial(true);
+		sqpgk.setAction("getGeneratedKeys");
+    	
+    	Vector r = new Vector();
 
+		sqpgk.setResults(r);
+
+		resultset = new org.jiql.jdbc.ResultSet(sqpgk.getResults(),sqpgk);
+		return resultset;
 }        
 //Retrieves any auto-generated keys created as a result of executing this Statement object.
 public int 	getMaxFieldSize() throws SQLException {
