@@ -142,7 +142,7 @@ org.jiql.jdbc.ResultSet res = (org.jiql.jdbc.ResultSet)Stmt.getResultSet();
 
 
 }catch (Exception ex){
-//org.jiql.util.JGUtil.log(ex);
+org.jiql.util.JGUtil.olog(ex);
 ex.printStackTrace();
 tools.util.LogMgr.err("JIQLServlet " + ex.toString());
 JGException je = null;
