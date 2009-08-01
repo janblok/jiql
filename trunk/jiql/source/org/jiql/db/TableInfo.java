@@ -70,8 +70,12 @@ public ColumnInfo getColumnInfo(String n){
 	{
 		ci = getColumnInfo(ct);
 		//(ci.getName().equals(n) + " ci.getName().equals(n) YEA " + ":" + n + ":" + ci.getName());
+		//( n +  " getColumnInfo " + ci.getName() );
 		if (ci.getName().equals(n))
 			return ci;
+		//if (sqp != null)
+		//	if (ci.getName().equals(sqp.getRealColName(n)))
+		//	return ci;		
 	}
 	return null;
 }
