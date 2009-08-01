@@ -66,7 +66,7 @@ public Object execute(SQLParser sqp)throws SQLException{
 
 			//(incl + ":"  + h + ":" + pk + ":VerifyPrimaryKeysCommand:" + sqp.getHash());
 			if (h != null && h.size() > 0)
-			throw jiqlException.get("duplicate_entry_for_primary_key","Duplicate entry for primary key " + pk);
+			throw jiqlException.get("duplicate_entry_for_primary_key",sqp.getTable() + " Duplicate entry for primary key " + pk + ":" + incl + ":" + h);
 
 			return null;
 }
