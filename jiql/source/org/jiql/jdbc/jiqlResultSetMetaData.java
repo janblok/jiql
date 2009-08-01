@@ -34,9 +34,11 @@ import org.jiql.db.*;
 import org.jiql.util.*;
 import org.jiql.db.objs.jiqlTableInfo;
 import org.jiql.db.select.FunctionBase;
+import org.jiql.db.jdbc.stat.ResultMetaObj;
 
 public class jiqlResultSetMetaData implements java.sql.ResultSetMetaData, java.io.Serializable
 {
+	ResultMetaObj rmo = null;
 	TableInfo ti = null;
 	SQLParser sqp = null;
 	static Vector <Integer> tcolstrings = new Vector<Integer>();
@@ -57,6 +59,9 @@ public class jiqlResultSetMetaData implements java.sql.ResultSetMetaData, java.i
 		ecolints.add(11);
 		ecolints.add(14);
 
+	}
+	public void setResultMetaObj(ResultMetaObj ro){
+		rmo = ro;
 	}
 	public jiqlResultSetMetaData(SQLParser sp)throws SQLException{
 			sqp = sp;
@@ -104,6 +109,8 @@ resLog("RL " + 7);
 
 public String 	getCatalogName(int column)throws SQLException{
 resLog("getCatalogName " + column);
+		if (rmo != null)
+			return rmo.getCatalogName(column);
 		if (isCatalog())
 			return "TABLE_CAT";
 
@@ -112,7 +119,10 @@ resLog("getCatalogName " + column);
 		return "@@identity";
 		else if (sqp.getAction().equals("getFoundRows"))
 		return "FOUND_ROWS()";
-
+		else if (sqp.getAction().equals("getTypeInfo"))
+		return sqp.getAction();
+		else if (sqp.getAction().equals("getGeneratedKeys"))
+		return sqp.getAction();
 	}
 		if (sqp.showTables()){
 			if (column == 1)
@@ -135,6 +145,9 @@ resLog("RL " + 8);
           //Returns the fully-qualified name of the Java class whose instances are manufactured if the method ResultSet.getObject is called to retrieve a value from the column.
 public int 	getColumnCount()throws SQLException{
 resLog("getColumnCount " );
+			if (rmo != null)
+			return rmo.getColumnCount();
+	
 		if (isSchema())
 		{
 //("getColumnCount isSchema " );
@@ -150,6 +163,10 @@ return 2;
 		return org.jiql.jdbc.ResultSet.foundrows.size();
 		else if (sqp.getAction().equals("getIndex"))
 		return org.jiql.jdbc.ResultSet.indexv.size();
+		else if (sqp.getAction().equals("getTypeInfo"))
+		return Gateway.get(sqp.getProperties()).getTypeinfoCols().size();
+		else if (sqp.getAction().equals("getGeneratedKeys"))
+		return 1;
 
 	}
 	
@@ -172,6 +189,8 @@ return ti.size();
           //Returns the number of columns in this ResultSet object.
 public int 	getColumnDisplaySize(int column)throws SQLException{
 resLog("getColumnDisplaySize " + column);
+			if (rmo != null)
+			return rmo.getColumnDisplaySize(column);
 
 		if (sqp.showTables()){
 					if (column == 1)
@@ -191,6 +210,10 @@ resLog("getColumnDisplaySize " + column);
 		return org.jiql.jdbc.ResultSet.foundrows.elementAt(column - 1).toString().length();
 		else if (sqp.getAction().equals("getIndex"))
 		return org.jiql.jdbc.ResultSet.indexv.elementAt(column - 1).toString().length();
+		else if (sqp.getAction().equals("getTypeInfo"))
+		return Gateway.get(sqp.getProperties()).getTypeinfoCols().elementAt(column -1).toString().length();
+		else if (sqp.getAction().equals("getGeneratedKeys"))
+			return 13;
 
 	}
 	if (sqp.getAction().equals("describeTable"))
@@ -231,7 +254,9 @@ public void setIsSchema(boolean tf){
 
 public String 	getColumnLabel(int column)throws SQLException{
 resLog("getColumnLabel " + column);
-	
+				if (rmo != null)
+			return rmo.getColumnLabel(column);
+
 		if (isSchema())
 			return "TABLE_SCHEM";
 
@@ -254,7 +279,10 @@ resLog("getColumnLabel " + column);
 		return org.jiql.jdbc.ResultSet.foundrows.elementAt(column - 1).toString();
 		else if (sqp.getAction().equals("getIndex"))
 		return org.jiql.jdbc.ResultSet.indexv.elementAt(column - 1).toString();
-
+		else if (sqp.getAction().equals("getTypeInfo"))
+		return Gateway.get(sqp.getProperties()).getTypeinfoCols().elementAt(column -1).toString();
+		else if (sqp.getAction().equals("getGeneratedKeys"))
+		return "GENERATED_KEY";
 	}
 	if (sqp.getAction().equals("describeTable"))
 		return org.jiql.jdbc.ResultSet.descols.elementAt(column - 1).toString();
@@ -275,6 +303,8 @@ return ci.getName();
           //Gets the designated column's suggested title for use in printouts and displays.
 public String 	getColumnName(int column)throws SQLException{
 resLog("getColumnName " + column);
+				if (rmo != null)
+			return rmo.getColumnName(column);
 
 		if (isSchema())
 		{
@@ -302,6 +332,10 @@ resLog("getColumnName " + column);
 		return org.jiql.jdbc.ResultSet.foundrows.elementAt(column - 1).toString();
 		else if (sqp.getAction().equals("getIndex"))
 		return org.jiql.jdbc.ResultSet.indexv.elementAt(column - 1).toString();
+		else if (sqp.getAction().equals("getTypeInfo"))
+		return Gateway.get(sqp.getProperties()).getTypeinfoCols().elementAt(column -1).toString();
+		else if (sqp.getAction().equals("getGeneratedKeys"))
+		return "GENERATED_KEY";
 
 	}
 	if (sqp.getAction().equals("describeTable"))
@@ -326,6 +360,9 @@ return ci.getDisplayName();
           //Get the designated column's name.
 public int 	getColumnType(int column)throws SQLException{
 resLog("getColumnType " + column);
+				if (rmo != null)
+			return rmo.getColumnType(column);
+
 		if (sqp.showTables())
 			return Types.VARCHAR;
 
@@ -334,6 +371,12 @@ resLog("getColumnType " + column);
 		return Types.VARCHAR;
 		else if (sqp.getAction().equals("getFoundRows"))
 		return Types.INTEGER;
+		else if (sqp.getAction().equals("getTypeInfo")){
+		int ir = ColumnInfo.getTypeFromName(Gateway.get(sqp.getProperties()).getTypeinfoColTypeNames().elementAt(column -1).toString());
+		return ir;
+		}		else if (sqp.getAction().equals("getGeneratedKeys"))
+		return -5;
+
 				else if (sqp.getAction().equals("getIndex"))
 				{
 					if (column == 7||column == 8 || column == 11 || column == 12)
@@ -382,6 +425,8 @@ if (fb != null)return fb.getType();
           //Retrieves the designated column's SQL type.
 public String 	getColumnTypeName(int column)throws SQLException{
 resLog("getColumnType " + column);
+				if (rmo != null)
+			return rmo.getColumnTypeName(column);
 
 		if (sqp.showTables())
 			return "varchar";
@@ -390,6 +435,11 @@ resLog("getColumnType " + column);
 		return "varchar";
 		else if (sqp.getAction().equals("getFoundRows"))
 		return "int";
+		else if (sqp.getAction().equals("getTypeInfo"))
+		return Gateway.get(sqp.getProperties()).getTypeinfoColTypeNames().elementAt(column -1).toString();
+		else if (sqp.getAction().equals("getGeneratedKeys"))
+		return "UNKNOWN";
+
 				else if (sqp.getAction().equals("getIndex"))
 				{
 					if (column == 7||column == 8 || column == 11 || column == 12)
@@ -455,6 +505,8 @@ return "";
           //Get the designated column's table's schema.
 public String 	getTableName(int column)throws SQLException{
 resLog("getTableName " + column);
+				if (rmo != null)
+			return rmo.getTableName(column);
 
 		if (isCatalog())
 			return "TABLE_CAT";
@@ -465,6 +517,10 @@ resLog("getTableName " + column);
 		return "identity";
 		else if (sqp.getAction().equals("getFoundRows"))
 		return "rows";
+		else if (sqp.getAction().equals("getTypeInfo"))
+		return sqp.getAction();
+		else if (sqp.getAction().equals("getGeneratedKeys"))
+		return sqp.getAction();
 
 	}
 	
