@@ -69,6 +69,10 @@ import java.util.Vector;
 import org.jiql.db.Row;
 import org.jiql.util.SQLParser;
 import org.jiql.util.CacheMgr;
+import java.io.IOException;
+import java.io.InputStream;
+import tools.util.EZArrayList;
+import java.util.StringTokenizer;
 
 // fredt@users 20020320 - patch 1.7.0 - JDBC 2 support and error trapping
 // JDBC 2 methods can now be called from jdk 1.1.x - see javadoc comments
@@ -759,7 +763,7 @@ dmetaLog( "dme 58 " );
     public boolean storesUpperCaseIdentifiers() throws SQLException {
         dmetaLog( "dme 73 " );
 
-        return true;
+        return false;
     }
 
     /**
@@ -901,7 +905,7 @@ dmetaLog( "dme 58 " );
     public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
         dmetaLog( "dme 78 " );
 
-        return false;
+        return true;
     }
 
     /**
@@ -1004,7 +1008,7 @@ dmetaLog( "dme 58 " );
     public String getTimeDateFunctions() throws SQLException {
        dmetaLog( "dme 90 " );
 
-        return null;
+        return "month,year";
     }
 
     /**
@@ -3546,7 +3550,9 @@ dmetaLog( "dme 58 " );
 		//return connection.createStatement().executeQuery("getColumns " + tableNamePattern);
 
 			    org.jiql.jdbc.ResultSet r = CacheMgr.getMetaCache(connection.getProperties().getProperty("baseUrl"),"getColumns",tableNamePattern);
-        		if (r != null)return r;
+        		if (r != null){
+        			return r;
+        		}
         		r = (org.jiql.jdbc.ResultSet)connection.createStatement().executeQuery("getColumns " + tableNamePattern);
 				CacheMgr.setMetaCache(connection.getProperties().getProperty("baseUrl"),"getColumns",r,connection.getProperties().getProperty("MetaCache"),tableNamePattern);
 				return r;
@@ -4295,10 +4301,34 @@ dmetaLog( "dme 58 " );
      *        type description
      * @exception SQLException if a database access error occurs
      */
+    
+    org.jiql.jdbc.ResultSet typeinfo = null;
+
+
+
+
     public ResultSet getTypeInfo() throws SQLException {
              dmetaLog("getTypeInfo ");
+	if (typeinfo == null)
+	{
+	//	try{
+		
+		/*InputStream inp = getClass().getResourceAsStream("typeinfo.properties");
+		EZArrayList ez1 = new EZArrayList(inp);
+		EZArrayList	cn = new EZArrayList(new StringTokenizer(ez1.elementAt(0).toString(),","));
+		ez1.removeElementAt(0);
+		EZArrayList cols = null;
+		for (int ct = 0;ct < ez1.size();ct++)
+		{
+			cols = new EZArrayList(new StringTokenizer(ez1.elementAt(ct).toString(),","));
+		}*/
+		
+        		typeinfo = (org.jiql.jdbc.ResultSet)connection.createStatement().executeQuery("getTypeInfo");
+		//("TYPINGH " + typeinfo);
 
-        return null;
+	}
+        typeinfo.reset();
+        return typeinfo;
 
     }
 
