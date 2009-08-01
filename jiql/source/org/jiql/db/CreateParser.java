@@ -55,7 +55,15 @@ public class CreateParser  implements Serializable
 		autoincrement = new AutoIncrement(sqp);
 
 	}
+	boolean notexists = false;
+	public void setIfNotExists(boolean tf){
+	notexists = tf;
+	}
 
+	public boolean ifNotExists(){
+	return notexists;
+	}
+	
 	public AutoIncrement getAutoIncrement(){
 		return autoincrement;
 	}
