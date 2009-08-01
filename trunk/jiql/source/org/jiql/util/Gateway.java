@@ -71,6 +71,77 @@ public void setProperties(Properties props){
 				return o;
 
 			}
+
+
+
+    Vector<Row> typeinfo = null;
+	EZArrayList	typeinfoCols = null;
+	public EZArrayList getTypeinfoCols(){
+		return typeinfoCols;
+	}
+
+	EZArrayList	typeinfoColTypeNames = null;
+	public EZArrayList getTypeinfoColTypeNames(){
+		return typeinfoColTypeNames;
+	}
+    public Vector<Row> getTypeInfo( SQLParser sqp) throws SQLException {
+	if (typeinfo == null)
+	{
+	//	try{
+				//("getTypeInfo 2 " + getClass().getResource("typeinfo.properties"));
+
+		InputStream inp = getClass().getResourceAsStream("typeinfo.properties");
+		EZArrayList ez1 = new EZArrayList(inp);
+		typeinfoCols = new EZArrayList(new StringTokenizer(ez1.elementAt(0).toString(),","));
+		ez1.removeElementAt(0);
+		typeinfoColTypeNames = new EZArrayList(new StringTokenizer(ez1.elementAt(0).toString(),","));
+		ez1.removeElementAt(0);
+
+		EZArrayList rows = null;
+				typeinfo = new Vector<Row>();
+				//("getTypeInfo 3 " + typeinfo);
+
+						Row nv = null;
+		String val = null;
+		Object o = null;
+		for (int ct = 0;ct < ez1.size();ct++)
+		{
+			rows = new EZArrayList(new StringTokenizer(ez1.elementAt(ct).toString(),","));
+			nv = new Row();
+		
+				for (int ctc = 0;ctc < typeinfoCols.size();ctc++)
+		{
+			val = rows.elementAt(ctc).toString();
+			if (!val.equalsIgnoreCase("null"))
+			{
+			o = jiqlCellValue.getObj(val,ColumnInfo.getTypeFromName(typeinfoColTypeNames.elementAt(ctc).toString()),sqp);
+			
+			//(ColumnInfo.getTypeFromName(typeinfoColTypeNames.elementAt(ctc).toString()) + ": get oo " + typeinfoColTypeNames.elementAt(ctc) + ":" + typeinfoCols.elementAt(ctc) + ":" + o.getClass().getName());
+			nv.put(typeinfoCols.elementAt(ctc),o);
+			}
+		
+		}
+		
+			typeinfo.add(nv);
+		
+		}
+		
+	//	}catch (IOException io){
+	//		throw new SQLException(io.toString());
+	//	}
+	}
+					//("getTypeInfo 4 " + typeinfo);
+
+        return typeinfo;
+
+    }
+
+
+
+
+
+
+
 			
 			public Vector<Row> getFoundRows(SQLParser sqp)throws SQLException{
 				Vector<Row> o = new Vector<Row>();
