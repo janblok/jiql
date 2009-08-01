@@ -97,7 +97,7 @@ public Object getValue(){
 				
 				int cit = ci.getColumnType();
 				if (cit ==  )
-					return new Long(value);
+					return new  (value);
 				else if (cit == Types.DATE)
 					return new Date(value);
 				else if (cit == Types.FLOAT)
