@@ -40,6 +40,7 @@ import org.jiql.db.objs.jiqlCellValue;
 import tools.util.NameValuePairs;
 import org.jiql.util.JGException;
 import org.jiql.util.JGUtil;
+import tools.util.NumberUtil;
 
 public class SelectParser  implements Serializable
 {
@@ -52,6 +53,16 @@ public class SelectParser  implements Serializable
 
 	}
 
+	public boolean isCompareValues(Criteria c){
+		boolean b = (NumberUtil.isNumeric(c.getName()) && NumberUtil.isNumeric(c.getValueString()));
+		if (b){
+			
+			sqp.getIncludeAllList().remove(c);
+		}
+		return b;
+	}
+
+
 	public Limit getLimit(){
 		return limit;
 	}
@@ -60,6 +71,7 @@ public class SelectParser  implements Serializable
 	}
 
 	public StringBuffer parse(StringBuffer tok)throws SQLException{
+		tok = sqp.getUnion().parse(tok);
 		tok = getLimit().parse(tok);
 		tok = getCalcFoundRows().parse(tok);
 		return tok;
@@ -74,8 +86,17 @@ public class SelectParser  implements Serializable
 		return tok;
 
 	}
+	
+		public boolean parseNoFrom(String tok)throws SQLException{
+		return getSelectValue().parse(tok,sqp);
 
-
+	}
+SelectValue sv = null;
+	public SelectValue getSelectValue(){
+		if (sv == null)
+			sv = new SelectValue();
+		return sv;
+	}
 
 }
 
