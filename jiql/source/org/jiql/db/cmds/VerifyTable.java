@@ -59,7 +59,7 @@ if (jti == null )
 			Criteria c = (Criteria)v.elementAt(ct);
 		//(sqp.getTable() + " VerifyTable 2 " + c);
 
-			if (ti.getColumnInfo(sqp.getRealColName(c.getName())) == null)
+			if (ti.getColumnInfo(sqp.getRealColName(c.getName())) == null && !( sqp.getAction().equals("select") && sqp.getSelectParser().isCompareValues(c)))
 			throw jiqlException.get("unknown_column",sqp.getTable() + " Included Unknown column " + c.getName() + ":" + ti + ":" + sqp);
 			}
 
