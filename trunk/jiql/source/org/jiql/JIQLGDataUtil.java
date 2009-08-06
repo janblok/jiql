@@ -114,7 +114,7 @@ public class JIQLGDataUtil
 		}
 	
 	protected static void checkThread()throws JGException{
-		String tid = String.valueOf(Thread.currentThread().getId());
+/*		String tid = String.valueOf(Thread.currentThread().getId());
 		long tct = tc.getLong(tid);
 		if (tct < 1){
 			tct = System.currentTimeMillis();
@@ -122,7 +122,7 @@ public class JIQLGDataUtil
 		}
 		if (System.currentTimeMillis() - tct > mtd)
 					throw JGException.get("thread_timeout"," Timeout! Try to break up the SQL Query. " + System.currentTimeMillis()  + ":" + tct + ":" + mtd);
-
+*/
 	}
 	 public static Object convert(Object o){
 	 	if (o == null)
