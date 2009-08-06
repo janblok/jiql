@@ -77,6 +77,7 @@ public int getFoundRows(){
 
 
 public void setIdentity(int f){
+//("jc.setIdentity " + f);
 	if (f > 0)
 	identity = f;
 }
