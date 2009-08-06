@@ -38,6 +38,7 @@ public  class CacheMgr
 {
 
 	static Hashtable<String,Hashtable<String,Hashtable<String,org.jiql.jdbc.ResultSet>>> mcaches = new Hashtable<String,Hashtable<String,Hashtable<String,org.jiql.jdbc.ResultSet>>>();
+	
 
 	public static  org.jiql.jdbc.ResultSet getMetaCache(String url,String meta,String table){
 		Hashtable<String,Hashtable<String,org.jiql.jdbc.ResultSet>> h1 = mcaches.get(url);
@@ -50,6 +51,21 @@ public  class CacheMgr
 		r.reset();
 		return r;
 //		return null;
+	}
+	
+		public static  void removeMetaCache(String url,String table){
+		Hashtable<String,Hashtable<String,org.jiql.jdbc.ResultSet>> h1 = mcaches.get(url);
+		if (h1 == null)return ;
+		
+		Enumeration<String> metas = h1.keys();
+		while (metas.hasMoreElements()){
+		
+		Hashtable<String,org.jiql.jdbc.ResultSet> h = h1.get(metas.nextElement());
+		if (h != null)
+		h.remove(table);
+		}
+
+
 	}
 
 	public static  void setMetaCache(String url,String meta,org.jiql.jdbc.ResultSet r,String mc,String table){
