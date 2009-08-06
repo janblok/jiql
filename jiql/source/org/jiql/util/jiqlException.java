@@ -56,10 +56,12 @@ public static jiqlException get(String id,String m){
 		se.setJGMessage(m);
 		return se;
 	}
+static boolean debug = true;
 
 	protected void setJGMessage(String m){
 		message = m;
-
+		if (debug)
+			System.err.println(message);
 	}
 	public jiqlException(){
 		super();
