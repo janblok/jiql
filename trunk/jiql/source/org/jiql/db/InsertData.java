@@ -43,7 +43,7 @@ import org.jiql.util.JGUtil;
 
 public class InsertData  implements Serializable
 {
-StringBuffer left = new StringBuffer("jiqlInsert");
+StringBuffer left = new StringBuffer("jiqlInsert ");
 	StringBuffer sb = null;
 	Connection connection = null;
 	String table = null;
@@ -67,7 +67,10 @@ if (i < 0)throw new SQLException ("Missing CLOSING BRACKET term in insert statem
 
 while (true){
 int i2 = sb.toString().toLowerCase().indexOf("values");
-if (i2 < 0)throw new SQLException ("Missing VALUES term in insert statement " + sb);
+//INSERT INTO `schema_info` VALUES (7);
+//INTO `schema_info` valjiqlues (7)
+if (i2 < 0)break;
+//throw new SQLException ("Missing VALUES term in insert statement " + sb);
 if (i2 < i){
 	sb.replace(i2,i2 + 6,"valjiqlues");
 	continue;
