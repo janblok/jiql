@@ -40,7 +40,7 @@ import org.jiql.db.objs.jiqlCellValue;
 import tools.util.NameValuePairs;
 import org.jiql.util.JGException;
 import org.jiql.util.JGUtil;
-//import org.jiql.db.Row;
+import org.jiql.db.Row;
 
 public class SelectValueStatementProcessor extends StatementProcessor implements Serializable
 {
