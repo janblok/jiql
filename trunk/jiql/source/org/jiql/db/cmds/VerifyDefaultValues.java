@@ -45,52 +45,53 @@ public Object execute(SQLParser sqp)throws SQLException{
 if (ti == null )return null;
 Hashtable dv = ti.getDefaultValues();
 //("vc1 " + ch);
-			if (dv == null || dv.size() < 1)return null;
+			Hashtable inv = sqp.getHash();
+
+			if (dv != null && dv.size() > 0)
+			{
+			
 String pk = null;
 
 			Enumeration en = dv.keys();
-			Hashtable inv = sqp.getHash();
-
-//int not null should default to 0
-
-
-			while(en.hasMoreElements())
+		while(en.hasMoreElements())
 			{
-
 			pk = (String)en.nextElement();
-
 			if (inv.get(pk) == null)// || inv.get(pk).toString().toLowerCase().equals("null"))
 			 inv.put(pk,dv.get(pk));
-			//throw jiqlException.get("column_cannot_be_null",pk + " Column cannot be null");
-
-
-
-
+			}
 			}
 
 Vector ch = ti.getNotNulls();
 String nn = null;
 Object nnv = null;
+//(nn + " getAutoIncrementInt 1 " + ch);
 for (int ct = 0;ct < ch.size();ct++)
 {
 	nn = ch.elementAt(ct).toString();
 	nnv = inv.get(nn);
+//(nn + " getAutoIncrementInt 2 " + nnv);
+
 	if (nnv == null || nnv.toString().equalsIgnoreCase("NULL"))
 	{
 			TableInfo tbi = sqp.getTableInfo();
+//(nn + " getAutoIncrementInt 3 " + tbi);
+
 			if (ti != null){
 			
 			ColumnInfo ci = tbi.getColumnInfo(nn);
+//(nn + " getAutoIncrementInt 4 " + ti);
+
 			if (ci != null){
-				//(nn + " getAutoIncrementInt c " + ci.getColumnType() + ":" +  );
+				//(nn + " getAutoIncrementInt c " + ci.getColumnType() + ":" + ci.getTypeName() + ":" + Types.BIGINT );
 
 				if (ci.isNumeric()){
-				//(nn + " getAutoIncrementInt a ");
+				//(nn + " getAutoIncrementInt a " + sqp.getJiqlTableInfo().listAutoIncrements());
 
 				if (sqp.getJiqlTableInfo().listAutoIncrements().contains(nn))
 				{
-				//(nn + " getAutoIncrementInt b ");
-					sqp.getInsertParser().setAutoIncrementValue(Gateway.get(sqp.getProperties()).getAutoIncrementInt(sqp,nn));
+					int incr = Gateway.get(sqp.getProperties()).getAutoIncrementInt(sqp,nn);
+				//(nn + " getAutoIncrementInt b " + incr);
+					sqp.getInsertParser().setAutoIncrementValue(incr);
 					inv.put(nn,sqp.getInsertParser().getAutoIncrementValue());
 				}
 				else
