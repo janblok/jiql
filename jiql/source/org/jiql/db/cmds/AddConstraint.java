@@ -150,6 +150,9 @@ public Object execute(SQLParser sqp)throws SQLException{
 			//(ti + ": ADDCONSRAUBT  " + jc + ":" + sqp.getTable());
 			
 			jiqlDBMgr.get(sqp.getProperties()).saveTableInfo(sqp.getTable(),ti);
+CacheMgr.removeMetaCache(sqp.getConnection().getProperties().getProperty("baseUrl"),sqp.getTable());
+sqp.setAttribute("removeMetaCache",sqp.getTable());
+
 			return null;
 }
 
