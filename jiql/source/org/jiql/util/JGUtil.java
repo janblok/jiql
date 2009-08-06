@@ -30,6 +30,8 @@ package org.jiql.util;
 import tools.util.*;
 import java.io.*;
 import java.util.*;
+import org.jiql.db.Row;
+import java.sql.SQLException;
 
 
 
@@ -37,6 +39,12 @@ public  class JGUtil
 {
 
 static int maxLog = 20;
+static Vector<String> validF = new Vector<String>();
+static{
+	validF.add("BOOLEAN");
+	validF.add("BOOL");
+
+}
 
 public static void log(Throwable l){
 	ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -75,6 +83,28 @@ public static void clear(){
 		}catch (Exception e){
 			tools.util.LogMgr.err("jiqlLog.clear " + e.toString());
 		}
+}
+
+public static boolean validFieldType(String f,SQLParser sqp)throws SQLException{
+
+	f = f.toUpperCase();
+	int i = f.indexOf("(");
+	if (i > 0)
+		f = f.substring(0,i);
+	f = f.trim();
+
+	if (validF.contains(f))return true;
+
+	Vector<Row> vr = Gateway.get(sqp.getProperties()).getTypeInfo(sqp);
+
+	Row r = null;
+	for (int ct = 0;ct < vr.size();ct++)
+	{
+		r = vr.elementAt(ct);
+		if (r.get("TYPE_NAME").equals(f))return true;
+	}
+	
+	return false;
 }
 
 }
