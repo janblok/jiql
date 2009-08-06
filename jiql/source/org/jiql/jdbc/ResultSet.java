@@ -199,6 +199,8 @@ protected String getColumnName(int  ci) throws SQLException{
 		return indexv.elementAt(ci -1).toString();
 		else if (sqp.getAction().equals("getTypeInfo"))
 		return Gateway.get(sqp.getProperties()).getTypeinfoCols().elementAt(ci -1).toString();
+		if (sqp.getAction().equals("getGeneratedKeys"))
+		return "GENERATED_KEY";
 
 	}
 	if (sqp.getAction().equals("describeTable"))
@@ -680,14 +682,14 @@ public  int getInt(String columnLabel)  throws SQLException{
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as an int in the Java programming language. 
 public  long getLong(int columnIndex)  throws SQLException{
-	rsetLog("RESL 53");
+	rsetLog("RESL 53 " + columnIndex);
 
 	return getLong(getColumnName(columnIndex));
 
 }
  //            Retrieves the value of the designated column in the current row of this ResultSet object as a long in the Java programming language. 
 public  long getLong(String columnLabel)  throws SQLException{
-	rsetLog("RESL 54");
+	rsetLog("RESL 54 " + columnLabel);
 		if ( sqp.isSpecial())
 		{
 				if (columnLabel.equalsIgnoreCase("FOUND_ROWS()"))
