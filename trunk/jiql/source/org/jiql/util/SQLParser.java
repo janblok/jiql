@@ -30,7 +30,7 @@ package org.jiql.util;
 import tools.util.NameValuePairs;
 import tools.util.NameValue;
 import tools.util.EZArrayList;
-import tools.util.StringUtil;
+//import tools.util.StringUtil;
 import tools.util.Crypto;
 import tools.util.StringUtil;
 import tools.util.SharedMethods;
@@ -86,11 +86,15 @@ public  class SQLParser implements java.io.Serializable
    	String prefixValue = "jiql";
 boolean prefix = true;
 StatementProcessor spro = null;
-//boolean local = false;
 
-/*public boolean isLocal(){
-	return local;
-}*/
+Hashtable attributes = new Hashtable();
+public void setAttribute(String n,Object v){
+	attributes.put(n,v);
+}
+
+public Object getAttribute(String n){
+	return attributes.get(n);
+}
 
 public StatementProcessor getStatementProcessor(){
 	return spro;
@@ -406,6 +410,10 @@ public DateFormat getDateFormat(){
 	public void setConnection(jiqlConnection c){
 		connection = c;
 		connection.setIdentity(getInsertParser().getAutoIncrementValue());
+		String tbl = (String)getAttribute("removeMetaCache");
+		if (tbl != null)
+	CacheMgr.removeMetaCache(connection.getProperties().getProperty("baseUrl"),tbl);
+
 	}
 	public void setSQLParser(String t,Properties u)throws SQLException{
 		properties = u;
@@ -1051,7 +1059,9 @@ int i3 = tok.indexOf(" ");
 		{
 			if (getSelectParser().parseNoFrom(tok2))
 				return;
-			throw new SQLException("SELECT STATEMENT MISSING FROM CLAUSE " + tok);
+			//throw  ("SELECT STATEMENT MISSING FROM CLAUSE " + tok);
+			throw JGException.get("missing_from_clause","SELECT STATEMENT MISSING FROM CLAUSE " + tok);
+
 		}
 		String sels = tok.substring(0,si);
 		sels = sels.trim();
@@ -1641,12 +1651,33 @@ if (si < 0)return;
 			else
 			tok = tok.substring(i + 1,tok.length());
 			tok = tok.trim();
-			if (tok.toLowerCase().startsWith("values"))
+			boolean checkfl = false;
+
+			if (tok.toLowerCase().startsWith("valjiqlues"))
 			{
-				tok = tok.substring("values".length(),tok.length());
-			tok = tok.trim();
+			checkfl = true;
+			StringBuffer sbf = new StringBuffer("(");
+			EZArrayList fv = getJiqlTableInfo().getFieldList();
+			sbf.append(fv.toDelimitedString(","));
+			sbf.append(") values ");
+			//tok = tok.substring("values".length(),tok.length());
+			//tok = tok.trim();
+			tok = sbf.toString() + tok.substring(10,tok.length());
 
 			}
+			if (tok.toLowerCase().startsWith("values"))
+			{
+			/*checkfl = true;
+			StringBuffer sbf = new StringBuffer("(");
+			EZArrayList fv = getJiqlTableInfo().getFieldList();
+			sbf.append(fv.toDelimitedString(","));
+			sbf.append(") ");*/
+			tok = tok.substring("values".length(),tok.length());
+			tok = tok.trim();
+			//tok = sbf.toString() + tok;
+
+			}
+			//("INSERT 1 " + tok);
 			tok = tok.substring(1,tok.length());
 			tok = tok.trim();
 			//tok = encode(tok);
@@ -1765,7 +1796,7 @@ public Hashtable getDefaultValues(){
 	EZArrayList notnulls = new EZArrayList();
 	Hashtable defaultValues = new Hashtable();
 
-	protected void parseAlter(int ti){
+	protected void parseAlter(int ti)throws SQLException{
 
 			tok = tok.substring(ti + " table ".length(),tok.length());
 			tok = tok.trim();
@@ -1838,6 +1869,10 @@ public Hashtable getDefaultValues(){
 					//(table + " aLTER 5 " + jConstraint + ":" + cn + ":" + ty  +":" + jref);
 					
 				}
+				
+				else {
+					 org.jiql.db.alter.AlterParser.get().parse(tok,this);
+				}
 
 	
 			}
@@ -1848,7 +1883,7 @@ public Hashtable getDefaultValues(){
 public  jiqlConstraint getConstraint(){
 	return jConstraint;
 }
-	protected String  decode(String s){
+	public String  decode(String s){
 		s = StringUtil.replaceSubstring(s,"jiql_replace_comma",",");
 		s = StringUtil.replaceSubstring(s,"jiql_replace_openbracket","(");
 		s = StringUtil.replaceSubstring(s,"jiql_replace_closebracket",")");
@@ -2145,12 +2180,20 @@ jiqlConstraint jConstraint = null;
 					}
 					
 				}
+				if (!JGUtil.validFieldType(va,this))
+								throw JGException.get("invalid_field_type",n + " --> " + va + " Invalid Field Type on Table " + getTable());
+
+					//throw   (n + " --> " + va + " Invalid Field Type on Table " + getTable());
 				hash.put(n,convert(va,n));
 				ti.addFieldList(n);
 			}	
 				//not null primary key
 
 			else{
+				if (!JGUtil.validFieldType(va,this))
+						throw JGException.get("invalid_field_type",n + " --> " + va + " Invalid Field Type on Table " + getTable());
+
+					//throw   (n + " --> " + va + " Invalid Field Type on Table " + getTable());
 			
 			hash.put(n,convert(va,n));
 			ti.addFieldList(n);
