@@ -73,6 +73,7 @@ public int getMaxLength(){
 	t = t.toLowerCase();
 	if (t.startsWith("varchar(")){
 		t = t.substring("varchar(".length(),t.length()-1);
+		t = t.trim();
 		return Integer.parseInt(t);
 	}
 	if (t.startsWith("tinyint(")){
