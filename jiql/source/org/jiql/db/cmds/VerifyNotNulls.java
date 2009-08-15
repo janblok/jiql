@@ -55,7 +55,7 @@ String pk = null;
 
 			pk = (String)en.nextElement();
 	
-			if (inv.get(pk) != null && inv.get(pk).toString().toLowerCase().equals("null"))
+			if (inv.get(pk) == null || inv.get(pk).toString().toLowerCase().equals("null"))
 			throw jiqlException.get("column_cannot_be_null",pk + " Column cannot be null");
 		
 
