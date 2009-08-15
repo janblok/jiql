@@ -56,6 +56,8 @@ public class Statement implements java.sql.Statement
 	static{
 		locals.add("getTypeInfo");
 		locals.add("SelectValue");
+		locals.add("sqldump");
+
 		//locals.add("getTypeInfo;");
 		//sprocessors.put("",new SelectValueStatementProcessor());
 
