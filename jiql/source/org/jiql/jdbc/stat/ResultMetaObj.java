@@ -51,6 +51,11 @@ public ResultMetaObj(org.jiql.jdbc.ResultSet r){
 	result = r;
 
 }
+
+public org.jiql.jdbc.ResultSet 	getResultSet()throws SQLException{
+	return result;
+}
+
 public String 	getTableName(int column)throws SQLException{
 	return result.getSQLParser().getAction();
 }
