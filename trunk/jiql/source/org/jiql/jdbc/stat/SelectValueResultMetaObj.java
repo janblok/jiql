@@ -100,12 +100,12 @@ public int findColumn(String col)throws SQLException{
 return 1;
 }
 
- public Object getValue(String col)throws SQLException{
+ public Object getValue(int indx,String col)throws SQLException{
  		//(val + " RO.getValue " + cn);
 
  	return val;
  }
-  public  int size(){
+  public  int size()throws SQLException{
   	return 1;
   }
 
