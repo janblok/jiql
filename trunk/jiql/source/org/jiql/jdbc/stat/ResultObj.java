@@ -55,8 +55,8 @@ public ResultObj(org.jiql.jdbc.ResultSet r){
 
  public abstract int findColumn(String col)throws SQLException;
 
- public abstract Object getValue(String col)throws SQLException;
- public abstract int size();
+ public abstract Object getValue(int indx,String col)throws SQLException;
+ public abstract int size()throws SQLException;
 
 
 }
