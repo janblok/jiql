@@ -64,16 +64,16 @@ Hashtable ch = ti.getConstraints();
 			
 			Vector incl = new Vector();
 			String n = null;
-			String v = null;
+			Object v = null;
 			Hashtable inv = sqp.getHash();
 			for (int ct = 0;ct < pk.size();ct++)
 			{
 				 n = pk.elementAt(ct).toString();
-				 v = inv.get(n).toString();
+				 v = inv.get(n);
 		//(n + " vc3 " + v);		
 
 				 if (v != null)
-				 	incl.add(new Criteria(n,v,"=",sqp));
+				 	incl.add(new Criteria(n,v.toString(),"=",sqp));
 			}
 			if (incl == null || incl.size() < 1)continue;
 
