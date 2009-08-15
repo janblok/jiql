@@ -67,7 +67,7 @@ public class jiqlDBMgr
 		/*commands.put("dropTable",new DropTableCommand());
 		commands.put("addPrimaryKeys",new AddPrimaryKeysCommand());
 		commands.put("verifyPrimaryKeys",new VerifyPrimaryKeysCommand());
-		commands.put("addConstraint",new AddConstraint());
+		commands.put(" ",new  ());
 		commands.put("verifyConstraints",new VerifyConstraints());
 		commands.put("VerifyNotNulls",new VerifyNotNulls());
 		commands.put("VerifyTable",new VerifyTable());
