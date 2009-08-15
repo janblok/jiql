@@ -660,7 +660,7 @@ public  int getInt(String columnLabel)  throws SQLException{
 	
 		Object o = null;
 		if (rmo != null)
-		o = rmo.getValue(columnLabel);
+		o = rmo.getValue(indx,columnLabel);
 		else
 		o = getRowObject().get(columnLabel);
 	//	checkNull(o);
@@ -817,7 +817,7 @@ public  Object getObject(String columnLabel)  throws SQLException{
 	rsetLog("getObject " + columnLabel);
 
 		if (rmo != null)
-		return rmo.getValue(columnLabel);
+		return rmo.getValue(indx,columnLabel);
 
 	Row r = getRowObject();
 	
@@ -997,7 +997,7 @@ public  String getString(String columnLabel)  throws SQLException{
 	//( () + ":" + indx + ":year " + columnLabel);
 	rsetLog( " getString a " + columnLabel);
 		if (rmo != null){
-			Object o = rmo.getValue(columnLabel);
+			Object o = rmo.getValue(indx,columnLabel);
 			if (o == null)return null;
 			return o.toString();
 		}
@@ -1203,7 +1203,12 @@ public  void moveToInsertRow() throws SQLException{
  //            Moves the cursor to the insert row. 
  public int size(){
  	if (rmo != null)
+ 		try{
+ 		
  		return rmo.size();
+ 		}catch (SQLException e){
+ 			e.printStackTrace();
+ 		}
  	return results.size();
  }
 public  boolean next() throws SQLException{
