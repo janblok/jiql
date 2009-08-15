@@ -46,6 +46,18 @@ public abstract class StatementProcessor  implements Serializable
 
 public StatementProcessor(){
 }
+ public void prepare(SQLParser sqp)throws SQLException{
+ 	sqp.setAction(getName());
+	sqp.setSpecial(isSpecial());
+	sqp.setStatementProcessor(this);
+
+ }
+  public boolean isSpecial(){
+ 	return false;
+ }
+ public String getName(){
+ 	return null;
+ }
  public abstract org.jiql.jdbc.ResultSet process(SQLParser sqp)throws SQLException;
 
 
