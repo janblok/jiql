@@ -45,7 +45,8 @@ import org.jiql.jdbc.jiqlConnection;
 import org.jiql.db.select.SelectParser;
 import org.jiql.db.insert.InsertParser;
 import org.jiql.db.jdbc.stat.StatementProcessor;
-
+import tools.util.AlphaNumeric;
+import org.jiql.db.SpecialCommandParser;
 
 public  class SQLParser implements java.io.Serializable
 {
@@ -234,7 +235,7 @@ public DateFormat getDateFormat(){
 		{
 			itm = selectList.elementAt(ct).toString();
 			String itm2 = parseSelectAlias(itm);
-			//(itm + " parseSelectAS2  " + itm2);
+			//(itm + " parse AS2  " + itm2);
 
 			itm2 = sfunctions.parse(itm2);
 
@@ -257,17 +258,17 @@ public DateFormat getDateFormat(){
 			StringBuffer uv = new StringBuffer(StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length())));
 			getSelectParser().parseFunctions(un,uv.toString());
 
-		//	selectList.setElementAt(un.toString(),ct);
-	//		 (selectList.elementAt(ct),uv.toString());
-	//		 (uv.toString(),selectList.elementAt(ct).toString());
+		//	 List.setElementAt(un.toString(),ct);
+	//		 ( List.elementAt(ct),uv.toString());
+	//		 (uv.toString(), List.elementAt(ct).toString());
 			selectList.setElementAt(uv.toString(),ct);
 			selectAS.put(selectList.elementAt(ct),un.toString());
-			//(ct + " ADD TO SELECT LIST " + uv.toString() + ":" + un.toString() + selectAS);
+			//(ct + " ADD TO   LIST " + uv.toString() + ":" + un.toString() +  AS);
 
 
-			// (un.toString(),selectList.elementAt(ct));
+			// (un.toString(), List.elementAt(ct));
 
-			// (uv.toString(),selectList.elementAt(ct).toString());
+			// (uv.toString(), List.elementAt(ct).toString());
 
 
 			}
@@ -289,7 +290,7 @@ public DateFormat getDateFormat(){
 			itm = sfunctions.parse(itm);
 
 			String itm2 = parseSelectAlias(itm);
-			//(itm + " parseSelectAS1  " + itm2);
+			//(itm + " parse AS1  " + itm2);
 			if (!itm2.equals(itm))
 			{
 				itm = itm2;
@@ -430,7 +431,7 @@ public DateFormat getDateFormat(){
 	}
 
 		/*public String toString(){
-		return "jiql.SQLParser table:" + table + ";selects:" +    ;
+		return "jiql.SQLParser table:" + table + "; s:" +    ;
 	}*/
 	
 	public String getStatement(){
@@ -535,10 +536,10 @@ public DateFormat getDateFormat(){
 						n = n.substring(i2 +1 ,n.length());
 					}*/
 					String rn = (String)selectAS.get(n);
-					//(rn +  " RN " + n + ":" + selectAS);
+					//(rn +  " RN " + n + ":" +  AS);
 					//if (rn == null)
-					//	rn = selectAS2.get(n);
-				//( rn + "   getRealColName " + selectAS + ":" + n + ":" + aliases);
+					//	rn =  AS2.get(n);
+				//( rn + "   getRealColName " +  AS + ":" + n + ":" + aliases);
 
 					if (rn != null)n = rn;
 					i2 = n.indexOf(".");
@@ -623,17 +624,17 @@ public DateFormat getDateFormat(){
 	
 	String getSelectASRealName(String n){
 		/*
-		String rn = (String)selectAS.get(n);
-			//(rn + ":" +   + " selectAS " + n + ":" + aliases);
+		String rn = (String) AS.get(n);
+			//(rn + ":" +   + "  AS " + n + ":" + aliases);
 			if (rn == null)
-			rn = (String)selectAS2.get(n);
+			rn = (String) AS2.get(n);
 			if (rn != null) n = rn;
 		
-		Enumeration en = selectAS.keys();
+		Enumeration en =  AS.keys();
 		while (en.hasMoreElements())
 		{
 			rn = en.nextElement().toString();
-			if (selectAS.get(rn).equals(n))
+			if ( AS.get(rn).equals(n))
 			{
 			
 				n = rn;
@@ -941,6 +942,9 @@ int i3 = tok.indexOf(" ");
 			return tok;		
 	}
 	
+		public String getToken(){
+			return tok;
+		}
 		public void setSpecial(boolean tf){
 			special = tf;
 		}
@@ -962,62 +966,11 @@ int i3 = tok.indexOf(" ");
 		
 		//  table testable (name varchar(18),countf int);
 		String tok2 = tok.toLowerCase();
-		int ti = 0;
-		if (tok2.startsWith("show tables")){
-			action = "showTables";
-			return;
-		}
-		else if (tok2.startsWith("describe ")){
-			action = "describeTable";
-			tok2 = tok.substring("describe ".length(),tok2.length()).trim();
-			setTable(tok2);
-			return;
-		}
-		else if (tok2.startsWith("getcolumns ")){
-			action = "getColumns";
-			tok2 = tok.substring("getcolumns ".length(),tok2.length()).trim();
-			setTable(tok2);
-			return;
-		}
-		else if (tok2.startsWith("getprimarykeys ")){
-			action = "getPrimaryKeys";
-			tok2 = tok.substring("getprimarykeys ".length(),tok2.length()).trim();
-			setTable(tok2);
-			return;
-		}//special = true;
-		else if (tok2.startsWith("getindex ")){
-			action = "getIndex";
-			tok2 = tok.substring("getindex ".length(),tok2.length()).trim();
-			setTable(tok2);
-			special = true;
-			return;
-		}
-		else if (tok2.startsWith("getexportedkeys ")){
-			action = "getExportedKeys";
-			tok2 = tok.substring("getexportedkeys ".length(),tok2.length()).trim();
-			setTable(tok2);
-			return;
-		}
-				else if (tok2.startsWith("gettypeinfo")){
-		special = true;
-		setAction("getTypeInfo");
-		//local = true;
-		return;
-
-		}
-		else if (tok2.startsWith("getimportedkeys ")){
-			action = "getImportedKeys";
-			tok2 = tok.substring("getimportedkeys ".length(),tok2.length()).trim();
-			setTable(tok2);
-			return;
-		}
-		else if (tok2.startsWith("jiqldescribe ")){
-			action = "jiqldescribeTable";
-			tok2 = tok.substring("jiqldescribe ".length(),tok2.length()).trim();
-			setTable(tok2);
-			return;
-		}
-		else if (tok2.startsWith("select ")){
+		String firstToken = tok2;
+		int ti = firstToken.indexOf(" ");
+		if (ti > 0)
+			firstToken = firstToken.substring(0,ti);
+		if (tok2.startsWith("select ")){
 		action = "select";
 		tok = tok.substring("select ".length(),tok.length());
 		tok = tok.trim();
@@ -1488,6 +1441,61 @@ if (si < 0)return;
 
 
 		return;
+		}else if (SpecialCommandParser.parse(this,firstToken)){
+			return;
+		} else if (tok2.startsWith("show tables")){
+			action = "showTables";
+			return;
+		}
+		else if (tok2.startsWith("describe ")){
+			action = "describeTable";
+			tok2 = tok.substring("describe ".length(),tok2.length()).trim();
+			setTable(tok2);
+			return;
+		}
+		else if (tok2.startsWith("getcolumns ")){
+			action = "getColumns";
+			tok2 = tok.substring("getcolumns ".length(),tok2.length()).trim();
+			setTable(tok2);
+			return;
+		}
+		else if (tok2.startsWith("getprimarykeys ")){
+			action = "getPrimaryKeys";
+			tok2 = tok.substring("getprimarykeys ".length(),tok2.length()).trim();
+			setTable(tok2);
+			return;
+		}//special = true;
+		else if (tok2.startsWith("getindex ")){
+			action = "getIndex";
+			tok2 = tok.substring("getindex ".length(),tok2.length()).trim();
+			setTable(tok2);
+			special = true;
+			return;
+		}
+		else if (tok2.startsWith("getexportedkeys ")){
+			action = "getExportedKeys";
+			tok2 = tok.substring("getexportedkeys ".length(),tok2.length()).trim();
+			setTable(tok2);
+			return;
+		}
+				else if (tok2.startsWith("gettypeinfo")){
+		special = true;
+		setAction("getTypeInfo");
+		//local = true;
+		return;
+
+		}
+		else if (tok2.startsWith("getimportedkeys ")){
+			action = "getImportedKeys";
+			tok2 = tok.substring("getimportedkeys ".length(),tok2.length()).trim();
+			setTable(tok2);
+			return;
+		}
+		else if (tok2.startsWith("jiqldescribe ")){
+			action = "jiqldescribeTable";
+			tok2 = tok.substring("jiqldescribe ".length(),tok2.length()).trim();
+			setTable(tok2);
+			return;
 		}
 		ti = tok2.indexOf(" index ");
 
@@ -1515,6 +1523,8 @@ if (si < 0)return;
 
 			table = tok.substring(0,i);
 			setTable(table);
+			if (!AlphaNumeric.isAlphaNumeric(table,"_"))
+				throw JGException.get("invalid_table_name", table + " Invalid Create Table name");
 			tok = tok.substring(i + 1,tok.length());
 			tok = tok.trim();
 			//(tok + ":" + table + ":REDBEAN");
@@ -2029,7 +2039,7 @@ jiqlConstraint jConstraint = null;
 		if (pvi > -1){
 			String tok1 = tok.substring(0,pvi);
 			String tok2 = tok.substring(pvi + "prefix_value=".length(),tok.length());
-			pvi = tok.indexOf(" ");
+			pvi = tok2.indexOf(" ");
 			if (pvi > 0){
 				prefixValue = tok2.substring(0,pvi).trim();
 				tok = tok1 + tok2.substring(pvi + 1,tok2.length());
@@ -2141,6 +2151,17 @@ jiqlConstraint jConstraint = null;
 						notnulls.add(n);
 					}
 				}
+
+				if (tok2.indexOf(" unique") > i)
+				{
+					jiqlConstraint jc = new jiqlConstraint();
+					jc.add(n);
+					jc.setName(n);
+					jc.setType(jiqlConstraint.UNIQUE);
+					ti.addConstraint(jc);
+
+				}
+
 				i = tok2.indexOf("primary ");
 					if (i > -1 && tok2.indexOf(" key") > i)
 				{
@@ -2151,9 +2172,21 @@ jiqlConstraint jConstraint = null;
 				//StringBuffer tok2b = new StringBuffer (tok2);
 				//tok2b = getCreateParser().parse(n,tok2b);
 				//tok2 = tok2b.toString();
-				i = tok2.indexOf("default ");
+				i = tok2.indexOf("default");
 					if (i > -1 )
 				{
+					//(n + " defaultValues -1 " + tok2);	
+
+					if (tok2.endsWith("default")){
+					defaultValues.put(n,"");
+					//(n + " defaultValues 0 " + tok2);	
+
+					}
+					else
+					{
+						i = tok2.indexOf("default ");
+					if (i > -1 )
+				{			
 					tok = tok.substring(i + "default ".length(),tok.length());
 					tok = tok.trim();
 					
@@ -2166,7 +2199,7 @@ jiqlConstraint jConstraint = null;
 					tok = tok.trim();
 					tok2 = decode(tok2);
 					defaultValues.put(n,tok2);
-						
+					//(n + " defaultValues 1 " + tok2);	
 					}
 					else{
 					
@@ -2177,8 +2210,11 @@ jiqlConstraint jConstraint = null;
 					tok = StringUtil.getTrimmedValue(tok);
 					tok = decode(tok);
 					defaultValues.put(n,tok);
+					//(n + " defaultValues 2 " + tok);	
+
 					}
-					
+				}
+					}	
 				}
 				if (!JGUtil.validFieldType(va,this))
 								throw JGException.get("invalid_field_type",n + " --> " + va + " Invalid Field Type on Table " + getTable());
