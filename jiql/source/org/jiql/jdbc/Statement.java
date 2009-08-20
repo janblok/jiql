@@ -210,17 +210,24 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 			String n = null;
 			String v = null;
 			int ml = 0;
+			int ty = 0;
+			String dVal = null;
 					while(dven.hasMoreElements())
 			{
 				n = dven.nextElement().toString();
 				v = (String)hash.get(n);
 			if(v == null)
 				throw JGException.get("no_column_for_default_value","No Column for default value " + n);
+			ty = ColumnInfo.getTypeFromName(v);
+			dVal = (String)dv.get(n);
+			if (!dVal.equalsIgnoreCase("null"))
+			jiqlCellValue.getObj(dVal,ty,sqp);
 			if (v.startsWith("varchar(")){
 		v = v.substring("varchar(".length(),v.length()-1);
 		ml =  Integer.parseInt(v);
-		v = (String)dv.get(n);
-		if (v.length() > ml)
+		//v = (String)dv.get(n);
+		if (!dVal.equalsIgnoreCase("null"))
+		if (dVal.length() > ml)
 				throw JGException.get("default_value_cannot_exceed_max_column_length",v + " Default value cannot exceed max column length " + n);
 
 			}
