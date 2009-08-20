@@ -47,7 +47,7 @@ Object co = null;
 //String rid = null;
 int otype = 0;
 //String coln = null;
-static String[] dformats = new String[]{"EEE MMM dd HH:mm:ss z yyyy"};
+static String[] dformats = new String[]{"EEE MMM dd HH:mm:ss z yyyy","yyyy/MM/dd"};
 
 public jiqlCellValue(Object v,int type,SQLParser sqp)throws SQLException{
 //new jiqlCellValue(get(cn),ci.getColumnType())	rid = i;
@@ -82,6 +82,7 @@ v = new String(((com.google.appengine.api.datastore.Text)v).getValue());
 		if (!NumberUtil.isNumeric(v.toString()))
 		{
 			//String dfmt = "yyyy-MM-dd HH:mm:ss";
+			//0000-00-00 00:00:00 yyyy-MM-dd HH:mm:ss
 		DateFormat df = sqp.getDateFormat();
 				//new SimpleDateFormat(dfmt);
 				//DateFormat.getInstance() ;
@@ -99,7 +100,7 @@ v = new String(((com.google.appengine.api.datastore.Text)v).getValue());
 
 			 	}catch (Exception e2){
 			 	}
-			 throw jiqlException.get("invalid_date_format",new StringBuffer("Invalid DateTime Format. Should be like ").append(sqp.getDatePattern()).toString());
+			 throw jiqlException.get("invalid_date_format",new StringBuffer(v.toString()).append(" Invalid DateTime Format. Should be like ").append(sqp.getDatePattern()).toString());
 	
 			}
 		}	

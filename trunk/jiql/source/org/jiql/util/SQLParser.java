@@ -2203,9 +2203,9 @@ jiqlConstraint jConstraint = null;
 					}
 					else{
 					
-					i = tok.indexOf(" ");
-					if (i > 0)
-						tok = tok.substring(0,i);
+					//i = tok.indexOf(" ");
+					//if (i > 0)
+					//	tok = tok.substring(0,i);
 					tok = tok.trim();
 					tok = StringUtil.getTrimmedValue(tok);
 					tok = decode(tok);
