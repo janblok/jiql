@@ -46,6 +46,12 @@ import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import java.io.ObjectInputStream;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import tools.util.StreamPartSource;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
 
 public class JiqlClient
 {
@@ -53,7 +59,7 @@ public class JiqlClient
 
 
 
- public static Hashtable execute(jiqlConnection jcon,String sql)
+ public static Hashtable execute(jiqlConnection jcon,String sql,Hashtable dv)
      throws SQLException
 
     {
@@ -85,7 +91,47 @@ public class JiqlClient
 
             method.addParameter("query", sql);
 
+		if (dv.size() > 0)
+		{
+NameValuePair[] nvp =	method.getParameters(); 
+Hashtable h = new Hashtable();
+for (int ct = 0;ct < nvp.length;ct++){
+h.put(nvp[ct].getName(),nvp[ct].getValue());
+}
+dv.put("parameters",h);
+//(h + " PAROT " + dv);
 
+			ByteArrayOutputStream bout = new ByteArrayOutputStream();
+			ObjectOutputStream dout = new ObjectOutputStream(bout);
+			dout.writeObject(dv);
+			dout.flush();
+			InputStream inp = new ByteArrayInputStream(bout.toByteArray());
+			//(inp.available() + " PAROT2 " + dv);
+			StreamPartSource sps = new StreamPartSource ("directValues",inp,inp.available());
+Part[] parts = new Part[1];
+parts[0] = new FilePart("defaultValues",sps);
+/*NameValuePair[] nvp =	method.getParameters(); 
+for (int ct = 0;ct < nvp.length;ct++){
+//(nvp[ct].getName() + " nvp[ct].getName(), nvp[ct].getValue() " + nvp[ct].getValue());
+InputStream binp = new ByteArrayInputStream(nvp[ct].getValue().getBytes());
+
+StreamPartSource sps2 = new StreamPartSource (nvp[ct].getName(),binp,binp.available());
+
+parts[ct + 1] = new FilePart(nvp[ct].getName(),sps2);
+ //parts[ct + 1] = new StringPart(nvp[ct].getName(), nvp[ct].getValue());
+}*/
+  /*Part[] parts = {
+      new FilePart("defaultValues",sps),
+      new StringPart("param_name", "value")
+  };*/
+  
+  method.setRequestEntity(
+      new MultipartRequestEntity(parts, method.getParams())
+      );
+
+
+
+		}
 
 
 
