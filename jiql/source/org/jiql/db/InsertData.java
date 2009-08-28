@@ -40,6 +40,7 @@ import org.jiql.db.objs.jiqlCellValue;
 import tools.util.NameValuePairs;
 import org.jiql.util.JGException;
 import org.jiql.util.JGUtil;
+import org.jiql.jdbc.jiqlPreparedStatement;
 
 public class InsertData  implements Serializable
 {
@@ -51,11 +52,11 @@ StringBuffer left = new StringBuffer("jiqlInsert ");
 //		this.sqp = sqp;
 		sb = new StringBuffer( tok.trim());
 	}
-	public void execute(Connection connection)throws SQLException{
-	execute(connection,null);
+	public void execute(Connection connection,Hashtable h)throws SQLException{
+	execute(connection,null,h);
 	}
 
-	public void execute(Connection connection,List<String> l)throws SQLException{
+	public void execute(Connection connection,List<String> l,Hashtable h)throws SQLException{
 //INSERT INTO `wp_term_relationships` (`object_id`, `term_taxonomy_id`, `term_order`) VALUES
 //(1, 2, 0),
 //(2, 2, 0),
@@ -90,15 +91,15 @@ break;
 //(left +" ID2 " + sb);
 
 this.connection = connection;
-load(sb,l);
+load(sb,l,h);
 	}
 
 
 		public  void load (StringBuffer f)throws SQLException
 	{
-		load(f,null);
+		load(f,null,new Hashtable());
 	}
-		public  void load (StringBuffer f,List<String> l)throws SQLException
+		public  void load (StringBuffer f,List<String> l,Hashtable h)throws SQLException
 	{
 			boolean exec = false;
 
@@ -145,8 +146,12 @@ load(sb,l);
 		//( .getTable() + ":LD.load 3 :" + fields);
 		if (l != null)
 			l.add(fields.toString());
-		else
-		connection.createStatement().execute(fields.toString());
+		else{
+		
+		org.jiql.jdbc.Statement stm = (org.jiql.jdbc.Statement)connection.createStatement();
+		stm.setDirectValues(h);
+		stm.execute(fields.toString());
+		}
 //(left +" ID3 " + fields);
 
 	//	}
