@@ -135,6 +135,8 @@ public static int 	getTypeFromName(String tn)throws SQLException{
 		return Types.BOOLEAN;
 	else if (tn.startsWith("tinyint"))
 		return Types.INTEGER;
+	else if (tn.startsWith("blob"))
+		return Types.BLOB;
 	//else if (tn.startsWith("bigint"))
 	//	return Types.INTEGER;
 
