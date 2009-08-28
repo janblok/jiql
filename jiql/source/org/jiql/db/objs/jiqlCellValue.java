@@ -37,8 +37,8 @@ import java.sql.SQLException;
 import org.jiql.util.SQLParser;
 import org.jiql.jdbc.jiqlConnection;
 import java.text.SimpleDateFormat;
-
-
+import com.google.appengine.api.datastore.Blob;
+import org.jiql.jdbc.jiqlBlob;
 public class jiqlCellValue implements Comparable
 {
 SQLParser sqp = null;
@@ -74,6 +74,8 @@ v = new String(((com.google.appengine.api.datastore.Text)v).getValue());
 		return new String(v.toString());
 	else if (Types.INTEGER == type || Types.BIGINT == type)
 		return new Long(v.toString());
+	else if (Types.BLOB == type && (v instanceof com.google.appengine.api.datastore.Blob))
+		return new jiqlBlob(((com.google.appengine.api.datastore.Blob)v).getBytes());
 	else if (Types.FLOAT == type)
 		return new Float(v.toString());
 	else if (Types.BOOLEAN == type)
