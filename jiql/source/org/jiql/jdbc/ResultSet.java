@@ -408,9 +408,8 @@ public  BigDecimal getBigDecimal(String columnLabel, int scale)  throws SQLExcep
 public  InputStream getBinaryStream(int columnIndex)  throws SQLException{
 	rsetLog("RESL 30");
 
-	Object r = getObject(columnIndex);
-	if (r == null)return null;
-	return new ByteArrayInputStream(r.toString().getBytes());
+		return getBinaryStream(getColumnName(columnIndex));
+
 
 
 }
@@ -418,22 +417,35 @@ public  InputStream getBinaryStream(int columnIndex)  throws SQLException{
 public  InputStream getBinaryStream(String columnLabel)  throws SQLException{
 	rsetLog("RESL 31");
 
-return getBinaryStream(findColumn(columnLabel));
+	Object r = getObject(columnLabel);
+	if (r == null)return null;
+	if(r instanceof jiqlBlob)
+		return ((jiqlBlob)r).getBinaryStream();
+		
+	return new ByteArrayInputStream(r.toString().getBytes());
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a stream of uninterpreted bytes. 
 public Blob getBlob(int columnIndex)  throws SQLException{
 	rsetLog("RMISC 8");
 
-	throw JGException.get("not_supported","NOT SUPPORTED");
+	return getBlob(getColumnName(columnIndex));
 
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a Blob object in the Java programming language. 
 public Blob getBlob(String columnLabel)  throws SQLException{
 	rsetLog("RMISC 9");
 
-	throw JGException.get("not_supported","NOT SUPPORTED");
-
+		Object b = getObject(columnLabel);
+	if (b == null)
+		wasNull = true;
+	else
+		wasNull = false;
+	if (b == null)return null;
+//("CANE YOU SEEa  " + b);
+	return (jiqlBlob)b;
+		
+		
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a Blob object in the Java programming language. 
 public  boolean getBoolean(int columnIndex) throws SQLException{
