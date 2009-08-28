@@ -50,6 +50,10 @@ public class Statement implements java.sql.Statement
 		return password;
 	}*/
 	jiqlConnection connection = null;
+	Hashtable directValues = new Hashtable();
+	
+	
+	
 	static Vector<String> locals = new Vector<String>();
 	//static Hashtable<String,StatementProcessor> sprocessors = new Hashtable<String,StatementProcessor>();
 
@@ -60,6 +64,16 @@ public class Statement implements java.sql.Statement
 
 		//locals.add("getTypeInfo;");
 		//sprocessors.put("",new SelectValueStatementProcessor());
+
+	}
+	protected void setDirectValue(String n,Object v){
+		directValues.put(n,v);
+		//(n  + " SET 2 " + v + ":" + directValues);
+
+	}
+		public void setDirectValues(Hashtable h){
+		directValues = h;
+		//(" setDirectValues " + directValues);
 
 	}
 	
@@ -90,7 +104,7 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 	resultset = null;
 	sdebug("execute1: " + sql);
 	if (connection.isRemote() && ! (locals.contains(sql) || sql.toLowerCase().trim().startsWith("load ") || sql.toLowerCase().trim().startsWith("insert "))){
-		Hashtable hres = org.jiql.JiqlClient.execute(connection,sql);
+		Hashtable hres = org.jiql.JiqlClient.execute(connection,sql,directValues);
 		//JGException je = (JGException)hres.get("error");
 		//if (je != null)throw je;
 		Object je = hres.get("error");
@@ -138,7 +152,8 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 		}
 		else if (sqp.getAction().equals("sqlInsert"))
 		{
-			sqp.getInsertIntoTable().execute(connection);
+			//(directValues + ":DIREODFDF");
+			sqp.getInsertIntoTable().execute(connection,directValues);
 		}
 		else if (sqp.getAction().equals("showTables"))
 		{
@@ -253,6 +268,26 @@ public <T> T unwrap(Class<T> iface)throws SQLException
     	else if (sqp.getAction().equals("writeTableRow")){
 		    				jiqlDBMgr.get(sqp.getProperties()).getCommand("VerifyTable").execute(sqp);
 
+			Hashtable wt = sqp.getHash();
+			//(directValues + " directValues 1 " + wt);
+			if (directValues.size() > 0){
+			Enumeration en = wt.keys();
+			String k = null;
+			String v = null;
+			Object dv = null;
+		
+			while (en.hasMoreElements()){
+			k = en.nextElement().toString();
+			v = wt.get(k).toString();
+			dv = directValues.get(v);
+			//(k + " directValues 2 " + v + ":" + dv);
+
+			if (dv != null)
+				wt.put(k,dv);
+			}
+			}
+				directValues.clear();
+
 			jiqlDBMgr.get(sqp.getProperties()).getCommand("verifyPrimaryKeys").execute(sqp);
 			jiqlDBMgr.get(sqp.getProperties()).getCommand("verifyConstraints").execute(sqp);
 			jiqlDBMgr.get(sqp.getProperties()).getCommand("VerifyDefaultValues").execute(sqp);
@@ -261,7 +296,7 @@ public <T> T unwrap(Class<T> iface)throws SQLException
 
 
 
-			Gateway.get(connection.getProperties()).writeTableRow(sqp.getTable(),sqp.getHash(),sqp);
+			Gateway.get(connection.getProperties()).writeTableRow(sqp.getTable(),wt,sqp);
 					connection.setIdentity(sqp.getInsertParser().getAutoIncrementValue());
 
 						//(sqp.getTable() + "   1 " + sqp.getHash());
@@ -359,7 +394,7 @@ org.jiql.jdbc.ResultSet resultset = null;
 resultset = null;
 
 	if (connection.isRemote() && !locals.contains(sql)){
-		Hashtable hres = org.jiql.JiqlClient.execute(connection,sql);
+		Hashtable hres = org.jiql.JiqlClient.execute(connection,sql,directValues);
 		Object je = hres.get("error");
 		if (je != null){
 			System.err.println(je.toString());
