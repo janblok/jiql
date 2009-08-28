@@ -37,16 +37,30 @@ import java.util.Properties;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.Hashtable;
-import java.io.OutputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.File;
 import tools.util.StringUtil;
 import tools.util.NameValuePairs;
 import org.jiql.util.JGException;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileItemIterator;
+import tools.util.StreamUtil;
+import java.util.Enumeration;
+
+import java.io.ByteArrayInputStream;
+import java.io.OutputStream;
+import java.io.ObjectOutputStream;
+import java.util.List;
 
 public class JiqlServlet extends HttpServlet {
   String theUser = null;
   String thePassword = null;
+  int mU = 10000000;
+
      public void init(ServletConfig config)
     throws ServletException
   {
@@ -60,6 +74,8 @@ public class JiqlServlet extends HttpServlet {
  		NameValuePairs p = new NameValuePairs(ps);
  		theUser = (String)p.get("user");
 		thePassword = (String)p.get("password");
+		if (p.getInt("maxUpload") > 0)
+			mU = p.getInt("maxUpload");
 
   	}catch (Exception e){
   		tools.util.LogMgr.err("JiqlServlet.init " + e.toString());
@@ -74,8 +90,85 @@ public class JiqlServlet extends HttpServlet {
   
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
               throws IOException,ServletException {
-		String user = req.getParameter("user");
-		String password = req.getParameter("password");
+ boolean isMultipart = FileUpload.isMultipartContent(req);
+ Hashtable dv = new Hashtable();
+String user = null;
+String password  = null;
+String  sql = null;
+String dfo = null;
+if (isMultipart){
+	
+	
+	ServletFileUpload upload = new ServletFileUpload();
+
+upload.setSizeMax(mU);
+try {
+    FileItemIterator iter = upload.getItemIterator(req);
+//List<FileItem> items = upload.parseRequest(req);
+
+while (iter.hasNext()) {
+       FileItemStream item = iter.next();
+//for (int ct = 0;ct < items.size();ct++){
+
+//         FileItem item = (FileItem)items.get(ct);
+
+        String name = item.getName();
+        //(name + " jiql UREEAD 1aay " + item.isFormField() + ":" + name.equals("directValues"));
+
+InputStream stream = item.openStream();
+//InputStream stream = item.getInputStream();
+
+////(name + " jiql UREEAD 1 " + stream.available());
+//byte[] b = StreamUtil.readBytes(stream);
+
+if ( name.equals("directValues")) {
+//(stream.available() + " jiql UREEAD " );
+
+			//ByteArrayInputStream bout = new ByteArrayInputStream(b);
+						ObjectInputStream dout = new ObjectInputStream(stream);
+
+			//ObjectInputStream dout = new ObjectInputStream(bout);
+			dv = (Hashtable)dout.readObject();
+
+
+
+
+}
+
+}
+
+
+}
+catch (Exception e) {
+	tools.util.LogMgr.err("JS.readDV " + e.toString());
+e.printStackTrace();
+}
+//("$$$ DV " + dv);
+Hashtable pars = (Hashtable)dv.get("parameters");
+if (pars != null){
+Enumeration en = pars.keys();
+while (en.hasMoreElements())
+{
+String n = en.nextElement().toString();
+//("PARSMS " + n);
+if (n.equals("query"))
+	sql = pars.get(n).toString();
+else if (n.equals("password"))
+	password =pars.get(n).toString();
+else if (n.equals("user"))
+	user = pars.get(n).toString();
+else if (n.equals("date.format"))
+	dfo = pars.get(n).toString();
+}
+}	
+	
+}
+
+
+		if (user == null)
+		user = req.getParameter("user");
+		if (password == null)
+		password = req.getParameter("password");
 		if (!StringUtil.isRealString(user) || !StringUtil.isRealString(password) )
 		{
 			resp.sendError(403,"Invalid User or Password");
@@ -87,17 +180,6 @@ public class JiqlServlet extends HttpServlet {
 			resp.sendError(403,"Invalid User OR Password");
 			return;
 		}
-			//throw new ServletException("Invalid User or Password");
-			
-		
-		/*String ps = getServletContext().getRealPath("/WEB-INF/jiql.properties");
-		if (!new File(ps).exists())
-				{
-			resp.sendError(403,"Missing /WEB-INF/jiql.properties file with user and password. Please refer to jiql Documentation");
-			return;
-		}*/
-			//throw new ServletException("Missing /WEB-INF/jiql.properties file with user and password. Please refer to jiql Documentation");
-	
 			
 			 Connection Conn = null;
 	 Hashtable h = new Hashtable();	
@@ -110,14 +192,20 @@ public class JiqlServlet extends HttpServlet {
 			return;
 		}
 			//throw new ServletException("Invalid User OR Password");
-
-			String sql = req.getParameter("query");
+			if (sql == null)
+			sql = req.getParameter("query");
+			//( "THE SQL " + sql);
 NameValuePairs nvp = new NameValuePairs();
-String tok = req.getParameter("date.format");
-if (tok != null)
-nvp.put("date.format",tok);
+if (dfo == null)
+dfo = req.getParameter("date.format");
+if (dfo != null)
+nvp.put("date.format",dfo);
  Conn = get(nvp);
+ 
 org.jiql.jdbc.Statement Stmt = (org.jiql.jdbc.Statement)Conn.createStatement();
+Stmt.setDirectValues(dv);
+
+ 
 Stmt.execute(sql);
 org.jiql.jdbc.ResultSet res = (org.jiql.jdbc.ResultSet)Stmt.getResultSet();
  
