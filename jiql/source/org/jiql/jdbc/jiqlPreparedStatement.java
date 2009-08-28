@@ -40,6 +40,7 @@ import org.jiql.db.*;
 import tools.util.EZArrayList;
 import tools.util.NameValuePairs;
 import tools.util.StringUtil;
+import tools.util.StreamUtil;
 import java.io.*;
 import java.math.*;
 import java.net.*;
@@ -145,13 +146,40 @@ params.put(parameterIndex,x);
 } 
           //Sets the designated parameter to the given input stream, which will have the specified number of bytes. 
 public void setBlob(int parameterIndex, Blob x)throws SQLException{
-params.put(parameterIndex,x);
+params.put(parameterIndex,"jiqlDirectValue_" + parameterIndex);
+byte[] b = x.getBytes(0,new Long(x.length()).intValue());
+com.google.appengine.api.datastore.Blob gb = new com.google.appengine.api.datastore.Blob(b);
+setDirectValue("jiqlDirectValue_" + parameterIndex,gb);
 } 
           //Sets the designated parameter to the given java.sql.Blob object. 
 public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException{
+params.put(parameterIndex,"jiqlDirectValue_" + parameterIndex);
+
+byte[] b = null;
+try{
+
+b = StreamUtil.readStream(inputStream,inputStream.available());
+}catch (IOException e){
+	throw new SQLException(e.toString());
+}
+com.google.appengine.api.datastore.Blob gb = new com.google.appengine.api.datastore.Blob(b);
+setDirectValue("jiqlDirectValue_" + parameterIndex,gb);
+
+
 } 
           //Sets the designated parameter to a InputStream object. 
 public void setBlob(int parameterIndex, InputStream inputStream, long length)throws SQLException{
+params.put(parameterIndex,"jiqlDirectValue_" + parameterIndex);
+
+byte[] b = null;
+//try{
+
+b = StreamUtil.readStream(inputStream,new Long(length).intValue());
+//}catch (IOException e){
+//	throw new SQLException(e.toString());
+//}
+com.google.appengine.api.datastore.Blob gb = new com.google.appengine.api.datastore.Blob(b);
+setDirectValue("jiqlDirectValue_" + parameterIndex,gb);
 } 
           // Sets the designated parameter to a InputStream object. 
 public void setBoolean(int parameterIndex, boolean x) throws SQLException{
@@ -163,7 +191,12 @@ params.put(parameterIndex,x);
 } 
           // Sets the designated parameter to the given Java byte value. 
 public void setBytes(int parameterIndex, byte[] x) throws SQLException{
-params.put(parameterIndex,x);
+
+params.put(parameterIndex,"jiqlDirectValue_" + parameterIndex);
+com.google.appengine.api.datastore.Blob gb = new com.google.appengine.api.datastore.Blob(x);
+setDirectValue("jiqlDirectValue_" + parameterIndex,gb);
+//("jiqlDirectValue_" + parameterIndex + " SET 1 " + gb);
+
 } 
           //Sets the designated parameter to the given Java array of bytes. 
 public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException{
