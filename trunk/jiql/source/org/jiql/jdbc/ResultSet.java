@@ -871,8 +871,11 @@ public  Object getObject(String columnLabel)  throws SQLException{
 
 			columnLabel = "tablename";
 		}
-	//columnLabel = getRName(columnLabel);
-	//(columnLabel + ": GETO " + sqp. () + ":" + r);
+
+if (sqp.isCount()){
+columnLabel = "count(*)";
+}
+
 	Object o = r.get(columnLabel);
 	
 	if (o == null){

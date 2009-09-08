@@ -150,7 +150,6 @@ resLog("getColumnCount " );
 	
 		if (isSchema())
 		{
-//("getColumnCount isSchema " );
 return 2;
 			
 		}
@@ -350,8 +349,17 @@ resLog("getColumnName " + column);
 	if (sqp.getAction().equals("jiqldescribeTable"))
 		return org.jiql.jdbc.ResultSet.jiqldescols.elementAt(column - 1).toString();
 
-if (sqp.isCount())
+if (sqp.isCount()){
+Hashtable<String,String> sas = sqp.getSelectAS();
+Enumeration<String> en = sas.keys();
+String k = null;
+while (en.hasMoreElements()){
+	k = en.nextElement();
+	if (sas.get(k).equals("*"))
+		return k;
+}
 return "count(*)";
+}
 ColumnInfo ci = ti.getColumnInfo(column);
 String dna = (String)(sqp.getSelectAS()).get(ci.getName());
 if (dna != null)return dna;

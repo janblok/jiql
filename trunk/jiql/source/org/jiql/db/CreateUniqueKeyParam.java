@@ -40,17 +40,65 @@ import org.jiql.db.objs.jiqlCellValue;
 import tools.util.NameValuePairs;
 import org.jiql.util.JGException;
 import org.jiql.util.JGUtil;
+import tools.util.SharedMethods;
+import org.jiql.db.objs.*;
+import org.jiql.db.*;
+
 
 public class CreateUniqueKeyParam  implements Serializable
 {
 
-	Vector<String> keys = new Vector<String>();
+//	Vector<String> keys = new Vector<String>();
 
 
 StringBuffer cache = new StringBuffer();
 
 
-	public boolean parse(StringBuffer tok){
+	public boolean parseUF(StringBuffer tok,SQLParser sqp)throws SQLException{
+String tokstr = "unique(";
+//tok.insert(0,cache);
+boolean i3 = tok.toString().trim().toLowerCase().startsWith(tokstr);
+if (!i3)
+{
+tokstr = "unique (";
+i3 = tok.toString().trim().toLowerCase().startsWith(tokstr);	
+}
+			if (i3){
+
+				int i = tok.indexOf(")");
+				//(i + " UN 0 " + tok);
+				
+				String ustr = tok.substring(tokstr.length(),i);
+				Vector v = SharedMethods.toVector(ustr,",");
+				jiqlTableInfo ti = sqp.getJiqlTableInfo();
+				//("UN 1 " + v);
+				for (int ct = 0;ct < v.size();ct++)
+				{
+					ustr = v.elementAt(ct).toString().trim();
+					jiqlConstraint jc = new jiqlConstraint();
+					jc.add(ustr);
+					jc.setName(ustr);
+					jc.setType(jiqlConstraint.UNIQUE);
+					ti.addConstraint(jc);
+				//("UN 2 " + ustr);
+
+				}
+				tok.replace(0,tok.length(),"");
+				return true;
+				
+
+
+			}
+			return false;
+
+
+	}
+
+
+
+	public boolean parse(StringBuffer tok,SQLParser sqp)throws SQLException{
+		if (parseUF(tok,sqp))
+			return true;
 String tokstr = "unique key ";
 tok.insert(0,cache);
 boolean i3 = tok.toString().trim().toLowerCase().startsWith(tokstr);

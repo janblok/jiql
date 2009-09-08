@@ -324,6 +324,8 @@ public DateFormat getDateFormat(){
 	}
 	
 		public boolean isCount(){
+					//(getSelectParser().getSQLFunctionParser().hasFunction("count") + " SC 2" + this);
+
 		return ((count || getSelectParser().getSQLFunctionParser().hasFunction("count") ) && (getSelectList().size() < 2));
 	}
 	
@@ -964,7 +966,6 @@ int i3 = tok.indexOf(" ");
 		tok = encode(tok);
 
 		
-		//  table testable (name varchar(18),countf int);
 		String tok2 = tok.toLowerCase();
 		String firstToken = tok2;
 		int ti = firstToken.indexOf(" ");
@@ -1005,8 +1006,7 @@ int i3 = tok.indexOf(" ");
 		tok2 = tok.toLowerCase();
 		}
 
-		//"select countf from testable where name='counter'"
-		//countf from testable where name='counter'"
+
 		int si = tok2.indexOf(" from ");
 		if (si < 0)
 		{
@@ -1030,6 +1030,7 @@ int i3 = tok.indexOf(" ");
 			count = true;
 			selectList = new EZArrayList();
 			selectList.add("*");
+			//("SC 1" + this);
 		}
 		//origSelectL = (Vector)selectList.clone();
 		setOriginalSelectList(selectList);
@@ -1049,7 +1050,7 @@ int i3 = tok.indexOf(" ");
 
 			return;
 		}
-		//SELECT DISTINCT t.countf FROM testable t WHERE t.countf IN (2,3)   bla1,bla2 desc;
+
 		String jtl = "";
 		while (true){
 			tok = parseTableAlias(tok);
@@ -1348,17 +1349,14 @@ i = tok2.indexOf(" or ");
 		
 		
 		else if (tok2.startsWith("update ")){
-	//select countf from testable where name='counter'
-	//UPDATE testable SET  countf=0 where  name = 'counter'
+
 	
 		action = "update";
 		tok = tok.substring("update ".length(),tok.length());
 		tok = tok.trim();
 		tok2 = tok.toLowerCase();
 
-		//"select countf from testable where name='counter'"
-		//countf from testable where name='counter'"
-		//SET  countf=0 where  name = 'counter'
+
 		int i = tok.indexOf(" ");
 				if (i < 0)
 			i = tok.length();
@@ -1373,7 +1371,6 @@ i = tok2.indexOf(" or ");
 		tok = tok.trim();
 		tok2 = tok.toLowerCase();
 
-		//countf=0 where  name = 'counter'
 		
 		int si = tok2.indexOf(" where ");
 		if (si < 0)
