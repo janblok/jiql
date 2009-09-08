@@ -79,12 +79,12 @@ public class CreateParser  implements Serializable
 
 	}
 
-	public boolean parseParams(String toks){
+	public boolean parseParams(String toks)throws SQLException{
 		StringBuffer tok = new StringBuffer(toks);
 		boolean tf = false;
 		if (keys.parse(tok))
 			tf = true;
-		else if (ukeys.parse(tok))
+		else if (ukeys.parse(tok,sqp))
 			tf = true;
 
 		return tf;
