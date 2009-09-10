@@ -54,7 +54,7 @@ public class CreateUniqueKeyParam  implements Serializable
 StringBuffer cache = new StringBuffer();
 
 
-	public boolean parseUF(StringBuffer tok,SQLParser sqp)throws SQLException{
+	public boolean parseUF(StringBuffer tok,SQLParser sqp,Enumeration en)throws SQLException{
 String tokstr = "unique(";
 //tok.insert(0,cache);
 boolean i3 = tok.toString().trim().toLowerCase().startsWith(tokstr);
@@ -66,6 +66,10 @@ i3 = tok.toString().trim().toLowerCase().startsWith(tokstr);
 			if (i3){
 
 				int i = tok.indexOf(")");
+				while(i < 0){
+					tok.append(en.nextElement().toString());
+					i = tok.indexOf(")");
+				}
 				//(i + " UN 0 " + tok);
 				
 				String ustr = tok.substring(tokstr.length(),i);
@@ -96,8 +100,8 @@ i3 = tok.toString().trim().toLowerCase().startsWith(tokstr);
 
 
 
-	public boolean parse(StringBuffer tok,SQLParser sqp)throws SQLException{
-		if (parseUF(tok,sqp))
+	public boolean parse(StringBuffer tok,SQLParser sqp,Enumeration en)throws SQLException{
+		if (parseUF(tok,sqp,en))
 			return true;
 String tokstr = "unique key ";
 tok.insert(0,cache);
