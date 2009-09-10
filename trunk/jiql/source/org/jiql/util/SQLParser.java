@@ -2052,14 +2052,17 @@ jiqlConstraint jConstraint = null;
 		String n = null;
 		String va = null;
 		int i = 0;
-		for (int ct = 0;ct < v.size();ct++)
+		Enumeration en = v.elements();
+		//for (int ct = 0;ct < v.size();ct++)
+		while (en.hasMoreElements())
 		{
 
-			n = v.elementAt(ct).toString();
+			n = en.nextElement().toString();
+			//v.elementAt(ct).toString();
 		n = StringUtil.replaceSubstring(n,"\"","");
 		n = StringUtil.replaceSubstring(n,"'","");
 		n = StringUtil.replaceSubstring(n,"`","");
-			if (getCreateParser().parseParams(n))
+			if (getCreateParser().parseParams(n,en))
 				continue;
 			n = n.trim();
 			i = n.indexOf(" ");
@@ -2094,12 +2097,11 @@ jiqlConstraint jConstraint = null;
 				va = va.trim();
 				//("VA VAL  1" + va);
 				while (!va.endsWith(")")){
-					ct = ct + 1;
-			//(v.elementAt(ct) + " VA VAL ll bb " + va);
-					va = va + "," + v.elementAt(ct).toString();
-				//("VA VAL ll " + va);
+					//ct = ct + 1;
+					//va = va + "," + v.elementAt(ct).toString();
+					va = va + "," + en.nextElement().toString();
+
 				}
-				//("VA VAL " + va);
 				va = va.trim();
 
 				va = va.substring( 0,va.length() -1);
