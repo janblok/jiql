@@ -44,6 +44,18 @@ import org.jiql.util.JGUtil;
 public class Limit  implements Serializable
 {
 
+	int begin = 0;
+	int range = 0;
+	
+	
+	public int getBegin(){
+		return begin;
+	}
+
+public int getRange(){
+		return range;
+	}
+	
 	public StringBuffer parse(StringBuffer tok)throws SQLException{
 String tokstr = "limit ";
 int i3 = tok.toString().toLowerCase().indexOf(tokstr);
@@ -51,7 +63,20 @@ int i3 = tok.toString().toLowerCase().indexOf(tokstr);
 
 			if (i3 > 0){
 			//	if (autoincrement.contains(n))return tok;
+	        	String l = tok.substring(i3,tok.length());
+	        	l = l.trim();
+	        	l = l.substring(5,l.length());
+	        	l = l.trim();
+	        	
 	        	tok.delete(i3,tok.length());
+	        	i3 = l.indexOf(",");
+	        	if (i3 > 0){
+	        		begin = Integer.parseInt(l.substring(0,i3).trim());
+	        		range = Integer.parseInt(l.substring(i3+1,l.length()).trim());
+	        		
+	        	}
+	        	else
+	        		range = Integer.parseInt(l);
 
 			
 					return tok;

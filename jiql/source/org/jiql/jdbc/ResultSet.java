@@ -57,6 +57,7 @@ ResultObj rmo = null;
 Vector results = null;
 boolean wasNull = false;
 int indx = 0;
+int range = 0;
 boolean close = false;
 SQLParser sqp = null;
 java.sql.Statement statement = null;
@@ -147,6 +148,8 @@ public ResultSet(Vector r,SQLParser s){
 	sqp = s;
 	if (results != null && sqp.getConnection() != null)
 		sqp.getConnection().setFoundRows(size());
+	indx = sqp.getSelectParser().getLimit().getBegin();
+	range = sqp.getSelectParser().getLimit().getRange();
 }
 
 public void reset(){
@@ -1092,29 +1095,34 @@ public  Time getTime(String columnLabel, Calendar cal) throws SQLException{
 public  Timestamp getTimestamp(int columnIndex) throws SQLException{
 	rsetLog("RMISC 31");
 
-	throw JGException.get("not_supported","NOT SUPPORTED");
-
+	return getTimestamp(getColumnName(columnIndex));
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Timestamp object in the Java programming language. 
 public  Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException{
 	rsetLog("RMISC 32");
 
-	throw JGException.get("not_supported","NOT SUPPORTED");
-
+	return getTimestamp(getColumnName(columnIndex));
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Timestamp object in the Java programming language. 
 public  Timestamp getTimestamp(String columnLabel) throws SQLException{
 	rsetLog("RMISC 330");
 
-	throw JGException.get("not_supported","NOT SUPPORTED");
-
+	java.sql.Date b = (java.sql.Date)getRowObject().get(columnLabel);//.getLong(columnLabel));
+	Timestamp r = null;
+	if (b == null)
+		wasNull = true;
+	else
+	{	
+		wasNull = false;
+		r = new Timestamp(b.getTime());
+	}	
+	return r;
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Timestamp object in the Java programming language. 
 public  Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException{
 	rsetLog("RMISC 34");
 
-	throw JGException.get("not_supported","NOT SUPPORTED");
-
+	return getTimestamp(columnLabel);
 }
  //           Retrieves the value of the designated column in the current row of this ResultSet object as a java.sql.Timestamp object in the Java programming language. 
 public  int getType() throws SQLException{
@@ -1217,13 +1225,18 @@ public  void moveToInsertRow() throws SQLException{
 }
  //            Moves the cursor to the insert row. 
  public int size(){
+ 	
  	if (rmo != null)
  		try{
- 		
+ 		if (range > 0 && range <= rmo.size())
+ 			return range;
  		return rmo.size();
  		}catch (SQLException e){
  			e.printStackTrace();
  		}
+  		if (range > 0 && range <= results.size())
+ 			return range;
+
  	return results.size();
  }
 public  boolean next() throws SQLException{

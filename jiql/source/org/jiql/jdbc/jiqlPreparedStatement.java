@@ -83,6 +83,8 @@ public class jiqlPreparedStatement extends org.jiql.jdbc.Statement implements ja
 	}
 
 public void addBatch()throws SQLException{
+	super.addBatch(processStatement());
+	clearParameters();
 } 
           //Adds a set of parameters to this PreparedStatement object's batch of commands. 
 public void clearParameters()throws SQLException{
@@ -297,7 +299,7 @@ public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException{
 public void setString(int parameterIndex, String x)throws SQLException{
 //x = StringUtil.replaceSubstring(pstatement,"?",val.toString())
 //if (sqp.getAction() == null || !"createUser".equals(sqp.getAction()))
-params.put(parameterIndex,"'" + x + "'");
+params.put(parameterIndex,"'" + x.replaceAll("'","\\\\'") + "'");
 //else
 //params.put(parameterIndex, x);
 } 
@@ -307,12 +309,15 @@ params.put(parameterIndex,x);
 } 
           // Sets the designated parameter to the given java.sql.Time value. 
 public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException{
+params.put(parameterIndex,x);
 } 
           // Sets the designated parameter to the given java.sql.Time value, using the given Calendar object. 
 public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException{
+params.put(parameterIndex,x.getTime());
 } 
           //Sets the designated parameter to the given java.sql.Timestamp value. 
 public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal)throws SQLException{
+params.put(parameterIndex,x.getTime());
 } 
           // Sets the designated parameter to the given java.sql.Timestamp value, using the given Calendar object. 
 public void setUnicodeStream(int parameterIndex, InputStream x, int length)throws SQLException{

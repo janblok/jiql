@@ -47,7 +47,7 @@ Object co = null;
 //String rid = null;
 int otype = 0;
 //String coln = null;
-static String[] dformats = new String[]{"EEE MMM dd HH:mm:ss z yyyy","yyyy/MM/dd"};
+static String[] dformats = new String[]{"EEE MMM dd HH:mm:ss z yyyy","yyyy/MM/dd","yyyy-MM-dd"};
 
 public jiqlCellValue(Object v,int type,SQLParser sqp)throws SQLException{
 //new jiqlCellValue(get(cn),ci.getColumnType())	rid = i;
@@ -81,7 +81,9 @@ v = new String(((com.google.appengine.api.datastore.Text)v).getValue());
 	else if (Types.BOOLEAN == type)
 		return new Boolean(v.toString());
 	else if (Types.DATE == type){
-		if (!NumberUtil.isNumeric(v.toString()))
+		if(v instanceof Date)
+			return new java.sql.Date(((Date) v).getTime());
+		else if (!NumberUtil.isNumeric(v.toString()))
 		{
 			//String dfmt = "yyyy-MM-dd HH:mm:ss";
 			//0000-00-00 00:00:00 yyyy-MM-dd HH:mm:ss

@@ -282,7 +282,7 @@ public Map<String,Class<?>> 	getTypeMap()throws SQLException{
 public SQLWarning 	getWarnings()throws SQLException{
              	jcLog( " : ss 11 " );
 
-        throw JGException.get("not_supported","Not Supported");
+             	return null;
 
 }
 //Retrieves the first warning reported by calls on this Connection object.

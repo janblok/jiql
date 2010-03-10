@@ -327,6 +327,7 @@ if (h == null) h = new Hashtable();
 		Vector ul = sqp.getUpdateList();//null;
 		NameValue nv = null;
 		Row ur = null;
+		updatedRowsCount = 0;
 		while (en.hasMoreElements())
 		{
 			rid = en.nextElement().toString();
@@ -340,7 +341,7 @@ if (h == null) h = new Hashtable();
 			ur.put(nv.name,sqp.convert(nv.value,nv.name));
 			}
 			gappe.updateTableValue( sqp.getTable(),ur,sqp);
-
+			updatedRowsCount ++;
 		}
 
 		}
@@ -370,11 +371,13 @@ if (h == null) h = new Hashtable();
 		Vector ul = null;
 		NameValue nv = null;
 		Row row = null;
+		updatedRowsCount = 0;
 		while (en.hasMoreElements())
 		{
 			rid = en.nextElement().toString();
 			row = (Row)h.get(rid);
 			gappe.deleteTableValue( sqp.getTable(),rid);
+			updatedRowsCount ++;
 
 		}
 
@@ -689,12 +692,13 @@ public int[] 	executeBatch() throws SQLException {
 	return new int[0];
 }        
 //Submits a batch of commands to the database for execution and if all commands execute successfully, returns an array of update counts.
-
+int updatedRowsCount = -1;
 public int 	executeUpdate(String sql) throws SQLException {
     	sdebug( " : ss executeUpdate ");
 
-execute(sql);
-return 0;
+    updatedRowsCount = -1;    	
+    execute(sql);
+    return updatedRowsCount == -1 ? 0 : updatedRowsCount;
 }        
 //Executes the given SQL statement, which may be an INSERT, UPDATE, or DELETE statement or an SQL statement that returns nothing, such as an SQL DDL statement.
 

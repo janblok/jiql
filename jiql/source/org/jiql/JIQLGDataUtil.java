@@ -820,7 +820,7 @@ static int maxCL = 500;
 
 
 		Query q = new Query(table);
-		q = q.addFilter(field,qf,value);
+		q = q.addFilter(field,qf,convert(value));
 		 DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
      	 PreparedQuery pq = datastore.prepare(q) ;
 		int ezt = pq.countEntities();
