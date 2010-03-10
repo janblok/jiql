@@ -1930,6 +1930,7 @@ public  jiqlConstraint getConstraint(){
 		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_O-N","ON");
 
 		sb = SharedMethods.replaceSubstringBuffer(sb,"\\\"","\"");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"\\'","'");
 
 		
 		return sb.toString();
@@ -1945,10 +1946,16 @@ public  jiqlConstraint getConstraint(){
 		while(true){
 		
 		i = si.indexOf("'");
+		while(i > 0 && si.substring(i - 1, i).equals("\\"))
+			i = si.indexOf("'", i + 1);
+			
 		if (i < 0)break;
 		ns = ns + si.substring(0,i);
 		si = si.substring(i +1,si.length());
 		i = si.indexOf("'");
+		while(i > 0 && si.substring(i - 1, i).equals("\\"))
+			i = si.indexOf("'", i + 1);
+		
 		if (i < 0)break;
 		smiddle = si.substring(0,i);
 		smiddle = StringUtil.replaceSubstring(smiddle,"order by","jiql_replace_ob");

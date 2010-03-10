@@ -79,6 +79,7 @@ public class JiqlServlet extends HttpServlet {
 
   	}catch (Exception e){
   		tools.util.LogMgr.err("JiqlServlet.init " + e.toString());
+  		e.printStackTrace(System.out);
   	}
   	super.init(config);
   }
