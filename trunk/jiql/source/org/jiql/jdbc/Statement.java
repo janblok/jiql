@@ -616,7 +616,7 @@ resultset = null;
 		}
 		else
 		r = new EZArrayList(h.elements());
-		//union.join(r);
+		//union. (r);
 
 		sqp.setResults(r);
 		jiqlDBMgr.get(sqp.getProperties()).getCommand("SortResult").execute(sqp);

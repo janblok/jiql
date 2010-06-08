@@ -351,6 +351,11 @@ public DateFormat getDateFormat(){
 		setResults(r,true);
 	}
 	
+	public boolean isJoin(){
+		if (union == null)
+		return false;
+		return union.isJoin();
+}
 		public void setResults(Vector r,boolean u)throws SQLException{
 				if (u)
 				if (union != null)
@@ -528,8 +533,65 @@ public DateFormat getDateFormat(){
 		
 	}
 	
+	/*public String getRealColName2(String n,String t){
+					if (t != null)
+			try{
+
+			jiqlTableInfo jti = null;
+			String tn = null;
+
+			jti =  jiqlDBMgr.get(getProperties()).getTableInfo( t);
+			if (jti == null)return n;
+			Vector v1 = jti.getFieldList();
+						//(n + " ********NEW TTT " + v1.contains(n) + ":" + t + ":" + v1);
+
+			if (v1.contains(n))return n;
+
+
+			//getJiqlTableInfo();
+			Hashtable ch = null;
+			if (jti != null)
+			ch = jti.getConstraints();
+			jiqlConstraint pk = null;
+			//if (ch != null)
+			//	pk = (jiqlConstraint)ch.get(n);
+			
+			if (ch != null)
+			{
+			
+			Enumeration en = ch.elements();
+			while(en.hasMoreElements())
+			{
+			
+			pk = (jiqlConstraint)en.nextElement();
+			if (pk == null || pk.size() < 1)continue;
+			if (jiqlConstraint.FOREIGNKEY == pk.getType())
+			{
+
+			String n1 = null;
+			String v = null;
+			jiqlFunction ref = pk.getReference();
+			for (int ct = 0;ct < pk.size();ct++)
+			{
+			n1 = pk.elementAt(ct).toString();
+		 	v = ref.elementAt(ct).toString();
+			//( t + ":" + pk.getName() + ":" + ref.getName() +  " ***log getRealColName 1a " +  ":" + n + ":" + aliases + ":" + ref + ":" + pk + ":" + n1 + ":" + v + getTable());
+
+			////( rn1 + ":" + pk.getName() + ":" + ref.getName() +  " log getRealColName 1a " +  ":" + n + ":" + aliases + ":" + ref + ":" + pk + ":" + n1 + ":" + v + getTable());
+
+			}
+			}
+			}
+			}
+			
+			////(  " log getRealColName 2 " +  ":" + n + ":" + aliases + ":" + ch + ":" + pk);
+			}catch (Exception e){
+				tools.util.LogMgr.err(n + " ERROR getRealName2 " + e.toString());
+			}
+			return n;
+	}*/
 	public String getRealColName(String n){
-		
+		String rn1 = n;
 					int i2 = 0;
 					//String oldn = n;
 					
@@ -541,7 +603,7 @@ public DateFormat getDateFormat(){
 					//(rn +  " RN " + n + ":" +  AS);
 					//if (rn == null)
 					//	rn =  AS2.get(n);
-				//( rn + "   getRealColName " +  AS + ":" + n + ":" + aliases);
+				//( rn + "  ********** getRealColName SHESHERE:" + n + ":" + aliases + ":" + getTable());
 
 					if (rn != null)n = rn;
 					i2 = n.indexOf(".");
@@ -556,9 +618,11 @@ public DateFormat getDateFormat(){
 				al = al.trim();
 				String ta = (String)aliases.get(al);
 
-				//( al + " log getRealColName " + ta + ":" + n + ":" + table + ":" +  aliases);
 				if (ta !=  null || al.equals(table)){
 					n = n.substring(i2+1,n.length());
+					//( al + " log getRealColName aa " + ta + ":" + n + ":" + table + ":" +  aliases);
+//feature log getRealColName aa null:feature_type_id:feature:{}
+					//return getRealColName2(n,table);
 					return n;
 					
 				}
@@ -574,14 +638,15 @@ public DateFormat getDateFormat(){
 				al = al.trim();
 				String ta = (String)aliases.get(al);
 
-				//( al + " log getRealColName 2 " + ta + ":" + n + ":" + aliases);
 				if (ta !=  null){
 					n = n.substring(i2+1,n.length());
+				//( al + " log getRealColName gg2 " + ta + ":" + n + ":" + aliases);
+
 					return n;
 					
 				}
 			}
-			
+
 			return n;
 		
 	}
@@ -915,10 +980,11 @@ int i3 = tok.indexOf(" ");
 					tok3 = StringUtil.getTrimmedValue(tok3.substring(0,i3));
 
 				tok3 = tok3.toLowerCase();
-				if (!reserved.contains(tok3) && !tok3.equals("as"))
+				if (!reserved.contains(tok3) && !tok3.equals("as") && StringUtil.isRealString(tok2) && !tok2.startsWith(","))
 					tok = tok1 + "as " + tok2;
 				
 			}
+			//("parseTableAlias 1 " + tok);
 			return tok;		
 	}
 	
@@ -937,10 +1003,12 @@ int i3 = tok.indexOf(" ");
 					tok3 = StringUtil.getTrimmedValue(tok3.substring(0,i3));
 
 				tok3 = tok3.toLowerCase();
-				if (!sreserved.contains(tok3) && !tok3.equals("as"))
+				if (!sreserved.contains(tok3) && !tok3.equals("as")&& StringUtil.isRealString(tok2)&& !tok2.startsWith(","))
 					tok = tok1 + "as " + tok2;
 				
 			}
+						//("parseTableAlias 2 " + tok);
+
 			return tok;		
 	}
 	
@@ -1873,7 +1941,7 @@ public Hashtable getDefaultValues(){
 					jConstraint.setName(cn);
 					jiqlFunction jref =  parseFunction(references);
 					jConstraint.setReference(jref);
-					//(table + " aLTER 5 " + jConstraint + ":" + cn + ":" + ty  +":" + jref);
+					//(table + " aLTER 5 " +   + ":" + cn + ":" + ty  +":" + jref);
 					
 				}
 				

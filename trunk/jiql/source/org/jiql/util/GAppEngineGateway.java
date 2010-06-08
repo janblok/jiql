@@ -341,22 +341,7 @@ rhkxim2k 	null 	wp_users 	ID 	1 	PRIMARY
 			if (pk == null || pk.size() < 1)continue;
 			if (jiqlConstraint.FOREIGNKEY == pk.getType())
 			{
-/*//getImportedKeys
-//PKTABLE_CAT  	PKTABLE_SCHEM  	PKTABLE_NAME  	PKCOLUMN_NAME  	FKTABLE_CAT  	FKTABLE_SCHEM  	FKTABLE_NAME  	FKCOLUMN_NAME  	KEY_SEQ  	UPDATE_RULE  	DELETE_RULE  	FK_NAME  	PK_NAME  	DEFERRABILITY
-//	WS_PORTALU 	REALM_USERROLE 	REALM_USER 		WS_PORTALU 	REALM_USER 	REALM_USERNAME 	1 	3 	3 	WS_USERID_FK 	SQL090716111225810 	7
-realm_username:realm_user:01:ws_userid_fk:realm_userrole:GAPIK
 
-//<tableinfo><name>realm_user</name><prefix>true</prefix><tableleafs>true</tableleafs><prefix_value>jiql</prefix_value><primarykeys>realm_username</primarykeys><fieldList>realm_username;realm_passphrase</fieldList><constraints>
-<constraint>
-<name>ws_userid_fk</name><type>2</type>
-<target>realm_username</target>
-<references>
-<name>realm_userrole</name>
-<target>realm_user</target>
-</references>
-</constraint>
-//</constraints></tableinfo>*/		
-			//Vector incl = new Vector();
 			String n = null;
 			String v = null;
 			jiqlFunction ref = pk.getReference();
