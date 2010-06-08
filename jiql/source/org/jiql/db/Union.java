@@ -109,7 +109,11 @@ public Union(SQLParser s){
 	    		//	if (cr.getCompareOperator().equals("="))
 	    		//	{
 	    				nvo = row.get(rn);
-	    				//(nvo + " CMPR " + cr.getName() + ":" +  cr.getValue());
+	    				////(nvo + " CMPR 2 " );
+	    		    				//(nvo + " CMPR 2 " + ref + ":" + h + ":" + rn + ":" + v);
+//null CMPR 2 {alias=BLUE, id=1}:[{name=SOME_FEATURE, id=1}]:feature.feature_type_id:1
+//1 CMPR 2 {alias=BLUE, id=1}:[{name=SOME_FEATURE, id=1}]:feature.id:1
+
 	    				if (nvo == null)continue;
 	    		//typ = ti.get (cr.getName()).getColumnType();
 	    				c1 = new jiqlCellValue(nvo,typ,sqp);
@@ -166,6 +170,8 @@ public Union(SQLParser s){
 	    		//	{
 	    				nvo = row.get(rn);
 	    				//(nvo + " CMPR " + cr.getName() + ":" +  cr.getValue());
+	    				//(nvo + " CMPR 1 " + id + ":" + h + ":" + rn + ":" + v);
+
 	    				if (nvo == null)continue;
 	    		//typ = ti.get (cr.getName()).getColumnType();
 	    				c1 = new jiqlCellValue(nvo,typ,null);
@@ -322,22 +328,15 @@ return null;
 public Hashtable getAliases(){
 	return aliases;
 }
+public boolean isJoin(){
+		if (sqps == null || sqps.size() < 1)
+		return false;
+		return true;
+}
 public Vector join(Vector r)throws SQLException{
 	//sqp.mergeAliases(aliases);
 	merge();
-/*		if (sqps.size() > 0)
-	{
-		Hashtable h = sqp.getAliases();
-		Enumeration en = h.keys();
-		SQLParser s = null;
-		while (en.hasMoreElements()){
-		String n = en.nextElement().toString();
-		String v = (String)h.get(n);
-		if (v.equals(sqp.getTable()))
-		 s = (SQLParser) (n);
-		}
-		
-	}*/
+
 	
 	if (sqps == null || sqps.size() < 1)
 		return r;
@@ -399,6 +398,7 @@ public Vector join(Vector r)throws SQLException{
 			 throw JGException.get("table_not_found_for_join_criteria",n + " Table not found for join criteria");
 		if (!sqp.getTable().equals(tt) && sqps.get(tt) == null)
 			 throw JGException.get("invalid_table_for_join_criteria",n + " Invalid Table for join criteria " + tt);
+		//(sqp.getTable() + ":" + tt + " THE RELAN NAME " + rn + ":" + n);
 		if (sqp.getTable().equals(tt)){
 		
 			//vm.remove(tt);
@@ -453,7 +453,7 @@ while (en.hasMoreElements()){
 		throw JGException.get("incompatible_join_criteria",n + " Incompatible join criteria " + tt);
 }
 
-	//Hashtable joinTable(String rn,Hashtable h,int typ,Object v)
+	//Hashtable  (String rn,Hashtable h,int typ,Object v)
 	Vector vr = new Vector();
    	NameValuePairs row = null;
 	h = null;
@@ -498,12 +498,24 @@ while (en.hasMoreElements()){
 
 
 		if (joined.contains(tt2))
+		{
 			j2 = vr;
+		//("j2 1 " + j2);
+
+		}
 		else{
-			if (tt2.equals(sqp.getTable()))
+			if (tt2.equals(sqp.getTable())){
+			
 				j2 = r;
-			else
+					//("j2 2 " + j2);
+
+			}
+			else{
+			
 				j2 = new EZArrayList(getSQLParser(tt2).getResultsTable().elements());
+					//("j2 3 " + j2);
+
+			}
 		}
 		nvr = new EZArrayList();
 		vt = null;
@@ -519,7 +531,7 @@ while (en.hasMoreElements()){
 
 			//for (int ct2 = 0; ct2 < j2.size(); ct2++){
 			
-				//Hashtable joinTable(String rn,Hashtable h,int typ,Object v)
+				//Hashtable  (String rn,Hashtable h,int typ,Object v)
 
 			
 			//}
@@ -834,9 +846,9 @@ return null;
 // :[table2]; :{t2=table2}; :{table2=[t2.price]}; :{table2={t2.price=the_price}} 
 //select t1.name,t2.price   the_price,countf from testablet   t1,table2   t2 where the_price=t1.price
 
-	//( t + ":" + a +   ":" + sal  +":" + sar + ":" + l + " log isJoinFilter " + r + ":" + left + ":" + right);
-//testablet:t1:null:null:name log isJoinFilter the_price:null:null 
-//testablet:t1:null:null:id log isJoinFilter t2.id:null:table2
+	//( t + ":" + a +   ":" + sal  +":" + sar + ":" + l + " log   " + r + ":" + left + ":" + right);
+//testablet:t1:null:null:name log   the_price:null:null 
+//testablet:t1:null:null:id log   t2.id:null:table2
 
 	if (left != null && right != null && !left.equals(right))
 		return true;
@@ -851,7 +863,7 @@ return false;
 	 *
 	 *
 	 		public boolean addToEitherOrList(String t,String a,String sal,String sar,Criteria cr){
-		if (isJoinFilter(t,a,sal,sar,cr.getName(),cr.getValueString())){
+		if ( (t,a,sal,sar,cr.getName(),cr.getValueString())){
 			jeitheroralllist.add(cr);
 			return true;
 		}
@@ -860,22 +872,22 @@ return false;
 	
 	 
 	 public boolean addToIncludeList(String t,String a,String sal,String sar,Criteria cr){
-		if (isJoinFilter(t,a,sal,sar,cr.getName(),cr.getValueString())){
+		if ( (t,a,sal,sar,cr.getName(),cr.getValueString())){
 			j .add(cr);
 			return true;
 		}
 		return false;
 	}
 
-	public boolean isJoinFilter(String t,String a,String sal,String sar,String l,String r){
+	public boolean  (String t,String a,String sal,String sar,String l,String r){
 // :[table2]; :{t2=table2}; :{table2=[t2.price]}; :{table2={t2.price=the_price}} 
 //select t1.name,t2.price   the_price,countf from testablet   t1,table2   t2 where the_price=t1.price
 	String left = findTable(t,a,sal,l);
 	String right = findTable(t,a,sar,r);
 
-	org.jiql.util.( t + ":" + a +   ":" + sal  +":" + sar + ":" + l + " log isJoinFilter " + r + ":" + left + ":" + right);
-//testablet:t1:null:null:name log isJoinFilter the_price:null:null 
-//testablet:t1:null:null:id log isJoinFilter t2.id:null:table2
+	org.jiql.util.( t + ":" + a +   ":" + sal  +":" + sar + ":" + l + " log   " + r + ":" + left + ":" + right);
+//testablet:t1:null:null:name log   the_price:null:null 
+//testablet:t1:null:null:id log   t2.id:null:table2
 
 	if (left != null && right != null && !left.equals(right))
 		return true;

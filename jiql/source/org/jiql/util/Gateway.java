@@ -614,7 +614,7 @@ return 0;
 
 	public Hashtable readTableValue(String t,Vector incl,Vector selL,Vector jeor,SQLParser sqp)throws SQLException{
 	    	Hashtable h = readTableValue(t,incl,sqp);
-			//(t + " readTableValue " + incl + ":" + selL + ":" + jeor + ":" + sqp + ":" + h);
+			//(t + " readTableValue " + incl + ":" +   + ":" + jeor + ":" + sqp + ":" + h);
 //realm_userrole readTableValue null:null:[SQLCriteria:realm_user=ruser2]:org.jiql.util.SQLParser@a02839:{7138={realm_rolename=role2, realm_user=ruser1}, 6140={realm_rolename=role2, realm_user=ruser2}} 
 	    	if (h == null) return null;
 	    	String id = null;
@@ -626,7 +626,7 @@ return 0;
 	    	jiqlCellValue c1 = null;
 	    	jiqlCellValue c2 = null;
 	    	int typ = 0;
-		//	 .log(ti + ":" + t + " readTableValue2 " + incl + ":" + selL + ":" + jeor + ":" + sqp);
+		//	 .log(ti + ":" + t + " readTableValue2 " + incl + ":" +   + ":" + jeor + ":" + sqp);
 //testable5 readTableValue2 [SQLCriteria:countf=3]:[]:[]:org.jiql.util.SQLParser@1a5fb5a    	
 			String crn = null;
 	    	if (jeor != null && jeor.size() > 0)
@@ -661,6 +661,7 @@ return 0;
 			    		typ = ti.getColumnInfo(crn).getColumnType();
 	    				c1 = new jiqlCellValue(nvo,typ,sqp);
 	    				c2 = new jiqlCellValue(cr.getValue(),typ,sqp);
+	    			    //(c2 + " PLESK WOK " + c1);
 	    			    if (c1.compareTo(c2) == 0)
 		    				action(sqp,heor,row,id);
 						else continue;
@@ -756,7 +757,7 @@ return 0;
 	    	
 	    	//("RD 34 " + h);
 	    	if (selL == null || selL.size() < 1)return h;
-	    	if(selL.contains("*") || sqp.isCount())return h;
+	    	if(selL.contains("*") || sqp.isCount() || sqp.isJoin())return h;
 	    	Enumeration en = h.keys();
 	    	Hashtable sh = new Hashtable();
 	    	Row nrow = null;
