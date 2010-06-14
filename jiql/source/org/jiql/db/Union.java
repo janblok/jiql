@@ -1112,7 +1112,7 @@ return null;
 	}
 	
 	public void parseTables(String t)throws SQLException{
-	
+			//("UPT: " + t);
 			merge();
 			EZArrayList uv = new EZArrayList(new StringTokenizer(t,","));
 			//(" PARSE U aaaa :" + t + ":");
