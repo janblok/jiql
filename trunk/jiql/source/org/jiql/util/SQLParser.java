@@ -957,6 +957,7 @@ public DateFormat getDateFormat(){
 	
 	String parseTable(String table)throws SQLException{
 		int ji = table.indexOf(",");
+		//(ji + " PSTBL1 : " + table);
 		if (ji > 0){
 			getUnion().parseTables(table.substring(ji + 1,table.length()).trim());
 			table = table.substring(0,ji).trim();
@@ -984,7 +985,7 @@ int i3 = tok.indexOf(" ");
 					tok = tok1 + "as " + tok2;
 				
 			}
-			//("parseTableAlias 1 " + tok);
+			//("  1 " + tok);
 			return tok;		
 	}
 	
@@ -1007,7 +1008,7 @@ int i3 = tok.indexOf(" ");
 					tok = tok1 + "as " + tok2;
 				
 			}
-						//("parseTableAlias 2 " + tok);
+						//("  2 " + tok);
 
 			return tok;		
 	}
@@ -1033,6 +1034,12 @@ int i3 = tok.indexOf(" ");
 		}
 		tok = encode(tok);
 
+		tok = StringUtil.replaceSubstring(tok, " join ",",");
+		tok  = StringUtil.replaceSubstring(tok, " on "," where ");
+		tok = StringUtil.replaceSubstring(tok, " JOIN ",",");
+		tok = StringUtil.replaceSubstring(tok, " ON "," where ");
+
+//("SELECt ME " + tok);
 		
 		String tok2 = tok.toLowerCase();
 		String firstToken = tok2;
@@ -1159,6 +1166,8 @@ int i3 = tok.indexOf(" ");
 		table = jtl;
 		
 		int ji = table.indexOf(",");
+		//(ji + " PSTBL2 : " + table);
+
 		if (ji > 0){
 			getUnion().parseTables(table.substring(ji + 1,table.length()).trim());
 			table = table.substring(0,ji).trim();
@@ -1236,6 +1245,8 @@ int i3 = tok.indexOf(" ");
 			al = al.trim();
 		}
 		ji = al.indexOf(",");
+			//(ji + " PSTBL3 : " + al);
+
 		if (ji > 0){
 			getUnion().parseTables(al.substring(ji + 1,al.length()).trim());
 			al = al.substring(0,ji).trim();
@@ -1997,6 +2008,10 @@ public  jiqlConstraint getConstraint(){
 		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_o-n","on");
 		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_O-N","ON");
 
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_joi-n","join");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"jiql_replace_JOI-N","JOIN");
+
+
 		sb = SharedMethods.replaceSubstringBuffer(sb,"\\\"","\"");
 		sb = SharedMethods.replaceSubstringBuffer(sb,"\\'","'");
 
@@ -2064,6 +2079,8 @@ public  jiqlConstraint getConstraint(){
 		sb = SharedMethods.replaceSubstringBuffer(sb,"on","jiql_replace_o-n");
 		sb = SharedMethods.replaceSubstringBuffer(sb,"ON","jiql_replace_O-N");
 		
+		sb = SharedMethods.replaceSubstringBuffer(sb,"join","jiql_replace_joi-n");
+		sb = SharedMethods.replaceSubstringBuffer(sb,"JOIN","jiql_replace_JOI-N");
 	  
 
 		si = si.substring(i +1,si.length());
