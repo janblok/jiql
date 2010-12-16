@@ -103,21 +103,33 @@ public Union(SQLParser s){
 	    	{
 	    		//id = en.nextElement().toString();
 	    		row = (Row)h.elementAt(ct);
-	    		//for (int ct = 0;ct < incl.size();ct++){
-	    			//add = false;
-	    			//cr = (Criteria)incl.elementAt(ct);
-	    		//	if (cr.getCompareOperator().equals("="))
-	    		//	{
+
+						//try{
+						
 	    				nvo = row.get(rn);
-	    				////(nvo + " CMPR 2 " );
-	    		    				//(nvo + " CMPR 2 " + ref + ":" + h + ":" + rn + ":" + v);
-//null CMPR 2 {alias=BLUE, id=1}:[{name=SOME_FEATURE, id=1}]:feature.feature_type_id:1
-//1 CMPR 2 {alias=BLUE, id=1}:[{name=SOME_FEATURE, id=1}]:feature.id:1
+						//}catch (Exception e)
+						//{
+						//	continue;
+						//}
 
 	    				if (nvo == null)continue;
-	    		//typ = ti.get (cr.getName()).getColumnType();
 	    				c1 = new jiqlCellValue(nvo,typ,sqp);
 	    				c2 = new jiqlCellValue(v,typ,sqp);
+
+	    				//(nvo + " CMPR 5 " + v + ":" +typ + ":" + rn + ":" + h + ":" + sqp);
+//ruser2 CMPR 5 ruser3:12:user.realm_username:[{realm_passphrase=tigres, realm_username=ruser2}, {realm_passphrase=tigres, realm_username=ruser1}]:jiql.SQLParser [ORIGINAL SQL:select role.realm_rolename from realm_user1 user INNER JOIN realm_userrole1 role ON role.realm_username=user.realm_username; ] table:realm_user1;aliases:{INNER=realm_user1, user=realm_user1, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[role.realm_rolename];groupby:org.jiql.db.GroupBy@856447;union:jiql.Union tables:{realm_userrole1=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{realm_userrole1=role, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@17a7de4;union:null, role=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{role=realm_userrole1};values:{};selects:[role.realm_rolename];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@b5ac2c;union:null};aliases:{role=realm_userrole1};selects:;selectAS:;jincludealllist:[SQLCriteria:role.realm_username=user.realm_username];jeitheroralllist:[];includealllist:;eitheroralllist:
+//ruser1 CMPR 5 ruser3:12:user.realm_username:[{realm_passphrase=tigres, realm_username=ruser2}, {realm_passphrase=tigres, realm_username=ruser1}]:jiql.SQLParser [ORIGINAL SQL:select role.realm_rolename from realm_user1 user INNER JOIN realm_userrole1 role ON role.realm_username=user.realm_username; ] table:realm_user1;aliases:{INNER=realm_user1, user=realm_user1, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[role.realm_rolename];groupby:org.jiql.db.GroupBy@856447;union:jiql.Union tables:{realm_userrole1=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{realm_userrole1=role, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@17a7de4;union:null, role=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{role=realm_userrole1};values:{};selects:[role.realm_rolename];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@b5ac2c;union:null};aliases:{role=realm_userrole1};selects:;selectAS:;jincludealllist:[SQLCriteria:role.realm_username=user.realm_username];jeitheroralllist:[];includealllist:;eitheroralllist:
+//ruser2 CMPR 5 ruser1:12:user.realm_username:[{realm_passphrase=tigres, realm_username=ruser2}, {realm_passphrase=tigres, realm_username=ruser1}]:jiql.SQLParser [ORIGINAL SQL:select role.realm_rolename from realm_user1 user INNER JOIN realm_userrole1 role ON role.realm_username=user.realm_username; ] table:realm_user1;aliases:{INNER=realm_user1, user=realm_user1, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[role.realm_rolename];groupby:org.jiql.db.GroupBy@856447;union:jiql.Union tables:{realm_userrole1=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{realm_userrole1=role, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@17a7de4;union:null, role=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{role=realm_userrole1};values:{};selects:[role.realm_rolename];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@b5ac2c;union:null};aliases:{role=realm_userrole1};selects:;selectAS:;jincludealllist:[SQLCriteria:role.realm_username=user.realm_username];jeitheroralllist:[];includealllist:;eitheroralllist:
+
+//ruser1 CMPR 5 ruser1:12:user.realm_username:[{realm_passphrase=tigres, realm_username=ruser2}, {realm_passphrase=tigres, realm_username=ruser1}]:jiql.SQLParser [ORIGINAL SQL:select role.realm_rolename from realm_user1 user INNER JOIN realm_userrole1 role ON role.realm_username=user.realm_username; ] table:realm_user1;aliases:{INNER=realm_user1, user=realm_user1, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[role.realm_rolename];groupby:org.jiql.db.GroupBy@856447;union:jiql.Union tables:{realm_userrole1=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{realm_userrole1=role, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@17a7de4;union:null, role=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{role=realm_userrole1};values:{};selects:[role.realm_rolename];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@b5ac2c;union:null};aliases:{role=realm_userrole1};selects:;selectAS:;jincludealllist:[SQLCriteria:role.realm_username=user.realm_username];jeitheroralllist:[];includealllist:;eitheroralllist:
+//ruser1 CMPR 5 ruser1:12:user.realm_username:[{realm_passphrase=tigres, realm_username=ruser2, realm_rolename=role2}, {realm_passphrase=tigres, realm_username=ruser1, realm_rolename=role1}]:jiql.SQLParser [ORIGINAL SQL:select role.realm_rolename from realm_user1 user INNER JOIN realm_userrole1 role ON role.realm_username=user.realm_username; ] table:realm_user1;aliases:{INNER=realm_user1, user=realm_user1, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[role.realm_rolename];groupby:org.jiql.db.GroupBy@856447;union:jiql.Union tables:{realm_userrole1=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{realm_userrole1=role, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@17a7de4;union:null, role=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{role=realm_userrole1};values:{};selects:[role.realm_rolename];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@b5ac2c;union:null};aliases:{role=realm_userrole1};selects:;selectAS:;jincludealllist:[SQLCriteria:role.realm_username=user.realm_username];jeitheroralllist:[];includealllist:;eitheroralllist:
+
+//ruser2 CMPR 5 ruser2:12:user.realm_username:[{realm_passphrase=tigres, realm_username=ruser2}, {realm_passphrase=tigres, realm_username=ruser1, realm_rolename=role1}]:jiql.SQLParser [ORIGINAL SQL:select role.realm_rolename from realm_user1 user INNER JOIN realm_userrole1 role ON role.realm_username=user.realm_username; ] table:realm_user1;aliases:{INNER=realm_user1, user=realm_user1, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[role.realm_rolename];groupby:org.jiql.db.GroupBy@856447;union:jiql.Union tables:{realm_userrole1=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{realm_userrole1=role, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@17a7de4;union:null, role=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{role=realm_userrole1};values:{};selects:[role.realm_rolename];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@b5ac2c;union:null};aliases:{role=realm_userrole1};selects:;selectAS:;jincludealllist:[SQLCriteria:role.realm_username=user.realm_username];jeitheroralllist:[];includealllist:;eitheroralllist:
+//ruser1 CMPR 5 ruser2:12:user.realm_username:[{realm_passphrase=tigres, realm_username=ruser2, realm_rolename=role2}, {realm_passphrase=tigres, realm_username=ruser1, realm_rolename=role1}]:jiql.SQLParser [ORIGINAL SQL:select role.realm_rolename from realm_user1 user INNER JOIN realm_userrole1 role ON role.realm_username=user.realm_username; ] table:realm_user1;aliases:{INNER=realm_user1, user=realm_user1, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[role.realm_rolename];groupby:org.jiql.db.GroupBy@856447;union:jiql.Union tables:{realm_userrole1=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{realm_userrole1=role, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@17a7de4;union:null, role=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{role=realm_userrole1};values:{};selects:[role.realm_rolename];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@b5ac2c;union:null};aliases:{role=realm_userrole1};selects:;selectAS:;jincludealllist:[SQLCriteria:role.realm_username=user.realm_username];jeitheroralllist:[];includealllist:;eitheroralllist:
+//ruser2 CMPR 5 ruser1:12:user.realm_username:[{realm_passphrase=tigres, realm_username=ruser2, realm_rolename=role2}, {realm_passphrase=tigres, realm_username=ruser1, realm_rolename=role1}]:jiql.SQLParser [ORIGINAL SQL:select role.realm_rolename from realm_user1 user INNER JOIN realm_userrole1 role ON role.realm_username=user.realm_username; ] table:realm_user1;aliases:{INNER=realm_user1, user=realm_user1, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[role.realm_rolename];groupby:org.jiql.db.GroupBy@856447;union:jiql.Union tables:{realm_userrole1=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{realm_userrole1=role, role=realm_userrole1};values:{};selects:[];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@17a7de4;union:null, role=jiql.SQLParser [ORIGINAL SQL:null ] table:realm_userrole1;aliases:{role=realm_userrole1};values:{};selects:[role.realm_rolename];selectAS:{};selectAS2:{};includealllist:[];eitheroralllist:[];getOriginalSelectList:[];groupby:org.jiql.db.GroupBy@b5ac2c;union:null};aliases:{role=realm_userrole1};selects:;selectAS:;jincludealllist:[SQLCriteria:role.realm_username=user.realm_username];jeitheroralllist:[];includealllist:;eitheroralllist:
+
+
+
 	    			    if (c1.compareTo(c2) == 0){
 	    			    	row.merge(ref);
 		    				sh.add(row);
@@ -140,6 +152,7 @@ public Union(SQLParser s){
 	    		
 	    	}
 	    	//if (sh.size() < 1)return null;
+	    	//("UNION HASH " + sh);
 	    	return sh;
 		
 	}
@@ -169,7 +182,6 @@ public Union(SQLParser s){
 	    		//	if (cr.getCompareOperator().equals("="))
 	    		//	{
 	    				nvo = row.get(rn);
-	    				//(nvo + " CMPR " + cr.getName() + ":" +  cr.getValue());
 	    				//(nvo + " CMPR 1 " + id + ":" + h + ":" + rn + ":" + v);
 
 	    				if (nvo == null)continue;
@@ -352,8 +364,23 @@ public Vector join(Vector r)throws SQLException{
 		 jiqlDBMgr.get(s.getProperties()).getCommand("VerifyTable").execute(s);
 		h = Gateway.get(s.getProperties()).readTableValue(s.getTable(),s.getIncludeAllList(),sl,s.getEitherOrAllList(),s.isDistinct(),s);
 		//(h + " JR " + s.getTable());
-		if (h != null)
+		if (h != null){
+			if (h.size() < 1)
+			{
+	String t = (String)s.getAliases().get(s.getTable());
+	if (t != null)
+	{
+		s.setTable(t);
+		h = Gateway.get(s.getProperties()).readTableValue(s.getTable(),s.getIncludeAllList(),sl,s.getEitherOrAllList(),s.isDistinct(),s);
+		//(h + " *******JR2************ " + s.getTable());
+
+	}
+	//else
+				//(h + " *******NO JR2************ " + s);
+
+			}
 			s.setResultsTable(h);
+		}
 	}
 	String rn = null;
 	Criteria c = null;
@@ -362,6 +389,7 @@ public Vector join(Vector r)throws SQLException{
 	Hashtable<String, String> rns  = new Hashtable<String, String>();	
 	//Vector vm = new EZArrayList(sqps.keys());
 	//vm.add(sqp.getTable());
+	//(jincludealllist + " ****jincludealllist**** " + r + ":" + h);
 	for (int ct = 0;ct < jincludealllist.size();ct++)
 	{
 		c = (Criteria)jincludealllist.elementAt(ct);
@@ -369,6 +397,10 @@ public Vector join(Vector r)throws SQLException{
 	   			throw JGException.get("operator_not_supported_for_joins",c.getCompareOperator() + " Operator not supported for joins");
 		n = c.getName();
 		tt = findTable(n);
+	//(sqp.getTable() + ":" + n + " ****jincludealllist 2 **** " + tt);
+//realm_user1:realm_username ****jincludealllist 2 **** realm_userrole1
+//realm_user1:role.realm_username ****jincludealllist 2 **** role
+
 		if (tt == null)
 			 throw JGException.get("table_not_found_for_join_criteria",n + " Table not found for join criteria");
 		if (!sqp.getTable().equals(tt) && sqps.get(tt) == null)
@@ -382,6 +414,18 @@ public Vector join(Vector r)throws SQLException{
 		else{
 		rns.put(tt,n);
 		//vm.remove(tt);
+			if (sqp.getTableInfo().getColumnInfo(sqp.getRealColName(n)) == null)
+	{
+			String t = (String)sqp.getAliases().get(sqp.getTable());
+	if (t != null)
+	{
+		sqp.setTable(t);
+	
+	//("DID YO WOK RELAN " + t + ":" + n + ":"  + sqp.getRealColName(n) + ":" + sqp.getTableInfo() + ":" + sqp.getTableInfo().getColumnInfo(sqp.getRealColName(n)) + ":" + sqp);
+}
+	}
+		
+		
 				if (sqp.getTableInfo().getColumnInfo(sqp.getRealColName(n)) != null)
 		{
 			rn = n;
@@ -399,6 +443,9 @@ public Vector join(Vector r)throws SQLException{
 		if (!sqp.getTable().equals(tt) && sqps.get(tt) == null)
 			 throw JGException.get("invalid_table_for_join_criteria",n + " Invalid Table for join criteria " + tt);
 		//(sqp.getTable() + ":" + tt + " THE RELAN NAME " + rn + ":" + n);
+//realm_user1:role THE RELAN NAME realm_username:role.realm_username
+//realm_user1:realm_user1 THE RELAN NAME role.realm_username:user.realm_username
+
 		if (sqp.getTable().equals(tt)){
 		
 			//vm.remove(tt);
@@ -439,8 +486,10 @@ if (rn == null)
 
 	
 int type = sqp.getTableInfo().getColumnInfo(sqp.getRealColName(rn)).getColumnType();	
-if (rns.size() != sqps.size())
- 	 throw JGException.get("missing_join_dependencies",n + " Missing join dependencies " + rns);
+if (rns.size() > sqps.size())
+ 	 throw JGException.get("missing_join_dependencies",n + " Missing join dependencies " + rns + ":" + rns.size() + "!=" + sqps.size());
+//else
+ //	 //(n + " FOUND dependencies " + rns + ":" + rns.size() + "==" + sqps.size());
 
  en = rns.keys();
 
@@ -448,7 +497,17 @@ while (en.hasMoreElements()){
 	tt = en.nextElement().toString();
 	n = rns.get(tt);
 	s = (SQLParser)sqps.get(tt);
+	//("DID YO WOK " + tt + ":" + n + ":"  + s.getRealColName(n) + ":" + s.getTableInfo() + ":" + s.getTableInfo().getColumnInfo(s.getRealColName(n)) + ":" + s);
+	if (s.getTableInfo().getColumnInfo(s.getRealColName(n)) == null)
+	{
+			String t = (String)s.getAliases().get(s.getTable());
+	if (t != null)
+	{
+		s.setTable(t);
+	}
+	//("DID YO WOK @ FORCE " + tt + ":" + n + ":"  + s.getRealColName(n) + ":" + s.getTableInfo() + ":" + s.getTableInfo().getColumnInfo(s.getRealColName(n)) + ":" + s);
 
+	}
 	if (s.getTableInfo().getColumnInfo(s.getRealColName(n)).getColumnType() != type)
 		throw JGException.get("incompatible_join_criteria",n + " Incompatible join criteria " + tt);
 }
@@ -476,12 +535,20 @@ while (en.hasMoreElements()){
 		c = (Criteria)jincludealllist.elementAt(ct);
 		n = c.getName();
 		tt = findTable(n);
+		//("************TT1 " + tt);
 		if (sqp.getTableInfo().getColumnInfo(sqp.getRealColName(n)) != null)
 			tt = sqp.getTable();
+		//("************TT2 " + tt);
+
 		n2 = c.getValueString();
 		tt2 = findTable(n2);
 		if (sqp.getTableInfo().getColumnInfo(sqp.getRealColName(n2)) != null && !tt.equals(sqp.getTable()))
 			tt2 = sqp.getTable();
+	//role.realm_username Cannot join the same table realm_user1:realm_user1 
+		if (tt.equals(tt2))
+			tt = findTable(n);
+		//("************TT3 " + tt);
+
 		if (tt.equals(tt2))
 		 throw JGException.get("cannot_join_same_table",n + " Cannot join the same table " + tt + ":" + tt2);
 		
@@ -584,6 +651,8 @@ return sqps.elements();
 }
 
  SQLParser add(String t)throws SQLException{
+
+
 SQLParser s = sqps.get(t);
 if (s == null){
 	if (sqp != null && sqp.getTable() != null && sqp.getTable().equals(t))
@@ -792,6 +861,7 @@ void selectASPut(String t,String c,String a)throws SQLException{
 		public boolean addToIncludeList(String t,String a,String sal,String sar,Criteria cr)throws SQLException{
 		String l = cr.getName();
 		String r = cr.getValueString();
+	//(t + " UNION ADD TO INCLUDE LIST " + a + ":" + sal  + ":" + sar + ":" + l + ":" + r);
 			String left = findTable(t,a,sal,l);
 			String right = findTable(t,a,sar,r);
 
@@ -822,7 +892,7 @@ void selectASPut(String t,String c,String a)throws SQLException{
 			v   = new Vector<Criteria>();
 			l.put(right,v);
 		}
-		v.add(cr);*/
+		v. (cr);*/
 		return right;
 	}
 	
@@ -996,6 +1066,7 @@ return null;
 			selectASPut(t,itmn,itmn2);
 			itm = itmn2;
 			}
+			//else //(" NO AS 1 " + itm);
 			//}else
 					//(t + " SELECTSSS U 4 " + itm);
 
@@ -1019,7 +1090,8 @@ return null;
 
 			selectASPut(t,itmn,itmn2);
 			itm = itmn2;
-			}
+			}			//else //(" NO AS 2 " + itm);
+
 				//(t + " SELECTSSS U 5 " + itm);
 			
 				sl.add(itm);
@@ -1066,7 +1138,8 @@ return null;
 			String itmn2 = StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length()));
 			selectASPut(t,itmn,itmn2);
 			itm = itmn2;
-			}
+			}			//else //(" NO AS 3 " + itm);
+
 			
 			/* (t + " SELECTSSS U 2 " + itm);
 				if (itm.endsWith(".*"))
@@ -1099,7 +1172,7 @@ return null;
 			String itmn2 = StringUtil.getTrimmedValue(itm.substring(i + 3,itm.length()));
 			selectASPut(t,itmn,itmn2);
 			itm = itmn2;
-			}
+			}	//else //(" NO AS 4 " + itm);
 				//(t + " SELECTSSS U 3 " + itm);
 			
 				sl.add(itm);
@@ -1134,6 +1207,26 @@ return null;
 				add(upstr).addAlias(alias,upstr);
 				continue;
 			}
+			else if (upstr.indexOf(" ") > 0){
+				
+			  i = upstr.indexOf(" ");
+			  String ta = upstr.substring(0,i);
+			  String a = upstr.substring(i + 1,upstr.length());
+				a = a.trim();
+				ta = ta.trim();
+				if (!SQLParser.getReserved().contains(a)){
+				aliases.put(a,ta);
+				if (sqps.get(ta) == null)
+					add(ta);
+				add(ta).addAlias(ta,a);
+				//(ta + " FOUND AS 5 " + a);
+				continue;
+					
+				}
+			}
+				//else //(" NO AS 5 " + upstr);
+			
+			
 				upstr = upstr.trim();
 				if (sqps.get(upstr) == null)
 					add(upstr);

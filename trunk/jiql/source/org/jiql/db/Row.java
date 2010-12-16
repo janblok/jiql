@@ -144,7 +144,9 @@ public Object get(String cn){
 				
 				return jiqlCellValue.getObj(super.get(cn),Types.VARCHAR,sqp);
 		}catch (Exception e){
-				tools.util.LogMgr.err(cn + " ERROR Row.get null sqp " + e.toString());
+				tools.util.LogMgr.err(cn + " ERROR Row.get null sqp 1 " + e.toString() + ":" + sqp);
+				e.printStackTrace(System.out);
+				JGUtil.log(e);
 
 		}
 			cn = sqp.getRealColName(cn);
@@ -161,6 +163,7 @@ TableInfo ti = sqp.getTableInfo();
 					
 				cn = squ.getRealColName(cn);
 				ti = squ.getTableInfo();
+				//(squ.getTable() + " TI GET INGO " + ti);
 				ci = ti.getColumnInfo(cn);
 				
 				
@@ -173,13 +176,25 @@ TableInfo ti = sqp.getTableInfo();
 		}
 			try{
 			//(cn + ":" + this + ":" + ci + ":SIFDOR "  + super.get(cn));
-			
+			if (ci == null)
+			{
+					String t = (String)sqp.getAliases().get(sqp.getTable());
+					if (t != null)
+					{
+						sqp.setTable(t);
+				ti = sqp.getTableInfo();
+				//(sqp.getTable() + " TI GET INGO 2 " + ti);
+				ci = ti.getColumnInfo(cn);
+
+					}
+			}
 			return jiqlCellValue.getObj(super.get(cn),ci.getColumnType(),sqp);
 			}catch (Exception e){
-				tools.util.LogMgr.err(cn + " ERROR Row.get " + super.get(cn) + " " + e.toString());
-				e.printStackTrace();
-				// 
-				//
+				tools.util.LogMgr.err(cn + " ERROR Row.get 2 " + super.get(cn) + " " + e.toString() + ":" + ci + ":" + union + ":" + sqp);
+				//e.printStackTrace();
+				//e.printStackTrace(System.out);
+				JGUtil.log(e);
+
 			}
 return null;
 }

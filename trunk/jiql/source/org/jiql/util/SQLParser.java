@@ -124,7 +124,9 @@ public boolean hasTableleafs(){
 		sreserved.add("from");
 		reserved.add("group");
 	}
-
+public static Vector<String> getReserved(){
+	return reserved;
+}
 public DateFormat getDateFormat(){
 			return getConnection().getDateFormat();
 
@@ -312,8 +314,8 @@ public DateFormat getDateFormat(){
 		updateSelects();
 	}
 	
-	/*public static SQLParser get(String t,Properties u)throws SQLException{
-		return new SQLParser(t,u);
+	/*public static   get(String t,Properties u)throws SQLException{
+		return new  (t,u);
 	}*/
 	public static SQLParser get(String t,jiqlConnection c)throws SQLException{
 		return new SQLParser(t,c);
@@ -423,8 +425,15 @@ public DateFormat getDateFormat(){
 	CacheMgr.removeMetaCache(connection.getProperties().getProperty("baseUrl"),tbl);
 
 	}
+	String osql = null;
+	
+	public  String getOriginalSQL(){
+		return osql;
+	}
 	public void setSQLParser(String t,Properties u)throws SQLException{
 		properties = u;
+		if (osql == null)
+			osql = t;
 		tok = t;
 		toko = tok;
 		parse();
@@ -434,11 +443,11 @@ public DateFormat getDateFormat(){
 	}
 	
 	public String toString(){
-		return "jiql.SQLParser table:" + table + ";aliases:" + aliases  + ";values:" + hash + ";selects:" + selectList + ";selectAS:" + selectAS + ";selectAS2:" + selectAS2 +  ";includealllist:" +  includealllist + ";eitheroralllist:" + eitheroralllist + ";getOriginalSelectList:" + getOriginalSelectList()+ ";groupby:" + groupby + ";union:" + union;
+		return "jiql.SQLParser [ORIGINAL SQL:" + osql + " ] table:" + table + ";aliases:" + aliases  + ";values:" + hash + ";selects:" + selectList + ";selectAS:" + selectAS + ";selectAS2:" + selectAS2 +  ";includealllist:" +  includealllist + ";eitheroralllist:" + eitheroralllist + ";getOriginalSelectList:" + getOriginalSelectList()+ ";groupby:" + groupby + ";union:" + union;
 	}
 
 		/*public String toString(){
-		return "jiql.SQLParser table:" + table + "; s:" +    ;
+		return "jiql.  table:" + table + "; s:" +    ;
 	}*/
 	
 	public String getStatement(){
@@ -457,6 +466,18 @@ public DateFormat getDateFormat(){
 		if (t.startsWith("jiql."))
 			t = t.substring(5,t.length());
 		table = t;
+	
+		int i = table.indexOf(" ");
+	if (i > 0)
+	{
+		t = table;
+		String a = t.substring(i + 1,t.length());
+		t = t.substring(0,i);
+		table = t;
+		addAlias(t,a);
+	}
+	
+	
 		if (connection == null || !connection.isRemote())
 		try{
 		
@@ -2082,6 +2103,8 @@ public  jiqlConstraint getConstraint(){
 		sb = SharedMethods.replaceSubstringBuffer(sb,"join","jiql_replace_joi-n");
 		sb = SharedMethods.replaceSubstringBuffer(sb,"JOIN","jiql_replace_JOI-N");
 	  
+	  	//DOES NOTHING
+	  	
 
 		si = si.substring(i +1,si.length());
 		ns = ns + "'" + sb.toString() + "'";

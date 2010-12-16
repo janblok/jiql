@@ -580,7 +580,7 @@ return readTableValue(sqp,t,ez);
 
 public Hashtable readTableValueWhereLessThan(SQLParser sqp,String t,String n,Object v)throws SQLException{
 
-//return readTableValue(sqp,t,JIQLGDataUtil.listWhereLessThan( (t),n,v));	
+//return  (sqp,t,JIQLGDataUtil.listWhereLessThan( (t),n,v));	
 					EZArrayList ez = new EZArrayList();
 				int ct = 1;
 				String tn = null;
@@ -598,7 +598,7 @@ return readTableValue(sqp,t,ez);
 
 public Hashtable readTableValueWhereGreaterThan(SQLParser sqp,String t,String n,Object v)throws SQLException{
 
-//return readTableValue(sqp,t,JIQLGDataUtil.listWhereGreaterThan( (t),n,v));	
+//return  (sqp,t,JIQLGDataUtil.listWhereGreaterThan( (t),n,v));	
 
 	EZArrayList ez = new EZArrayList();
 	int ct = 1;
@@ -617,7 +617,7 @@ public Hashtable readTableValueWhereGreaterThan(SQLParser sqp,String t,String n,
 
 public Hashtable readTableValueWhereLessThanOrEqual(SQLParser sqp,String t,String n,Object v)throws SQLException{
 
-//return readTableValue(sqp,t,JIQLGDataUtil.listWhereLessThanOrEqual( (t),n,v));	
+//return  (sqp,t,JIQLGDataUtil.listWhereLessThanOrEqual( (t),n,v));	
 	EZArrayList ez = new EZArrayList();
 	int ct = 1;
 	String tn = null;
@@ -635,7 +635,7 @@ public Hashtable readTableValueWhereLessThanOrEqual(SQLParser sqp,String t,Strin
 
 public Hashtable readTableValueWhereGreaterThanOrEqual(SQLParser sqp,String t,String n,Object v)throws SQLException{
 
-//return readTableValue(sqp,t,JIQLGDataUtil.listWhereGreaterThanOrEqual( (t),n,v));	
+//return  (sqp,t,JIQLGDataUtil.listWhereGreaterThanOrEqual( (t),n,v));	
 	EZArrayList ez = new EZArrayList();
 	int ct = 1;
 	String tn = null;
@@ -681,7 +681,7 @@ static Hashtable tkeys = new HashCache();
 				if (k != null)return k;
 				/*if (JIQLGDataUtil.get(t,leafstem) == null)
 				{
-					JIQLGDataUtil.put(t,new Hashtable(),leafstem);
+					 (t,new Hashtable(),leafstem);
 				}*/
 				k = KeyFactory.createKey(t,leafstem);
 				synchronized (tkeys){
@@ -832,8 +832,35 @@ static int maxTS = 5000;
      throws SQLException
 
     {
+			//String enc = (String)sqp.getProperties().get("encoding");
+			/*if (enc != null){
+			Enumeration en = hash.keys();
+			String k = null;
+			Object v = null;
+			Object dv = null;
+		
+			while (en.hasMoreElements()){
+			k = en.nextElement().toString();
+			v = hash.get(k).toString();
 
+			if (v != null){
+				if (v instanceof String){
+					try{
+					System.out.println(k + " WR ENCODE RR " + v);
+					v = new String(v.toString().getBytes(), "UTF-8");
+					System.out.println(k + " WR ENCODED RR " + v);
+					hash.put(k,v);
+					}catch (java.io.UnsupportedEncodingException ue){
+					throw JGException.get("UnsupportedEncodingException","Error writing to table : " + ue.toString());
 
+					} 
+				}
+			
+			}
+			}
+			}*/
+			
+			
 	Throwable ex = null;
 for (int ct = 0; ct < writeTries;ct++)
 {
@@ -934,7 +961,7 @@ Thread.currentThread().sleep(wtP);
 
 				while (true){
 				tn = convertToJiql(t,ct,sqp);
-				//(String.valueOf(tid. (ct)) + " readTableValue " + tn + ":" + ct);
+				//(String.valueOf(tid. (ct)) + "   " + tn + ":" + ct);
 				if (getLeafCount(t,ct,sqp) <= 0)
 					break;
 				v.addEnumeration(JIQLGDataUtil.list(tn).elements(),v);
@@ -958,12 +985,15 @@ Thread.currentThread().sleep(wtP);
 					for (int ct = 0; ct < v.size();ct++)
 					{
 						jn = (JGNameValuePairs)v.elementAt(ct);
+					//	String enc = (String)sqp.getProperties().get("encoding");
+					//	if (enc != null)
+					//		jn.setEncoding(enc);
 						if (jn.getKeyName().equals(leafstem))
 							continue;
 						nv = new Row(jn);
 						nv.setSQLParser(sqp);
-						//(jn + " ****** readTableValue 1 ***** " + nv);
-						//(jn.getKeyName() + " ****** readTableValue 2 ***** " + nv.getRowId());
+						//(jn + " ******   1 ***** " + nv);
+						//(jn.getKeyName() + " ******   2 ***** " + nv.getRowId());
 						
 						
 						h.put(nv.getRowId(),nv);
@@ -999,7 +1029,7 @@ return ez;
 
 public int countTableValueWhereLessThan(SQLParser sqp,String t,String n,Object v)throws SQLException{
 
-//return readTableValue(sqp,t,JIQLGDataUtil.countWhereLessThan( (t),n,v));	
+//return  (sqp,t,JIQLGDataUtil.countWhereLessThan( (t),n,v));	
 					int ez = 0;
 				int ct = 1;
 				String tn = null;
@@ -1017,7 +1047,7 @@ return ez;
 
 public int countTableValueWhereGreaterThan(SQLParser sqp,String t,String n,Object v)throws SQLException{
 
-//return readTableValue(sqp,t,JIQLGDataUtil.countWhereGreaterThan( (t),n,v));	
+//return  (sqp,t,JIQLGDataUtil.countWhereGreaterThan( (t),n,v));	
 
 	int ez = 0;
 	int ct = 1;
@@ -1036,7 +1066,7 @@ public int countTableValueWhereGreaterThan(SQLParser sqp,String t,String n,Objec
 
 public int countTableValueWhereLessThanOrEqual(SQLParser sqp,String t,String n,Object v)throws SQLException{
 
-//return readTableValue(sqp,t,JIQLGDataUtil.countWhereLessThanOrEqual( (t),n,v));	
+//return  (sqp,t,JIQLGDataUtil.countWhereLessThanOrEqual( (t),n,v));	
 	int ez = 0;
 	int ct = 1;
 	String tn = null;
@@ -1054,7 +1084,7 @@ public int countTableValueWhereLessThanOrEqual(SQLParser sqp,String t,String n,O
 
 public int countTableValueWhereGreaterThanOrEqual(SQLParser sqp,String t,String n,Object v)throws SQLException{
 
-//return readTableValue(sqp,t,JIQLGDataUtil.countWhereGreaterThanOrEqual( (t),n,v));	
+//return  (sqp,t,JIQLGDataUtil.countWhereGreaterThanOrEqual( (t),n,v));	
 	int ez = 0;
 	int ct = 1;
 	String tn = null;

@@ -97,6 +97,7 @@ String user = null;
 String password  = null;
 String  sql = null;
 String dfo = null;
+String enc = null;
 if (isMultipart){
 	
 	
@@ -160,6 +161,8 @@ else if (n.equals("user"))
 	user = pars.get(n).toString();
 else if (n.equals("date.format"))
 	dfo = pars.get(n).toString();
+else if (n.equals("encoding"))
+	enc = pars.get(n).toString();
 }
 }	
 	
@@ -201,6 +204,12 @@ if (dfo == null)
 dfo = req.getParameter("date.format");
 if (dfo != null)
 nvp.put("date.format",dfo);
+
+if (enc == null)
+enc = req.getParameter("encoding");
+if (enc != null)
+nvp.put("encoding",enc);
+
  Conn = get(nvp);
  
 org.jiql.jdbc.Statement Stmt = (org.jiql.jdbc.Statement)Conn.createStatement();
@@ -224,6 +233,8 @@ org.jiql.jdbc.ResultSet res = (org.jiql.jdbc.ResultSet)Stmt.getResultSet();
 
  //h.put("remote","true");
             resp.setContentType("binary/object");
+           // if (enc != null)
+            //	resp.setCharacterEncoding(enc);
             OutputStream fos = resp.getOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(h);

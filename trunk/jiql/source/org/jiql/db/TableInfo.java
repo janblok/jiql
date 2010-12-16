@@ -86,14 +86,41 @@ public void include(SQLParser sqp)throws SQLException{
 	Vector inc = new Vector();
 	ColumnInfo ci = null;
 
-	if (v.contains("*") )
+	if (v.contains("*") || (v.size() == 1 && v.elementAt(0).toString().endsWith(".*")))
 	{
 		try{
 		
 		Vector co = sqp.getJiqlTableInfo().getFieldList();
+		String al = null;
+		if ((v.size() == 1 && v.elementAt(0).toString().endsWith(".*")))
+		{
+			al = v.elementAt(0).toString();
+			al = al.substring(0,al.length() - 1);
+			/*Vector co2 = (Vector)co.clone();
+			co = new Vector();
+		for (int ct = 0; ct < co2.size();ct++)
+	{
+		co.add(al + co2.elementAt(ct));
+		
+	}*/
+			sqp.addAlias(sqp.getTable(),al);
+			//(v + " FORCE WILD CARD CLONE " + co + ":" + sqp);
+			
+		}
+		//(v + " FORCE WILD CARD " + co + ":" + sqp.getTable());
 		for (int ct = 0; ct < co.size();ct++)
 	{
 		ci = getColumnInfo(co.elementAt(ct).toString());
+		if (al != null)
+		{
+		
+		ci = ci.copy();
+		ci.setDisplayName(al + co.elementAt(ct).toString());
+		}
+
+		
+		//(v + " FORCE WILD CARD 2b " + co + ":" + sqp.getTable() + ":" + ci + ":" + co.elementAt(ct));
+
 			inc.add(ci);
 	}
 
@@ -112,6 +139,8 @@ public void include(SQLParser sqp)throws SQLException{
 		return;
 		}catch (Exception e){
 			tools.util.LogMgr.err("TableInfo.inc* " + e.toString());
+			e.printStackTrace();
+			org.jiql.util.JGUtil.log(e);
 		}
 	}
 /*Vector v2 = new Vector();
@@ -143,9 +172,14 @@ String rn = null;
 		if (rn.equals(ci.getName()))
 			break;
 	}
+		//(size()  + " TI 1 " + ci + ":" + this + ":" + v + ":" + rn + ":" + dn);
+		if (ci != null)
+		{
+		
 		ci = ci.copy();
 		ci.setDisplayName(dn);
 		inc.add(ci);
+		}
 	}
 	
 		while (size() > 0)

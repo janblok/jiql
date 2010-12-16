@@ -307,7 +307,7 @@ return null;
 	public Hashtable readTableValue(String t,Vector incl,SQLParser sqp)throws SQLException{
 	    	//Hashtable h = null;
 	    	//if (incl == null || incl.size() < 1){
-	    	//	return readTableValue(sqp,t);
+	    	//	return  (sqp,t);
 	    	//}
 	    	
 	    	Hashtable h = null;
@@ -322,7 +322,7 @@ return null;
 	    		return readTableValue(sqp,t);
 	    	}
 	    	
-	    	//h = readTableValue(sqp,t);
+	    	//h =  (sqp,t);
 	    	//if (h == null) return null;
 	    	//if (incl == null || incl.size() < 1)return h;
 	    	
@@ -559,8 +559,8 @@ else if (cr.getCompareOperator().equals(">"))
 	}
 
 
-	/*public Hashtable readTableValue(String t,Vector incl,Vector selL,Vector jeor,SQLParser sqp)throws SQLException{
-			return readTableValue(t,incl,selL,jeor,false,sqp);
+	/*public Hashtable  (String t,Vector incl,Vector selL,Vector jeor,SQLParser sqp)throws SQLException{
+			return  (t,incl,selL,jeor,false,sqp);
 	}*/
 
 	public Hashtable readTableValue(String t,Vector incl,Vector selL,Vector jeor,boolean distinct,SQLParser sqp)throws SQLException{
@@ -614,8 +614,8 @@ return 0;
 
 	public Hashtable readTableValue(String t,Vector incl,Vector selL,Vector jeor,SQLParser sqp)throws SQLException{
 	    	Hashtable h = readTableValue(t,incl,sqp);
-			//(t + " readTableValue " + incl + ":" +   + ":" + jeor + ":" + sqp + ":" + h);
-//realm_userrole readTableValue null:null:[SQLCriteria:realm_user=ruser2]:org.jiql.util.SQLParser@a02839:{7138={realm_rolename=role2, realm_user=ruser1}, 6140={realm_rolename=role2, realm_user=ruser2}} 
+			//(t + "   " + incl + ":" +   + ":" + jeor + ":" + sqp + ":" + h);
+//realm_userrole   null:null:[SQLCriteria:realm_user=ruser2]:org.jiql.util.SQLParser@a02839:{7138={realm_rolename=role2, realm_user=ruser1}, 6140={realm_rolename=role2, realm_user=ruser2}} 
 	    	if (h == null) return null;
 	    	String id = null;
 	    	Row row = null;
@@ -626,8 +626,8 @@ return 0;
 	    	jiqlCellValue c1 = null;
 	    	jiqlCellValue c2 = null;
 	    	int typ = 0;
-		//	 .log(ti + ":" + t + " readTableValue2 " + incl + ":" +   + ":" + jeor + ":" + sqp);
-//testable5 readTableValue2 [SQLCriteria:countf=3]:[]:[]:org.jiql.util.SQLParser@1a5fb5a    	
+		//	 .log(ti + ":" + t + "  2 " + incl + ":" +   + ":" + jeor + ":" + sqp);
+//testable5  2 [SQLCriteria:countf=3]:[]:[]:org.jiql.util.SQLParser@1a5fb5a    	
 			String crn = null;
 	    	if (jeor != null && jeor.size() > 0)
 	    	{

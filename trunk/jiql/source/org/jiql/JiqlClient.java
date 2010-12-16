@@ -90,6 +90,9 @@ public class JiqlClient
              method.addParameter("date.format", hash.getProperty("date.format"));
 
             method.addParameter("query", sql);
+			if (StringUtil.isRealString(hash.getProperty("encoding")))
+             method.addParameter("encoding", hash.getProperty("encoding"));
+
 
 		if (dv.size() > 0)
 		{
