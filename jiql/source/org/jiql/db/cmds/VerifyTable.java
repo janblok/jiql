@@ -43,8 +43,30 @@ public Object execute(SQLParser sqp)throws SQLException{
 			jiqlTableInfo jti = sqp.getJiqlTableInfo();
 			//jiqlDBMgr.get(sqp.getProperties()).getTableInfo(sqp.getTable(),true);
 if (jti == null )
-	throw JGException.get("table_does_not_exists",sqp.getTable() + " Table does NOT Exists " + sqp);
+{
+	/*int i = sqp.getTable().indexOf(" ");
+	if (i > 0)
+	{
+		String t = sqp.getTable();
+		String a = t.substring(i + 1,t.length());
+		t = t.substring(0,i);
+		sqp.setTable(t);
+		sqp.addAlias(t,a);
+		jti = sqp.getJiqlTableInfo();
+	}
+	else*/{
+	
+	String t = (String)sqp.getAliases().get(sqp.getTable());
+	if (t != null)
+	{
+		sqp.setTable(t);
+		jti = sqp.getJiqlTableInfo();
+	}
+	}
 
+	if (jti == null )
+	throw JGException.get("table_does_not_exists",sqp.getTable() + " Table does NOT Exists " + sqp);
+}
 		//TableInfo ti = Gateway.get(sqp.getProperties()).readTableInfo(sqp.getTable());
 					TableInfo ti = sqp.getTableInfo();
 			if (ti == null)

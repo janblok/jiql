@@ -35,6 +35,8 @@ public class JGNameValuePairs extends NameValuePairs
 	private long kid = 0;
 	private String kidn = null;
 	private String tn = null;
+	String enc = null;
+	
 		public  JGNameValuePairs ()
 	{
 		super();
@@ -45,6 +47,37 @@ public class JGNameValuePairs extends NameValuePairs
 		super(fields);
 		
 	}
+	
+		public void setEncoding(String ki){
+		enc = ki;
+	}
+	
+	/*public Object get(Object k){
+		Object v = super.get(k);
+
+			if (v != null){
+				if (v instanceof String){
+					try{
+						if (k.equals("name") || k.equals("id"))
+						{
+						 
+					System.out.println(k + " WR ENCODE yes  '????' RRR " + v);
+					v = new String(v.toString().getBytes(), enc);
+					System.out.println(k + " WR ENCODED RRR " + v);
+					return v;
+						}
+					}catch (java.io.UnsupportedEncodingException ue){
+					//throw JGException.get("UnsupportedEncodingException","Error writing to table : " + ue.toString());
+
+					} 
+				}
+			
+			}
+
+	
+		return v;
+	}*/
+	
 	public void setKeyId(long ki){
 		kid = ki;
 	}
